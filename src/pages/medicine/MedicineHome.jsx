@@ -1,9 +1,13 @@
 // src/pages/medicine/MedicineHome.jsx
 import React from 'react'
+import MedicineHero from './MedicineHero'
 
 function MedicineHome() {
   return (
-    <div>MedicineHome</div>
+    <div>
+      <MedicineHero/>
+      
+    </div>
   )
 }
 
