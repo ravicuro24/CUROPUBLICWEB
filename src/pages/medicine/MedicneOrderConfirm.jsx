@@ -8,34 +8,35 @@ function MedicineOrderConfirm() {
     const navigate = useNavigate();
 
     const { payment, cartData, totalAmount } = location.state || {};
-    console.log(payment,cartData,totalAmount)
+    console.log(payment, cartData, totalAmount)
 
     useEffect(() => {
         setTimeout(() => setAnimate(true), 300);
+        window.scrollTo(0, 0)
     }, []);
 
     return (
-        <div className="min-h-screen bg-teal-50 flex items-center justify-center p-4">
-            <div className="bg-white w-full max-w-xl rounded-2xl shadow-lg p-6 border border-teal-200">
+        <div className="min-h-screen flex items-center justify-center p-4">
+            <div className="bg-white w-full max-w-xl rounded-lg shadow-lg p-6 ">
 
                 {/* ICON + TITLE SIDE BY SIDE */}
-                <div className="flex items-center gap-3 justify-center">
+                <div className="flex flex-col items-center gap-1 justify-center">
 
                     {/* Animated Green Box */}
                     <div className="relative">
                         <div
-                            className={`w-10 h-10 bg-green-500 rounded-lg shadow-lg 
-                transition-all duration-500 
-                ${animate ? "scale-100 opacity-100" : "scale-0 opacity-0"}
-              `}
+                            className={`w-20 h-20 bg-green-500 rounded-full shadow-lg 
+                                    transition-all duration-500 
+                                    ${animate ? "scale-100 opacity-100" : "scale-0 opacity-0"}
+                                `}
                         ></div>
 
                         {/* Tick Animation */}
                         <svg
-                            className={`absolute top-0 left-0 w-10 h-10 p-2 
-                transition-opacity duration-500 
-                ${animate ? "opacity-100" : "opacity-0"}
-              `}
+                            className={`absolute top-0 left-0 w-20 h-20 p-2 
+                            transition-opacity duration-500 
+                            ${animate ? "opacity-100" : "opacity-0"}
+                        `}
                             viewBox="0 0 52 52"
                         >
                             <path

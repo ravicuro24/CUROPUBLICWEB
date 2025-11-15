@@ -12,6 +12,7 @@ import MedicineDetails from '../pages/medicine/MedicineDetails'
 import MedicineCheckout from '../pages/medicine/MedicineCheckout'
 import MedicinePaymentMethod from '../pages/medicine/MedicinePaymentMethod'
 import MedicneOrderConfirm from '../pages/medicine/MedicneOrderConfirm'
+import SubCategoryMedicineDetails from '../pages/medicine/SubCategoryMedicineDetails'
 
 function Router() {
   return (
@@ -25,6 +26,7 @@ function Router() {
         <Route path='/medicine/cart' element={<MedicineCartItems />} />
         <Route path='/medicine/shopbyhealthconcern/medicine/:name' element={<ShopByHealthConcernMedicne />}/>
         <Route path='/medicine/shopbyhealthconcern/medicine_details' element={<MedicineDetails />}/>
+        <Route path='/medicine/subCategory/medicine_details' element={<SubCategoryMedicineDetails />}/>
         <Route path='/medicine/checkout' element={<MedicineCheckout />}/>
         <Route path='/medicine/payemnt' element={<MedicinePaymentMethod />}/>
         <Route path='/medicine/checkout/order-confirm' element={<MedicneOrderConfirm />}/>

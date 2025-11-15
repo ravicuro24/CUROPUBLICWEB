@@ -2,10 +2,12 @@
 import React, { useState } from "react";
 import { useAuth } from "../../Authorization/AuthContext";
 import axiosInstance from "../../Authorization/axiosInstance";
+import { useNavigate } from "react-router-dom";
 
 function MedicineProductBySubCategory({ productList = [] }) {
     const { userData, getAllMedicineCartItems } = useAuth()
     const [addingCartId, setAddingCartItd] = useState(null)
+    const navigate = useNavigate()
     const userId = userData?.id
 
 
@@ -26,9 +28,13 @@ function MedicineProductBySubCategory({ productList = [] }) {
 
     return (
         <div className="space-y-3 md:space-y-4 px-3 h-screen  w-full">
-
             {productList.map((item, index) => (
                 <div
+                    onClick={() =>
+                        navigate('/medicine/subCategory/medicine_details', {
+                            state: { medicineList: item }
+                        })
+                    }
                     key={index}
                     className="flex items-center bg-white border border-gray-200 rounded-md p-3 shadow-sm"
                 >

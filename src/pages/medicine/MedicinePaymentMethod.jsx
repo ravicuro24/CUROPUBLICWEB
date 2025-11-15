@@ -8,18 +8,18 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchAddresses } from '../../redux/features/addressSlice';
 import { FaHome, FaPlus } from "react-icons/fa";
 import { FaBuildingColumns } from "react-icons/fa6";
+import axiosInstance from '../../Authorization/axiosInstance';
 
-function PaymentMethod() {
-    const { userData } = useAuth();
+function PaymentMethod({ from }) {
+    const { userData, getAllMedicineCartItems } = useAuth();
     const userId = userData?.id;
     const dispatch = useDispatch();
     const location = useLocation();
     const navigate = useNavigate();
-
     const { cartData, totalAmount } = location.state || {};
-
     const [selectedPayment, setSelectedPayment] = useState('cod');
     const [selectedAddressId, setSelectedAddressId] = useState(null);
+    const [loading, setLoading] = useState()
 
     const { addresses } = useSelector((state) => state.address);
 
@@ -52,11 +52,23 @@ function PaymentMethod() {
         setSelectedPayment(method);
     };
 
-    const handlePlaceOrder = () => {
 
-        console.log(selectedPayment)
-        navigate('/medicine/checkout/order-confirm', { state: { payment: selectedPayment, totalAmount, cartData } })
+    const handlePlaceOrder = async () => {       
+        setLoading(true);
+        try {
+            const response = await axiosInstance.post(
+                `/endUserEndPoint/createEndUserOrder?userId=${userId}&selectedAddressId=${selectedAddressId}&from=${from || ""}`
+            );
+            console.log("order", response);
+            navigate('/medicine/checkout/order-confirm', { state: { payment: selectedPayment, totalAmount, cartData } })
+            setLoading(false)
+            await getAllMedicineCartItems(userId);
+        } catch (error) {
+            console.log(error);
+            setLoading(false);
+        }
     };
+
 
     const paymentMethods = [
         { value: 'cod', label: 'Cash on Delivery', icon: 'https://cdn-icons-png.flaticon.com/128/6491/6491623.png' },
@@ -208,8 +220,8 @@ function PaymentMethod() {
                                 ? "bg-green-600 hover:bg-green-700 cursor-pointer"
                                 : "bg-gray-300 cursor-not-allowed"
                             }`}
-                    >
-                        Place Order ₹{totalAmount}
+                     >
+                       {loading? <span className="loading loading-spinner loading-sm"></span>: `Place Order ₹${totalAmount}`}
                     </button>
                 </div>
             </div>

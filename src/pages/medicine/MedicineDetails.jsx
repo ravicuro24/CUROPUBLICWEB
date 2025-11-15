@@ -4,16 +4,39 @@ import { useLocation } from "react-router-dom";
 import { PiCurrencyInrBold } from "react-icons/pi";
 import { MdMedicalServices, MdLocalHospital } from "react-icons/md";
 import SimilarMedicineProduct from "./SimilarMedicineProduct";
+import axiosInstance from "../../Authorization/axiosInstance";
+import { useAuth } from "../../Authorization/AuthContext";
+import { toast } from "react-toastify";
 
 export default function MedicineDetails() {
+    const { userData, getAllMedicineCartItems } = useAuth()
+    const userId = userData?.id
     const { state } = useLocation();
     const medicine = state?.medicine;
+    const [addingCart, setAddingCart] = useState(false)
+
 
     if (!medicine) return <div>No medicine data found.</div>;
 
     const [activeImage, setActiveImage] = useState(
         medicine.medicine?.imagesUrl?.[0] || ""
     );
+
+    const handleAddtocart = async (item) => {
+        console.log("item", item.id)
+        try {
+            setAddingCart(true)
+            const response = await axiosInstance.post(
+                `/endUserEndPoint/addToCart?userId=${userId}&batchId=${item?.id}`
+            );
+            await getAllMedicineCartItems(userId);
+            setAddingCart(false)
+            toast.success(`${medicine.medicine?.name} Added in cart`);
+        } catch (error) {
+            console.log("error add to cart", error.respose)
+            setActiveImage(false)
+        }
+    }
 
     return (
         <div className="p-6 container mx-auto min-h-screen">
@@ -52,7 +75,7 @@ export default function MedicineDetails() {
 
                             {/* NAME */}
                             <h1 className="text-lg md:text-xl font-bold text-gray-800">
-                                {medicine.medicine?.name || medicine.name}
+                                {medicine.medicine?.name}
                             </h1>
 
                             {/* RATING + REVIEWS */}
@@ -118,13 +141,15 @@ export default function MedicineDetails() {
                         </div>
                         <span className="text-gray-400 text-xs">Inclusive of all taxes</span>
 
-                        <button className="bg-green-600 cursor-pointer w-full py-2 text-white rounded-md text-lg font-medium hover:bg-green-700 transition mt-4">
+                        <button
+                            onClick={() => handleAddtocart(medicine)}
+                            className="bg-green-600 cursor-pointer w-full py-2 text-white rounded-md text-lg font-medium hover:bg-green-700 transition mt-4">
                             Add to cart
                         </button>
                     </div>
                 </div>
             </div>
-            <SimilarMedicineProduct name={medicine.medicine?.prescribedFor || ""} />
+            <SimilarMedicineProduct name={medicine.medicine?.prescribedFor || medicine.medicine?.symptoms[0]} />
         </div>
     );
 }

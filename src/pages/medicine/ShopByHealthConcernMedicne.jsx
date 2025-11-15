@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axiosInstance from "../../Authorization/axiosInstance";
+import { toast } from 'react-toastify';
 
 const ShopByHealthConcernMedicne = () => {
     const { name } = useParams();
@@ -10,9 +11,11 @@ const ShopByHealthConcernMedicne = () => {
     const [loading, setLoading] = useState(false);
     const [medicines, setMedicines] = useState([]);
     const navigate = useNavigate()
+  
 
     useEffect(() => {
         getShopMedication();
+        window.scrollTo(0,0)
     }, [name, pageNum]);
 
     const getShopMedication = async () => {

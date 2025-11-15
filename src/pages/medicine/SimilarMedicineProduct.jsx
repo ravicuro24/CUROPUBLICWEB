@@ -38,20 +38,20 @@ export default function SimilarMedicineProduct({ name }) {
                 <div
                     className={`${
                         isScrollable
-                            ? "flex gap-4 overflow-x-auto scrollbar-hide py-2"
+                            ? "flex gap-4 overflow-x-auto hide-scrollbar scrollbar-hide py-2"
                             : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6"
                     }`}
-                >
+                 >
                     {medicines.map((item) => {
                         const m = item.medicine || {};
 
                         return (
                             <div
                                 key={item.id}
-                                className={`min-w-[150px] sm:min-w-[180px] md:min-w-[200px] ${
+                                className={`min-w-[150px] sm:min-w-[180px] md:min-w-[200px]  ${
                                     isScrollable ? "flex-shrink-0" : ""
                                 } rounded-xl p-3 bg-white shadow-sm hover:shadow-md transition-all cursor-pointer`}
-                            >
+                             >
                                 {/* SALE Badge */}
                                 <span className="bg-green-600 text-white text-xs px-2 py-1 rounded-md font-semibold">
                                     SALE
