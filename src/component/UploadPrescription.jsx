@@ -18,7 +18,7 @@ function UploadPrescription() {
     return (
         <>
             <div className='container  md:mx-auto mx-2'>
-                <div className='w-full bg-[#e0ffff] py-8 rounded-md border border-gray-200'>
+                <div className='w-full bg-[#e0ffff] py-8 rounded-md shadow-md'>
                     <div className='flex justify-center items-center flex-col'>
                         <div className='bg-teal-600 p-4 rounded-full'>
                             <FiUpload size={24} className='text-white' />

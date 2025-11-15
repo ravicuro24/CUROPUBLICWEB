@@ -6,7 +6,7 @@ export default function UpcommingStaus() {
   return (
     <div className=" container mx-2 md:mx-auto  flex flex-col items-center">
 
-      <div className=" bg-white border border-gray-200 rounded-md shadow-sm mt-10 w-full ">
+      <div className=" bg-white shdow-md rounded-md shadow-sm mt-10 w-full ">
 
         {/* Delivery Status */}
         <div className="py-3 px-4">

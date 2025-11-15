@@ -7,7 +7,7 @@ import heroImg from '../assets/hero.png'
 const Hero = () => {
     return (
 
-        <section className="w-full bg-white py-10 container md:mx-auto mx-2  mt-2">
+        <section className="w-full  py-10 container md:mx-auto mx-2  mt-2">
             <div className="w-full mx-auto flex flex-col md:flex-row items-center justify-between gap-10">
                 {/* Left Content */}
                 <div className="flex-1 text-center md:text-left">

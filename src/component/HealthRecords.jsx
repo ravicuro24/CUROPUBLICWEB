@@ -8,7 +8,7 @@ import { MdKeyboardArrowRight } from "react-icons/md";
 function HealthRecords() {
     return (
         <>
-            <div className='container mx-auto border border-gray-200 rounded-md my-10 p-6'>
+            <div className='container bg-white mx-auto shadow-md rounded-md my-10 p-6'>
                 <div className='flex flex-row justify-between items-center'>
                     <div className='flex flex-row justify-start items-center gap-10'>
                         <div className='bg-yellow-50 p-4 rounded-full'><FaHandHoldingHeart className='text-amber-600' /></div>
