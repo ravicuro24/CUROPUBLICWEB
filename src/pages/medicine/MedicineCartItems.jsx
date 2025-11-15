@@ -11,6 +11,7 @@ import { FiShoppingCart } from "react-icons/fi";
 function MedicineCartItems() {
     const navigate = useNavigate();
     const { userData, getAllMedicineCartItems } = useAuth();
+    const [handlingChareg, setHandlingChareg] = useState(12)
 
     const [cartData, setCartData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -149,80 +150,157 @@ function MedicineCartItems() {
             </p>
 
             {/* CART LIST */}
-            <div className="mt-4 space-y-4">
-                {cartData.map((item) => {
-                    const medicine = item.medicineBatch?.medicine;
+            <div className="flex gap-4 ">
+                <div className="mt-4 space-y-4 w-2/3 border-r border-gray-300 pr-4">
+                    {cartData.map((item) => {
+                        const medicine = item.medicineBatch?.medicine;
 
-                    return (
-                        <div
-                            key={item.id}
-                            className="bg-white  p-4 rounded-md border border-gray-200 flex justify-between items-center gap-4 "
-                        >
+                        return (
+                            <div
+                                key={item.id}
+                                className="p-4  flex justify-between items-center gap-4  border-b border-gray-300 "
+                            >
 
 
-                            <div className="flex gap-4">
-                                <img
-                                    src={
-                                        medicine?.imagesUrl?.[0] ||
-                                        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQywcmMUL-iZxqJ_yZYp67MaZefH7aXhMPS5w&s"
-                                    }
-                                    className="w-20 h-20 object-contain bg-gray-100 rounded"
-                                />
+                                <div className="flex gap-4">
+                                    <img
+                                        src={
+                                            medicine?.imagesUrl?.[0] ||
+                                            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQywcmMUL-iZxqJ_yZYp67MaZefH7aXhMPS5w&s"
+                                        }
+                                        className="w-20 h-20 object-contain bg-gray-100 rounded"
+                                    />
+                                    <div>
+                                        <h3 className="font-semibold text-gray-900 line-clamp-2">
+                                            {medicine?.name || "Medicine"}
+                                        </h3>
+                                        <p className="text-xs mt-1 text-gray-600">Strip of 10 tablets</p>
+
+                                    </div>
+                                </div>
+
                                 <div>
-                                    <h3 className="font-semibold text-gray-900 line-clamp-2">
-                                        {medicine?.name || "Medicine"}
-                                    </h3>
+                                    <div>
+                                        <p className="text-sm text-gray-600">
+                                            ₹{item.unitPrice} × {item.quantity} ={" "}
+                                            <span className="font-semibold">
+                                                ₹{item.unitPrice * item.quantity}
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center gap-3 border border-green-600 w-32 mt-2 px-2 py-1 ">
 
-                                    <p className="text-sm text-gray-600">
-                                        ₹{item.unitPrice} × {item.quantity} ={" "}
-                                        <span className="font-semibold">
-                                            ₹{item.unitPrice * item.quantity}
+                                        {/* LEFT BUTTON -> Trash OR "-" */}
+                                        {item.quantity === 1 ? (
+                                            <button
+                                                onClick={() => handleDeleteItem(item)}
+                                                className="w-7 h-7 flex items-center justify-center rounded-full hover:cursor-pointer transition "
+                                            >
+                                                <FaRegTrashAlt className="text-red-500 text-sm" />
+                                            </button>
+                                        ) : (
+                                            <button
+                                                onClick={() => handleDecrease(item.id)}
+                                                className="w-7 h-7 flex items-center justify-center  hover:bg-gray-100 cursor-pointer"
+                                            >
+                                                −
+                                            </button>
+                                        )}
+
+                                        {/* Quantity Number */}
+                                        <span className="font-semibold text-gray-700 min-w-[1rem] text-center cursor-pointer">
+                                            {item.quantity}
                                         </span>
-                                    </p>
 
-                                    {/* Quantity Control */}
-                                    <div className="flex items-center gap-3 bg-gray-100 w-28 mt-2 px-2 py-1 rounded">
+                                        {/* INCREASE BUTTON */}
                                         <button
-                                            className="bg-white cursor-pointer w-7 h-7 rounded-full shadow flex items-center justify-center"
-                                            onClick={() => handleDecrease(item.id)}
-                                        >
-                                            −
-                                        </button>
-
-                                        <span className="font-semibold">{item.quantity}</span>
-
-                                        <button
-                                            className="bg-white cursor-pointer w-7 h-7 rounded-full shadow flex items-center justify-center"
                                             onClick={() => handleIncrease(item.id)}
+                                            className="w-7 h-7 flex items-center justify-center rounded-full  hover:bg-gray-100"
                                         >
                                             +
                                         </button>
+
                                     </div>
+
                                 </div>
                             </div>
+                        );
+                    })}
+                </div>
+                <div className="w-1/4   mt-10 ml-10 ">
+                    <div className="  mx-auto w-full">
 
-                            <button className="mr-10 cursor-pointer hover:bg-red-200 rounded-full p-2 bg-red-50 transition duration-300" onClick={() => handleDeleteItem(item)}>
-                                <FaRegTrashAlt className="text-red-500 cursor-pointer" />
-                            </button>
+                        <h2 className="text-lg font-semibold text-gray-800 mb-4">
+                            Bill Summary
+                        </h2>
+
+                        <div className="space-y-3 text-sm">
+
+                            {/* Item Total */}
+                            <div className="flex justify-between text-gray-700">
+                                <span>Item total (MRP)</span>
+                                <span className="font-medium">₹{totalAmount.toFixed(2)}</span>
+                            </div>
+
+                            {/* Handling Charges */}
+                            <div className="flex justify-between text-gray-700">
+                                <span>Handling charges</span>
+                                <span className="font-medium">₹{handlingChareg}</span>
+                            </div>
+
+                            {/* Total Discount */}
+                            <div className="flex justify-between text-gray-700">
+                                <span>Total discount</span>
+                                <span className="font-medium text-green-600">0</span>
+                            </div>
+
+                            {/* Shipping Fee */}
+                            <div className="flex justify-between text-gray-700">
+                                <span>Shipping fee</span>
+                                <span className="font-medium text-green-600">Free</span>
+                            </div>
+
                         </div>
-                    );
-                })}
+
+                        <hr className="my-4" />
+
+                        {/* Grand Total */}
+                        <div className="flex justify-between text-gray-900 text-base font-semibold">
+                            <span>Grand Total</span>
+                            <span>
+                                ₹{(Number(totalAmount) + Number(handlingChareg)).toFixed(2)}
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <div className="  mt-10">
+                        <button
+                            className="bg-green-600 w-full text-white px-4 cursor-pointer py-2 text-lg font-semibold"
+                            onClick={() =>
+                                navigate("/medicine/payemnt", {
+                                    state: {
+                                        cartData,
+                                        totalAmount: (Number(totalAmount) + Number(handlingChareg)).toFixed(2)
+                                    }
+                                })
+                            }
+                        >
+                            Continue
+                        </button>
+
+                    </div>
+
+                </div>
+
             </div>
+
 
             {/* SUBTOTAL */}
-            
+
 
             {/* CHECKOUT BUTTON */}
-            <div className="  mt-10">
-                <button
-                    className="bg-green-600 text-white px-4 cursor-pointer py-2 rounded-lg text-lg font-semibold"
-                    onClick={() =>
-                        navigate("/medicine/checkout", { state: { cartData, totalAmount } })
-                    }
-                 >
-                    Place Order (₹{totalAmount.toFixed(2)})
-                </button>
-            </div>
+
         </div>
     );
 }

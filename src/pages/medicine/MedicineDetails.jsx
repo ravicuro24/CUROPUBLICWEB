@@ -3,101 +3,128 @@ import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { PiCurrencyInrBold } from "react-icons/pi";
 import { MdMedicalServices, MdLocalHospital } from "react-icons/md";
+import SimilarMedicineProduct from "./SimilarMedicineProduct";
 
-function MedicineDetails() {
+export default function MedicineDetails() {
     const { state } = useLocation();
     const medicine = state?.medicine;
 
-    if (!medicine) {
-        return <div>No medicine data found.</div>;
-    }
+    if (!medicine) return <div>No medicine data found.</div>;
 
-    // Initially show first image
-    const [activeImage, setActiveImage] = useState(medicine.medicine?.imagesUrl?.[0] || "");
+    const [activeImage, setActiveImage] = useState(
+        medicine.medicine?.imagesUrl?.[0] || ""
+    );
 
     return (
-        <div className="p-6 container mx-auto h-screen">
-            {/* Title */}
+        <div className="p-6 container mx-auto min-h-screen">
+            {/* PRODUCT SECTION */}
+            <div className="flex flex-col md:flex-row gap-6">
 
+                {/* LEFT SECTION (Images + Details) */}
+                <div className="flex flex-row gap-5 w-full md:w-3/4">
 
-            {/* Images Section */}
-            <div className="flex flex-row gap-6 mb-6">
+                    {/* Thumbnail Column */}
+                    <div className="flex flex-col gap-3 h-fit">
+                        {medicine.medicine?.imagesUrl?.map((img, i) => (
+                            <img
+                                key={i}
+                                src={img}
+                                onClick={() => setActiveImage(img)}
+                                className={`w-16 h-16 object-cover rounded-md cursor-pointer shadow-md transition 
+                                ${activeImage === img ? "ring-2 ring-blue-500" : "hover:scale-105"}`}
+                                alt=""
+                            />
+                        ))}
+                    </div>
 
-                {/* Large Image */}
-                <div className="flex-row flex justify-between items-start gap-4">
-                    <div>
-                        <div className="w-full">
+                    {/* Main Image + Details */}
+                    <div className="flex  w-full">
+                        <div className="w-1/2   rounded-lg p-2 ">
                             <img
                                 src={activeImage}
-                                alt={medicine.medicine?.name || medicine.name}
-                                className="w-full h-30 md:h-80 object-contain border rounded-lg shadow"
+                                alt="medicine"
+                                className="w-full h-72 object-contain"
                             />
                         </div>
 
-                        {/* Thumbnails at Bottom */}
-                        <div className="flex gap-3 w-full overflow-x-auto justify-start py-2 mt-2">
-                            {medicine.medicine?.imagesUrl?.map((img, index) => (
-                                <img
-                                    key={index}
-                                    src={img}
-                                    alt={`Thumbnail ${index + 1}`}
-                                    onClick={() => setActiveImage(img)}
-                                    className={`h-10 w-10 md:w-18 md:h-18 ml-1 object-cover border rounded-lg cursor-pointer transition-all
-                            ${activeImage === img ? "ring-2 ring-blue-500 scale-105" : "hover:scale-105"}`}
-                                />
-                            ))}
-                        </div>
-                    </div>
-                    <div className="mt-4 space-y-2">
+                        {/* Product Text */}
+                        <div className="mt-6 space-y-4">
 
-                        {/* Name */}
-                        <h1 className=" text-md md:text-3xl font-bold text-gray-800 flex items-center gap-2">
-                            {medicine.medicine?.name || medicine.name}
-                        </h1>
+                            {/* NAME */}
+                            <h1 className="text-lg md:text-xl font-bold text-gray-800">
+                                {medicine.medicine?.name || medicine.name}
+                            </h1>
 
-                        {/* Price */}
-                        <p className="text-md md:text-xl font-semibold text-green-600 flex items-center gap-1">
-                            <PiCurrencyInrBold className="text-sm md:text-2xl" />
-                            {medicine.effectiveCostPrice}
-                        </p>
+                            {/* RATING + REVIEWS */}
+                            <div className="flex items-center gap-2">
+                                <span className="bg-green-600 text-white text-xs px-2 py-1 rounded-md font-semibold">
+                                    4.3 ★
+                                </span>
+                                <p className="text-gray-600 text-sm">
+                                    296 Ratings & 57 Reviews
+                                </p>
+                            </div>
 
-                        {/* Used For */}
-                        <p className="flex items-center gap-2 text-gray-700 text-lg">
-                            <MdMedicalServices className="text-blue-600 text-md md:text-2xl" />
-                            <span>
+                            {/* PRICE + DISCOUNT */}
+                            <div className="flex items-center gap-3">
+                                <p className="text-xl font-semibold text-green-600 flex items-center gap-1">
+                                    ₹{medicine.effectiveCostPrice}
+                                </p>
+                                <p className="line-through text-gray-500 text-sm">₹363</p>
+                                <p className="text-green-600 font-medium text-sm">35% off</p>
+                            </div>
+
+                            {/* USED FOR */}
+                            <p className="flex items-center gap-2 text-gray-700 text-md">
                                 {medicine.medicine?.prescribedFor || "NA"}
-                            </span>
-                        </p>
+                            </p>
 
-                        {/* Symptoms */}
-                        {medicine.medicine?.symptoms?.length > 0 && <p p className="flex items-center gap-2 text-gray-700 text-lg">
-                            <MdLocalHospital className="text-red-600 text-2xl" />
-                            <span>
-                                <strong>Symptoms:</strong>{" "}
-                                {medicine.medicine?.symptoms?.length
-                                    ? medicine.medicine.symptoms.join(", ")
-                                    : "NA"}
-                            </span>
-                        </p>}
+                            {/* PRODUCT HIGHLIGHTS */}
+                            <div className="w-80 text-gray-700 text-sm leading-relaxed">
+                                <p className="font-semibold mb-1">Product highlights</p>
+                                <ul className="list-disc ml-4 space-y-1">
+                                    <li>It can help manage your blood sugar levels</li>
+                                    <li>The tablets can help stimulate the secretion of insulin</li>
+                                    <li>It can help manage your metabolism and produce key enzymes</li>
+                                    <li>It can aid in repairing beta cells</li>
+                                </ul>
+                            </div>
+
+                            {/* SYMPTOMS */}
+                            {medicine.medicine?.symptoms?.length > 0 && (
+                                <p className="flex items-center gap-2 text-gray-700 text-md">
+                                    <MdLocalHospital className="text-red-600 text-xl" />
+                                    <strong>Symptoms:</strong>{" "}
+                                    {medicine.medicine.symptoms.join(", ")}
+                                </p>
+                            )}
+
+                        </div>
+
                     </div>
                 </div>
 
+                {/* RIGHT SECTION (Pricing Card) */}
+                <div className="w-full bg-white p-4 rounded-lg md:w-1/4 shadow-md">
+                    <div className=" rounded-lg  p-5 space-y-6">
+                        <div className="flex items-center gap-3">
+                            <p className="text-xl font-semibold text-green-600 flex items-center gap-1">
+                                ₹{medicine.effectiveCostPrice}
+                            </p>
+                        </div>
+                        <div className="flex gap-2">
+                            <p className="line-through text-gray-500 text-sm">₹363</p>
+                            <p className="text-green-600 font-medium text-sm">35% off</p>
+                        </div>
+                        <span className="text-gray-400 text-xs">Inclusive of all taxes</span>
+
+                        <button className="bg-green-600 cursor-pointer w-full py-2 text-white rounded-md text-lg font-medium hover:bg-green-700 transition mt-4">
+                            Add to cart
+                        </button>
+                    </div>
+                </div>
             </div>
-
-
-
-
-
-        </div >
+            <SimilarMedicineProduct name={medicine.medicine?.prescribedFor || ""} />
+        </div>
     );
 }
-
-// Helper component for consistent info row styling
-const InfoRow = ({ label, value }) => (
-    <div className="flex justify-between items-center py-2 border-b border-gray-100">
-        <span className="font-medium text-gray-600">{label}:</span>
-        <span className="text-gray-800">{value || "Not specified"}</span>
-    </div>
-);
-
-export default MedicineDetails;

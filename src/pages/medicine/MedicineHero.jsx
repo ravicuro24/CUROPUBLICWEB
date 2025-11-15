@@ -10,7 +10,7 @@ import ShopByHealthConcern from "./ShopByHealthConcern";
 const MedicineHero = () => {
     return (
 
-        <section className="w-full min-h-screen bg-white py-10 container mx-auto  mt-2 space-y-2">
+        <section className="w-full min-h-screen  py-10 container mx-auto  mt-2 space-y-2">
             <div className="w-full mx-auto flex flex-col md:flex-row items-center justify-between gap-10">
                 {/* Left Content */}
                 <div className="flex-1 text-center md:text-left">

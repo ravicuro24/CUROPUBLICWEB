@@ -94,9 +94,9 @@ function ShopByHealthConcern() {
                         onClick={() =>
                             navigate(`/medicine/shopbyhealthconcern/medicine/${item.name}`)
                         }
-                        className="cursor-pointer flex flex-col items-center border border-gray-200 hover:shadow-md transition p-4 rounded-md w-full"
+                        className="cursor-pointer bg-white rounded-md flex flex-col items-center shdow-md hover:shadow-md transition p-4 w-full"
                     >
-                        <div className="w-20 h-20 bg-white flex flex-col items-center justify-center">
+                        <div className="w-20 h-20  flex flex-col items-center justify-center">
                             {item.icon}
                             <p className="text-xs text-gray-700 mt-1 text-center px-1">
                                 {item.name}

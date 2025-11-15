@@ -10,7 +10,7 @@ function App() {
   const { authModal, setAuthModal } = useAuth()
 
   return (
-    <>
+    <div className='bg-[#f3f3f2]'>
       <Header />
 
       <Router />
@@ -44,7 +44,7 @@ function App() {
 
 
 
-    </>
+    </div>
   )
 }
 

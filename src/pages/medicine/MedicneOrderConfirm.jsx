@@ -1,95 +1,102 @@
+// src/pages/medicine/MedicneOrderConfirm.jsx
 import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function MedicineOrderConfirm() {
-  const [animate, setAnimate] = useState(false);
+    const [animate, setAnimate] = useState(false);
+    const location = useLocation();
+    const navigate = useNavigate();
 
-  useEffect(() => {
-    setTimeout(() => setAnimate(true), 300);
-  }, []);
+    const { payment, cartData, totalAmount } = location.state || {};
+    console.log(payment,cartData,totalAmount)
 
-  return (
-    <div className="min-h-screen bg-teal-50 flex items-center justify-center p-4">
-      <div className="bg-white w-full max-w-xl rounded-2xl shadow-lg p-6 border border-teal-200">
+    useEffect(() => {
+        setTimeout(() => setAnimate(true), 300);
+    }, []);
 
-        {/* ICON + TITLE SIDE BY SIDE */}
-        <div className="flex items-center gap-3 justify-center">
+    return (
+        <div className="min-h-screen bg-teal-50 flex items-center justify-center p-4">
+            <div className="bg-white w-full max-w-xl rounded-2xl shadow-lg p-6 border border-teal-200">
 
-          {/* Animated Green Box */}
-          <div className="relative">
-            <div
-              className={`w-10 h-10 bg-green-500 rounded-lg shadow-lg 
+                {/* ICON + TITLE SIDE BY SIDE */}
+                <div className="flex items-center gap-3 justify-center">
+
+                    {/* Animated Green Box */}
+                    <div className="relative">
+                        <div
+                            className={`w-10 h-10 bg-green-500 rounded-lg shadow-lg 
                 transition-all duration-500 
                 ${animate ? "scale-100 opacity-100" : "scale-0 opacity-0"}
               `}
-            ></div>
+                        ></div>
 
-            {/* Tick Animation */}
-            <svg
-              className={`absolute top-0 left-0 w-10 h-10 p-2 
+                        {/* Tick Animation */}
+                        <svg
+                            className={`absolute top-0 left-0 w-10 h-10 p-2 
                 transition-opacity duration-500 
                 ${animate ? "opacity-100" : "opacity-0"}
               `}
-              viewBox="0 0 52 52"
-            >
-              <path
-                className="tick stroke-white"
-                fill="none"
-                strokeWidth="5"
-                d="M14 27 L22 35 L38 18"
-              />
-            </svg>
-          </div>
+                            viewBox="0 0 52 52"
+                        >
+                            <path
+                                className="tick stroke-white"
+                                fill="none"
+                                strokeWidth="5"
+                                d="M14 27 L22 35 L38 18"
+                            />
+                        </svg>
+                    </div>
 
-          {/* TEXT */}
-          <h2 className="text-2xl font-bold text-teal-700">
-            Order Confirmed!
-          </h2>
-        </div>
+                    {/* TEXT */}
+                    <h2 className="text-2xl font-bold text-teal-700">
+                        Order Confirmed!
+                    </h2>
+                </div>
 
-        {/* Description */}
-        <p className="text-center text-gray-600 mt-2">
-          Thank you for your medicine order.
-          Your order is being processed.
-        </p>
+                {/* Description */}
+                <p className="text-center text-gray-600 mt-2">
+                    Thank you for your medicine order.
+                    Your order is being processed.
+                </p>
 
-        {/* ORDER DETAILS */}
-        <div className="mt-6 bg-teal-100 rounded-xl p-4 border border-teal-300">
-          <h3 className="text-lg font-semibold text-teal-800 mb-3">
-            Order Details
-          </h3>
+                {/* ORDER DETAILS */}
+                <div className="mt-6 bg-teal-100 rounded-xl p-4 border border-teal-300">
+                    <h3 className="text-lg font-semibold text-teal-800 mb-3">
+                        Order Details
+                    </h3>
 
-          <div className="flex justify-between text-gray-700 mb-2">
-            <span>Order ID:</span>
-            <span className="font-semibold">#MD123456</span>
-          </div>
+                    <div className="flex justify-between text-gray-700 mb-2">
+                        <span>Order ID:</span>
+                        <span className="font-semibold">#MD123456</span>
+                    </div>
 
-          <div className="flex justify-between text-gray-700 mb-2">
-            <span>Payment:</span>
-            <span className="font-semibold">Online / COD</span>
-          </div>
+                    <div className="flex justify-between text-gray-700 mb-2">
+                        <span>Payment:</span>
+                        <span className="font-semibold">Online / COD</span>
+                    </div>
 
-          <div className="flex justify-between text-gray-700 mb-2">
-            <span>Delivery:</span>
-            <span className="font-semibold">2 - 3 Days</span>
-          </div>
-        </div>
+                    <div className="flex justify-between text-gray-700 mb-2">
+                        <span>Delivery:</span>
+                        <span className="font-semibold">2 - 3 Days</span>
+                    </div>
+                </div>
 
-        {/* HELP */}
-        <div className="mt-6 text-center">
-          <p className="text-gray-700">Need help?</p>
-          <p className="font-semibold text-teal-700 mt-1">
-            📞 9451063419
-          </p>
-        </div>
+                {/* HELP */}
+                <div className="mt-6 text-center">
+                    <p className="text-gray-700">Need help?</p>
+                    <p className="font-semibold text-teal-700 mt-1">
+                        📞 9451063419
+                    </p>
+                </div>
 
-        {/* BUTTON */}
-        <button className="w-full mt-6 bg-teal-600 text-white py-3 rounded-xl font-semibold hover:bg-teal-700 transition">
-          Continue Shopping
-        </button>
-      </div>
+                {/* BUTTON */}
+                <button className="w-full mt-6 bg-teal-600 text-white py-3 rounded-xl font-semibold hover:bg-teal-700 transition">
+                    Continue Shopping
+                </button>
+            </div>
 
-      {/* ANIMATION CSS */}
-      <style>{`
+            {/* ANIMATION CSS */}
+            <style>{`
         .tick {
           stroke-dasharray: 48;
           stroke-dashoffset: 48;
@@ -102,8 +109,8 @@ function MedicineOrderConfirm() {
           }
         }
       `}</style>
-    </div>
-  );
+        </div>
+    );
 }
 
 export default MedicineOrderConfirm;

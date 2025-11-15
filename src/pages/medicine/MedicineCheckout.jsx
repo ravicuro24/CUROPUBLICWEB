@@ -1,11 +1,12 @@
 // src/pages/medicine/MedicineCheckout.jsx
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 function MedicineCheckout() {
     const location = useLocation();
     const { cartData, totalAmount } = location.state || {};
     console.log(cartData)
+    const navigate = useNavigate()
 
     // Format number as Indian Rupees
     const formatRupees = (amount) => {
@@ -76,7 +77,9 @@ function MedicineCheckout() {
                             <span>Total Amount:</span>
                             <span>{formatRupees(totalAmount)}</span>
                         </div>
-                        <button className='mt-6 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold'>
+                        <button
+                            onClick={() => navigate('/medicine/checkout/payemnt', { state: { cartData, totalAmount } })}
+                            className='mt-6 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold'>
                             Proceed to Payment
                         </button>
                     </div>

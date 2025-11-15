@@ -42,18 +42,19 @@ function MedicinePopularCategories() {
                     <div
                         key={item.id}
                         onClick={() => navigate(`/medicine/category/subcategory/product/${item.id}`)}
-                        className="bg-white border border-gray-200 rounded-md p-3 items-center flex flex-col justify-center text-center transition cursor-pointer"
+                        className="shadow-md bg-white hover:shadow-2xl rounded-md p-3 flex flex-col items-center justify-center text-center transition cursor-pointer"
                     >
                         <img
                             src={item.imageUrl}
                             alt={item.name}
-                            className="h-14 w-1/2 md:w-full md:h-28 object-cover rounded-md"
+                            className="h-16 w-full md:h-24 md:w-full object-cover rounded-md"
                         />
 
                         <p className="font-medium mt-2 text-sm">
                             {item.name}
                         </p>
                     </div>
+
                 ))}
             </div>
 
