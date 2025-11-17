@@ -1,70 +1,56 @@
 // src/pages/medicine/MedicineDetails.jsx
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { PiCurrencyInrBold } from "react-icons/pi";
-import { MdMedicalServices, MdLocalHospital } from "react-icons/md";
+import { toast } from "react-toastify";
 import SimilarMedicineProduct from "./SimilarMedicineProduct";
 import axiosInstance from "../../Authorization/axiosInstance";
 import { useAuth } from "../../Authorization/AuthContext";
-import { toast } from "react-toastify";
 
 export default function MedicineDetails() {
-    const { userData, getAllMedicineCartItems } = useAuth()
-    const userId = userData?.id
+    const { userData, getAllMedicineCartItems } = useAuth();
+    const userId = userData?.id;
     const { state } = useLocation();
     const medicine = state?.medicine;
-    const [addingCart, setAddingCart] = useState(false)
-
+    const [addingCart, setAddingCart] = useState(false);
+    const [activeImage, setActiveImage] = useState(
+        medicine?.medicine?.imagesUrl?.[0] || ""
+    );
 
     if (!medicine) return <div>No medicine data found.</div>;
 
-    const [activeImage, setActiveImage] = useState(
-        medicine.medicine?.imagesUrl?.[0] || ""
-    );
-
     useEffect(() => {
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-        });
-
+        window.scrollTo({ top: 0, behavior: "smooth" });
         setActiveImage(medicine.medicine?.imagesUrl?.[0] || "");
     }, [medicine]);
 
-
-
     const handleAddtocart = async (item) => {
-        console.log("item", item.id)
         try {
-            setAddingCart(true)
-            const response = await axiosInstance.post(
+            setAddingCart(true);
+            await axiosInstance.post(
                 `/endUserEndPoint/addToCart?userId=${userId}&batchId=${item?.id}`
             );
             await getAllMedicineCartItems(userId);
-            setAddingCart(false)
+            setAddingCart(false);
             toast.success(`${medicine.medicine?.name} Added in cart`);
         } catch (error) {
-            console.log("error add to cart", error.respose)
-            setActiveImage(false)
+            console.log("error add to cart", error.response);
+            setAddingCart(false);
         }
-    }
+    };
 
     return (
-        <div className="p-6 container mx-auto min-h-screen">
-            {/* PRODUCT SECTION */}
+        <div className="p-4 md:p-6 container mx-auto min-h-screen">
             <div className="flex flex-col md:flex-row gap-6">
-
                 {/* LEFT SECTION (Images + Details) */}
-                <div className="flex flex-row gap-5 w-full md:w-3/4">
-
+                <div className="flex flex-col md:flex-row w-full gap-5">
                     {/* Thumbnail Column */}
-                    <div className="flex flex-col gap-3 h-fit">
+                    <div className="flex flex-row md:flex-col gap-3 md:w-20 w-full overflow-x-auto md:overflow-x-visible">
                         {medicine.medicine?.imagesUrl?.map((img, i) => (
                             <img
                                 key={i}
                                 src={img}
                                 onClick={() => setActiveImage(img)}
-                                className={`w-16 h-16 object-cover rounded-md cursor-pointer shadow-md transition 
+                                className={`w-16 h-16 object-cover rounded-md cursor-pointer shadow-md transition
                                 ${activeImage === img ? "ring-2 ring-blue-500" : "hover:scale-105"}`}
                                 alt=""
                             />
@@ -72,24 +58,22 @@ export default function MedicineDetails() {
                     </div>
 
                     {/* Main Image + Details */}
-                    <div className="flex  w-full">
-                        <div className="w-1/2   rounded-lg p-2 ">
+                    <div className="flex flex-col md:flex-row w-full gap-4">
+                        {/* Main Image */}
+                        <div className="w-full md:w-1/2 flex justify-center items-center p-2 bg-white rounded-lg shadow-sm">
                             <img
                                 src={activeImage}
                                 alt="medicine"
-                                className="w-full h-72 object-contain"
+                                className="w-full h-64 md:h-72 object-contain"
                             />
                         </div>
 
                         {/* Product Text */}
-                        <div className="mt-6 space-y-4">
-
-                            {/* NAME */}
+                        <div className="flex-1 mt-4 md:mt-0 space-y-3 md:space-y-4">
                             <h1 className="text-lg md:text-xl font-bold text-gray-800">
                                 {medicine.medicine?.name}
                             </h1>
 
-                            {/* RATING + REVIEWS */}
                             <div className="flex items-center gap-2">
                                 <span className="bg-green-600 text-white text-xs px-2 py-1 rounded-md font-semibold">
                                     4.3 ★
@@ -99,7 +83,6 @@ export default function MedicineDetails() {
                                 </p>
                             </div>
 
-                            {/* PRICE + DISCOUNT */}
                             <div className="flex items-center gap-3">
                                 <p className="text-xl font-semibold text-green-600 flex items-center gap-1">
                                     ₹{medicine.effectiveCostPrice}
@@ -108,13 +91,11 @@ export default function MedicineDetails() {
                                 <p className="text-green-600 font-medium text-sm">35% off</p>
                             </div>
 
-                            {/* USED FOR */}
                             <p className="flex items-center gap-2 text-gray-700 text-md">
                                 {medicine.medicine?.prescribedFor || "NA"}
                             </p>
 
-                            {/* PRODUCT HIGHLIGHTS */}
-                            <div className="w-80 text-gray-700 text-sm leading-relaxed">
+                            <div className="text-gray-700 text-sm leading-relaxed">
                                 <p className="font-semibold mb-1">Product highlights</p>
                                 <ul className="list-disc ml-4 space-y-1">
                                     <li>It can help manage your blood sugar levels</li>
@@ -124,43 +105,48 @@ export default function MedicineDetails() {
                                 </ul>
                             </div>
 
-                            {/* SYMPTOMS */}
                             {medicine.medicine?.symptoms?.length > 0 && (
-                                <p className="flex items-center gap-2 text-gray-700 text-md">
-                                    <MdLocalHospital className="text-red-600 text-xl" />
-                                    <strong>Symptoms:</strong>{" "}
+                                <p className="flex flex-wrap leading-relaxed items-center gap-2 text-gray-700 md:text-sm font-semibold">
                                     {medicine.medicine.symptoms.join(", ")}
                                 </p>
                             )}
-
                         </div>
-
                     </div>
                 </div>
 
                 {/* RIGHT SECTION (Pricing Card) */}
-                <div className="w-full bg-white p-4 rounded-lg md:w-1/4 shadow-md">
-                    <div className=" rounded-lg  p-5 space-y-6">
-                        <div className="flex items-center gap-3">
-                            <p className="text-xl font-semibold text-green-600 flex items-center gap-1">
-                                ₹{medicine.effectiveCostPrice}
-                            </p>
-                        </div>
+                <div className="w-full md:w-1/4 bg-white p-4 rounded-lg shadow-md flex-shrink-0">
+                    <div className="space-y-4">
+                        <p className="text-xl font-semibold text-green-600">
+                            ₹{medicine.effectiveCostPrice}
+                        </p>
                         <div className="flex gap-2">
                             <p className="line-through text-gray-500 text-sm">₹363</p>
                             <p className="text-green-600 font-medium text-sm">35% off</p>
                         </div>
                         <span className="text-gray-400 text-xs">Inclusive of all taxes</span>
-
                         <button
                             onClick={() => handleAddtocart(medicine)}
-                            className="bg-green-600 cursor-pointer w-full py-2 text-white rounded-md text-lg font-medium hover:bg-green-700 transition mt-4">
-                            {addingCart ? <span className="loading loading-spinner loading-sm"></span>:"Add to cart"}
+                            className="bg-green-600 cursor-pointer w-full py-2 text-white rounded-md text-lg font-medium hover:bg-green-700 transition"
+                        >
+                            {addingCart ? (
+                                <span className="loading loading-spinner loading-sm"></span>
+                            ) : (
+                                "Add to cart"
+                            )}
                         </button>
                     </div>
                 </div>
             </div>
-            <SimilarMedicineProduct name={medicine.medicine?.prescribedFor || medicine.medicine?.symptoms[0]} />
+
+            <div className="mt-10">
+                <SimilarMedicineProduct
+                    name={
+                        medicine.medicine?.prescribedFor ||
+                        medicine.medicine?.symptoms?.[0]
+                    }
+                />
+            </div>
         </div>
     );
 }

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { LuClock3 } from "react-icons/lu";
 import axiosInstance from "../../Authorization/axiosInstance";
 import { useNavigate } from "react-router-dom";
+import { IoCaretBackSharp, IoCaretForwardSharp } from "react-icons/io5";
 
 export default function SimilarMedicineProduct({ name }) {
     const [medicines, setMedicines] = useState([]);
@@ -50,18 +51,18 @@ export default function SimilarMedicineProduct({ name }) {
                                 className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 
                 bg-white shadow-md p-2 rounded-full z-10 hover:bg-gray-100"
                             >
-                                ◀
+                                <IoCaretBackSharp />
                             </button>
                         )}
 
                         {/* SCROLLABLE WRAPPER */}
                         <div
                             id="similarScroll"
-                            className={`grid gap-2 ${isScrollable
-                                ? "grid-flow-col  auto-cols-max overflow-x-auto no-scrollbar "
+                            className={`grid gap-2 no-scrollbar  ${isScrollable
+                                ? "grid-flow-col  auto-cols-max overflow-x-auto  "
                                 : "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
                                 } scroll-smooth`}
-                         > 
+                        >
                             {medicines.map((item) => {
                                 const m = item.medicine || {};
 
@@ -75,7 +76,7 @@ export default function SimilarMedicineProduct({ name }) {
                                         key={item.id}
                                         className={`min-w-[150px] sm:min-w-[180px] md:min-w-[200px] ${isScrollable ? "flex-shrink-0" : ""
                                             } rounded-xl p-3 bg-white shadow-sm hover:shadow-md transition-all cursor-pointer`}
-                                     >
+                                    >
                                         {/* SALE Badge */}
                                         <span className="bg-green-600 text-white text-xs px-2 py-1 rounded-md font-semibold">
                                             SALE
@@ -149,8 +150,8 @@ export default function SimilarMedicineProduct({ name }) {
                                 }}
                                 className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 
                                 bg-white shadow-md p-2 rounded-full z-10 hover:bg-gray-100"
-                             >
-                                ▶
+                            >
+                                <IoCaretForwardSharp />
                             </button>
                         )}
                     </div>

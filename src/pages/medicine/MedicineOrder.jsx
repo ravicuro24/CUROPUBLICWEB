@@ -1,3 +1,4 @@
+// src/pages/medicine/MedicineOrder.jsx
 // src/component/medicine/MedicineOrder.jsx
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../../Authorization/axiosInstance';
@@ -95,9 +96,9 @@ function MedicineOrder() {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-6 container mx-2 md:mx-auto">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">My Medicine Orders</h2>
+        <h2 className="text-md md:text-3xl font-bold text-gray-900 mb-2">My Medicine Orders</h2>
         <p className="text-gray-600">Track and manage your medicine purchases</p>
       </div>
 
@@ -189,12 +190,12 @@ function MedicineOrder() {
             {/* Header */}
             <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
               <div className="flex justify-between items-center">
-                <div>
+                <div className='flex gap-4'>
                   <h3 className="text-xl font-bold text-white">Order Details</h3>
                   <p className="text-blue-100 text-sm mt-1">#{selectedOrder.id}</p>
                 </div>
                 <button
-                  className="text-white hover:text-blue-200 transition-colors text-2xl font-light p-1"
+                  className="text-white cursor-pointer bg-blue-50/20 text-gray-600 rounded-full h-8 w-8 hover:text-blue-200 transition-colors text-md font-light p-1"
                   onClick={() => setSelectedOrder(null)}
                 >
                   ✕

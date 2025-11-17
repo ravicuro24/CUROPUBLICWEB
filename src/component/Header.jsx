@@ -118,16 +118,17 @@ const Navbar = () => {
             {/* SEARCH BAR */}
             <div className="hidden sm:flex items-center bg-gray-100 px-3 py-1.5 rounded-full w-56">
               <FiSearch className="text-gray-500 mr-2" />
-              <input type="text" placeholder="Search for medicine" className="bg-transparent outline-none text-sm w-full" />
+              <input type="text" placeholder="Search for medicine" className="bg-transparent outline-none text-sm w-full border-0" />
             </div>
 
             {/* CART */}
             <button onClick={() => navigate('/medicine/cart')} className="relative cursor-pointer">
-              <FiShoppingCart size={20} className="text-gray-700 hover:text-teal-600" />
-              <span className="absolute -top-2 -right-2 bg-teal-600 text-white text-xs px-1 rounded-full">
+              <FiShoppingCart size={24} className="text-gray-700 hover:text-teal-600" />
+              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
                 {allmedicineIncart?.length || 0}
               </span>
             </button>
+
 
             {/* PROFILE */}
             {token ? (

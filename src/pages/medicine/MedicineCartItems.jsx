@@ -5,6 +5,7 @@ import { useAuth } from "../../Authorization/AuthContext";
 import axiosInstance from "../../Authorization/axiosInstance";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { FiShoppingCart } from "react-icons/fi";
+import SimilaMedicineProduct from '../medicine/SimilarMedicineProduct'
 
 
 
@@ -294,12 +295,7 @@ function MedicineCartItems() {
                 </div>
 
             </div>
-
-
-            {/* SUBTOTAL */}
-
-
-            {/* CHECKOUT BUTTON */}
+            <SimilaMedicineProduct name={"Fever"} />
 
         </div>
     );
