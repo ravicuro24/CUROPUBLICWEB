@@ -1,3 +1,4 @@
+// src/router/LabRouting.jsx
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
 import LabHome from '../pages/lab/labhome/LabHome'

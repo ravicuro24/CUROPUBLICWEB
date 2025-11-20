@@ -190,7 +190,7 @@ const MedicineHero = () => {
             {/* UPLOAD PRESCRIPTION MODAL */}
             {uploadPrescriptionModal && (
                 <div className="fixed inset-0 backdrop-brightness-50 flex items-center justify-center z-50">
-                    <div className="relative bg-white max-w-7xl w-full min-h-[80vh] rounded-lg shadow-lg overflow-auto">
+                    <div className="relative bg-white max-w-7xl w-full  rounded-lg shadow-lg overflow-auto">
 
                         {/* CLOSE BUTTON */}
                         <button

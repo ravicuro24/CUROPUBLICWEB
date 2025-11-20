@@ -9,6 +9,7 @@ function MedicineProductBySubCategory({ productList = [] }) {
     const [addingCartId, setAddingCartItd] = useState(null)
     const navigate = useNavigate()
     const userId = userData?.id
+    console.log("product list", productList)
 
 
     const handleAddtocart = async (item) => {
@@ -37,14 +38,18 @@ function MedicineProductBySubCategory({ productList = [] }) {
                     }
                     key={index}
                     className="flex items-center bg-white border border-gray-200 rounded-md p-3 shadow-sm"
-                 >
+                >
                     {/* Image */}
                     <div className="w-20 h-20 md:w-28 md:h-28 ">
                         <img
-                            src={item?.pharmacyMedicineBatch?.medicine?.imagesUrl?.[0]}
+                            src={item?.pharmacyMedicineBatch?.medicine?.imagesUrl[0]}
                             alt="medicine"
                             className="h-full w-full object-contain rounded-md"
                         />
+                        {/* <BinImage
+                            url={item?.pharmacyMedicineBatch?.medicine?.imagesUrl?.[0]}
+                            alt="medicine"
+                        /> */}
                     </div>
 
                     {/* Content */}

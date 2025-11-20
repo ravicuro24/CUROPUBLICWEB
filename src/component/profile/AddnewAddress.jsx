@@ -7,7 +7,7 @@ import { IoBusiness } from "react-icons/io5";
 import axiosInstance from "../../Authorization/axiosInstance";
 import { useAuth } from "../../Authorization/AuthContext";
 
-const AddNewAddress = ({ onClose, editData }) => {
+const AddNewAddress = ({ onClose, editData, onSucess }) => {
   const { userData } = useAuth();
   const userId = userData?.id;
   const navigate = useNavigate();
@@ -85,7 +85,7 @@ const AddNewAddress = ({ onClose, editData }) => {
 
       await axiosInstance.post(endpoint, payload);
       setLoading(false);
-      onClose();
+      onSucess()
     } catch (error) {
       setLoading(false);
       alert("Failed to add address");
@@ -115,7 +115,7 @@ const AddNewAddress = ({ onClose, editData }) => {
       setLoading(true);
       await axiosInstance.put("/endUserAddress/updateAddressById", payload);
       setLoading(false);
-      onClose();
+      onSucess()
     } catch (error) {
       setLoading(false);
       alert(error.response?.data?.message || "Failed to update address");

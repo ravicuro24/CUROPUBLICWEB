@@ -1,8 +1,14 @@
+// src/pages/medicine/MedicineTrackorder.jsx
 import React from "react";
 import { FiCheck } from "react-icons/fi";
 import { FaRegClipboard, FaShieldAlt, FaUserTie, FaGift } from "react-icons/fa";
+import { useLocation } from "react-router-dom";
 
 const MedicineTrackorder = () => {
+  const location = useLocation();
+  const activePage = location.state;
+
+  console.log("order Data",activePage);
   const steps = [
     {
       title: "Order Placed",
@@ -32,7 +38,7 @@ const MedicineTrackorder = () => {
   ];
 
   return (
-    <div className="max-w-xl mx-auto bg-white p-6 rounded-xl shadow">
+    <div className="max-w-xl mx-auto bg-white p-6 rounded-xl shadow h-screen my-4">
       {/* Header */}
       <div className="text-center border-b pb-4 mb-6">
         <h2 className="text-2xl font-bold text-green-700">Track Order</h2>
@@ -60,10 +66,9 @@ const MedicineTrackorder = () => {
             {/* Circle */}
             <div
               className={`w-6 h-6 rounded-full flex items-center justify-center z-10
-                ${
-                  step.completed || step.active
-                    ? "bg-green-600"
-                    : "bg-gray-300"
+                ${step.completed || step.active
+                  ? "bg-green-600"
+                  : "bg-gray-300"
                 }`}
             >
               {step.completed ? (
@@ -77,13 +82,12 @@ const MedicineTrackorder = () => {
             <div>
               <h3
                 className={`flex items-center gap-2 text-lg font-semibold 
-                ${
-                  step.active
+                ${step.active
                     ? "text-blue-600"
                     : step.completed
-                    ? "text-gray-900"
-                    : "text-gray-400"
-                }`}
+                      ? "text-gray-900"
+                      : "text-gray-400"
+                  }`}
               >
                 {step.icon} {step.title}
               </h3>

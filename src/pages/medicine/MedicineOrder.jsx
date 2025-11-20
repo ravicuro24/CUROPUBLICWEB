@@ -4,10 +4,12 @@ import React, { useEffect, useState } from 'react';
 import axiosInstance from '../../Authorization/axiosInstance';
 import { useAuth } from '../../Authorization/AuthContext';
 import { MdHome, MdLocationCity, MdMap, MdPhone, MdOutlinePin } from 'react-icons/md';
+import { Link, useNavigate } from 'react-router-dom';
 
 
 function MedicineOrder() {
   const { userData } = useAuth();
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(false);
   const [allOrderList, setAllOrderList] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -26,6 +28,7 @@ function MedicineOrder() {
         `/endUserEndPoint/getMedicineOrdersByEndUserId?endUserId=${id}`
       );
       setAllOrderList(response.data.dto || []);
+      console.log("my order", response)
     } catch (err) {
       console.error("Get orders error:", err?.response ?? err);
       setError('Failed to load orders. Please try again.');
@@ -48,6 +51,13 @@ function MedicineOrder() {
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
+
+  const handleTrackOrder = (order) => {
+    navigate('/medicine_trackOrder', {
+      state: { activePage: order }
+    });
+  };
+
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-IN', {
@@ -96,10 +106,9 @@ function MedicineOrder() {
   }
 
   return (
-    <div className="p-6 container mx-2 md:mx-auto">
-      <div className="mb-8">
-        <h2 className="text-md md:text-3xl font-bold text-gray-900 mb-2">My Medicine Orders</h2>
-        <p className="text-gray-600">Track and manage your medicine purchases</p>
+    <div className="  md:p-6 container  md:mx-auto">
+      <div className="mb-1">
+        <h2 className="text-md md:text-lg font-bold text-gray-900 mb-2">My Medicine Orders</h2>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -108,7 +117,7 @@ function MedicineOrder() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  Order Details
+                  Order
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   Medicine
@@ -130,7 +139,7 @@ function MedicineOrder() {
                     {index === 0 && (
                       <td className="px-6 py-4 whitespace-nowrap align-top" rowSpan={order.orderItems.length}>
                         <div className="flex flex-col">
-                          <span className="text-lg font-semibold text-blue-600 hover:text-blue-800 transition-colors">
+                          <span className="text-xs md:text-md font-semibold text-blue-600 hover:text-blue-800 transition-colors">
                             #{order.id}
                           </span>
                           <span className="text-sm text-gray-500 mt-1">
@@ -146,6 +155,9 @@ function MedicineOrder() {
                           <div className="mt-2 text-sm font-semibold text-gray-900">
                             {formatCurrency(order.totalAmount)}
                           </div>
+                          <div>
+                            <button onClick={() => handleTrackOrder(order)} className='text-xs bg-blue-400 hover:bg-blue-600 text-white px-2 cursor-pointer py-1 rounded-lg'>Tack Order</button>
+                          </div>
                         </div>
                       </td>
                     )}
@@ -153,12 +165,10 @@ function MedicineOrder() {
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-3">
                         <img
-                          src={item.medicineBatch?.medicine?.imagesUrl?.[0] || '/placeholder-medicine.jpg'}
-                          alt={item.medicineBatch?.medicine?.name}
+                          src={item.medicineBatch?.medicine?.imagesUrl[0] || '/placeholder-medicine.jpg'}
+                          alt={""}
                           className="w-12 h-12 object-cover rounded-lg border border-gray-200"
-                          onError={(e) => {
-                            e.target.src = '/placeholder-medicine.jpg';
-                          }}
+
                         />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-900 truncate">
@@ -209,13 +219,13 @@ function MedicineOrder() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h4 className="font-semibold text-gray-700 mb-2 md:text-md text-[12px]">Order Status</h4>
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium md:text-xl text-md ${getStatusColor(selectedOrder.status)}`}>
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full font-medium md:text-md text-xs ${getStatusColor(selectedOrder.status)}`}>
                     {selectedOrder.status}
                   </span>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h4 className="font-semibold text-gray-700 mb-2 md:text-md text-[12px]">Order Date</h4>
-                  <p className="text-gray-900 md:text-xl text-md">
+                  <p className="text-gray-900 md:text-md text-xs">
                     {new Date(selectedOrder.orderDate).toLocaleString('en-IN', {
                       day: 'numeric',
                       month: 'long',
@@ -227,7 +237,7 @@ function MedicineOrder() {
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h4 className="font-semibold text-gray-700 mb-2 md:text-md text-[12px]">Total Amount</h4>
-                  <p className="md:text-xl text-md font-bold text-blue-600">
+                  <p className="md:text-md text-xs font-bold text-blue-600">
                     {formatCurrency(selectedOrder.totalAmount)}
                   </p>
                 </div>
@@ -236,30 +246,30 @@ function MedicineOrder() {
               {/* Delivery Address */}
               {selectedOrder.deliveryAddress && (
                 <div className="mb-6">
-                  <h4 className="md:text-xl text-md font-semibold text-gray-900 mb-3">Delivery Address</h4>
+                  <h4 className="md:text-md text-xs font-semibold text-gray-900 mb-3">Delivery Address</h4>
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-gray-700">
-                      <p className="flex items-center gap-2 md:text-lg text-xs">
+                      <p className="flex items-center gap-2 md:text-md text-xs">
                         <MdHome className="text-blue-500" />
                         {selectedOrder.deliveryAddress.houseNumber}, {selectedOrder.deliveryAddress.street}
                       </p>
-                      <p className="flex items-center gap-2 md:text-lg text-xs">
+                      <p className="flex items-center gap-2 md:text-md text-xs">
                         <MdLocationCity className="text-blue-500" />
                         {selectedOrder.deliveryAddress.city}
                       </p>
-                      <p className="flex items-center gap-2 md:text-lg text-xs">
+                      <p className="flex items-center gap-2 md:text-md text-xs">
                         <MdMap className="text-blue-500" />
                         <span className="font-medium">Address Type:</span> {selectedOrder.deliveryAddress.addressType}
                       </p>
-                      <p className="flex items-center gap-2 md:text-lg text-xs">
+                      <p className="flex items-center gap-2 md:text-md text-xs">
                         <MdLocationCity className="text-blue-500" />
                         <span className="font-medium">State:</span> {selectedOrder.deliveryAddress.state}
                       </p>
-                      <p className="flex items-center gap-2 md:text-lg text-xs">
+                      <p className="flex items-center gap-2 md:text-md text-xs">
                         <MdOutlinePin className="text-blue-500" />
                         {selectedOrder.deliveryAddress.postalCode}
                       </p>
-                      <p className="flex items-center gap-2 md:text-lg text-xs">
+                      <p className="flex items-center gap-2 md:text-md text-xs">
                         <MdPhone className="text-blue-500" />
                         {selectedOrder.deliveryAddress.phoneNumber}
                       </p>
@@ -270,25 +280,23 @@ function MedicineOrder() {
 
               {/* Order Items */}
               <div>
-                <h4 className="text-lg font-semibold text-gray-900 mb-4">Order Items</h4>
-                <div className="space-y-4">
+                <h4 className="text-xs md:text-md font-semibold text-gray-900 mb-4">Order Items</h4>
+                <div className="space-y-2">
                   {selectedOrder.orderItems?.map((item) => (
                     <div key={item.id} className="flex items-center space-x-4 bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
                       <img
-                        src={item.medicineBatch?.medicine?.imagesUrl?.[0] || '/placeholder-medicine.jpg'}
+                        src={item.medicineBatch?.medicine?.imagesUrl[0] || '/placeholder-medicine.jpg'}
                         alt={item.medicineBatch?.medicine?.name}
                         className="w-16 h-16 object-cover rounded-lg border border-gray-200"
-                        onError={(e) => {
-                          e.target.src = '/placeholder-medicine.jpg';
-                        }}
+
                       />
                       <div className="flex-1 min-w-0">
-                        <h5 className="font-semibold text-gray-900 md:text-lg text-xs mb-1">
+                        <h5 className="font-semibold text-gray-900 md:text-md text-xs mb-1">
                           {item.medicineBatch?.medicine?.name}
                         </h5>
 
                         <div className="flex items-center space-x-6 text-sm">
-                          <span className="text-md font-semibold text-gray-600 md:text-lg text-xs">
+                          <span className="text-md font-semibold text-gray-600 md:text-md text-xs">
                             {item.quantity}x{item.unitPrice.toFixed(2)} = ₹{(item.quantity * item.unitPrice).toFixed(2)}
                           </span>
                         </div>

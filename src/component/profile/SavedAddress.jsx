@@ -8,6 +8,7 @@ import {
 } from "react-icons/md";
 import { FaBriefcase, FaMapMarkerAlt } from "react-icons/fa";
 import { IoLocationSharp } from "react-icons/io5";
+
 import axiosInstance from "../../Authorization/axiosInstance";
 import { useAuth } from "../../Authorization/AuthContext";
 import AddnewAddress from "./AddnewAddress";
@@ -23,7 +24,6 @@ const SavedAddress = () => {
     const [addAddressModal, setAddaddressModal] = useState(false);
     const [editAddressData, setEditAddressData] = useState(null);
 
-    // ─────────────────────────────────────────
     // COLORS
     const getTypeColor = (type) => {
         switch (type) {
@@ -48,13 +48,13 @@ const SavedAddress = () => {
         }
     };
 
-    // ─────────────────────────────────────────
     // FETCH ADDRESSES
     const fetchAddresses = async () => {
         if (!userId) return;
 
         try {
             setLoading(true);
+
             const res = await axiosInstance.get(
                 `/endUserAddress/getAddressByUserId/${userId}`
             );
@@ -76,7 +76,6 @@ const SavedAddress = () => {
         fetchAddresses();
     }, [userId]);
 
-    // ─────────────────────────────────────────
     // DELETE ADDRESS
     const confirmDeleteAddress = async (id) => {
         Swal.fire({
@@ -131,7 +130,7 @@ const SavedAddress = () => {
                 <div className="flex gap-4 items-center">
                     <button
                         onClick={() => {
-                            setEditAddressData(null); // reset edit mode
+                            setEditAddressData(null);
                             setAddaddressModal(true);
                         }}
                         className="bg-green-200 cursor-pointer py-1 px-2 md:px-4 text-[10px] md:text-sm rounded-full hover:bg-green-300 text-green-800 flex items-center gap-2"
@@ -145,103 +144,118 @@ const SavedAddress = () => {
                 </div>
             </div>
 
+            {/* LOADING SPINNER */}
+            {loading && (
+                <div className="flex justify-center items-center py-20">
+                    <div className="w-12 h-12 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+            )}
+
             {/* ADDRESS LIST */}
             <div className="p-2">
-                {addresses.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                {!loading && (
+                    <>
+                        {addresses.length > 0 ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
 
-                        {addresses.map((address) => (
-                            <div key={address.id}
-                                className="bg-white rounded-lg shadow-md border border-gray-200 p-2 flex flex-col justify-between h-[260px]"
-                            >
-                                {/* Card Header */}
-                                <div className="flex justify-between items-center p-2">
-                                    <div className="flex items-center gap-3">
-                                        <div
-                                            className="h-10 w-10 p-2 rounded-md flex items-center justify-center"
-                                            style={{
-                                                background: `${getTypeColor(address.addressType)}20`
-                                            }}
-                                        >
-                                            {getTypeIcon(address.addressType)}
-                                        </div>
-                                        <h2 className="text-sm font-semibold">
-                                            {address.addressType}
-                                        </h2>
-                                    </div>
-                                </div>
-
-                                {/* Details */}
-                                <div className="p-2 space-y-2">
-                                    <div className="flex gap-3">
-                                        <IoLocationSharp size={20} className="text-red-500 mt-1" />
-                                        <div>
-                                            <p className="font-medium text-gray-800 text-sm">
-                                                {address.houseNumber}, {address.street}
-                                            </p>
-                                            <p className="text-gray-600 text-xs">
-                                                {address.city}, {address.state} - {address.postalCode}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex gap-3 items-center">
-                                        <MdPhone size={18} className="text-gray-500" />
-                                        <p className="text-gray-600 text-sm">
-                                            {address.phoneNumber}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Actions */}
-                                <div className="flex justify-between pt-2 border-t mt-auto">
-                                    <button
-                                        onClick={() => {
-                                            setEditAddressData(address);
-                                            setAddaddressModal(true);
-                                        }}
-                                        className="flex items-center gap-2 text-blue-600 text-sm"
+                                {addresses.map((address) => (
+                                    <div key={address.id}
+                                        className="bg-white rounded-lg shadow-md border border-gray-200 p-2 flex flex-col justify-between h-[260px]"
                                     >
-                                        <MdEdit size={16} />
-                                        Edit
-                                    </button>
+                                        {/* Card Header */}
+                                        <div className="flex justify-between items-center p-2">
+                                            <div className="flex items-center gap-3">
+                                                <div
+                                                    className="h-10 w-10 p-2 rounded-md flex items-center justify-center"
+                                                    style={{
+                                                        background: `${getTypeColor(address.addressType)}20`
+                                                    }}
+                                                >
+                                                    {getTypeIcon(address.addressType)}
+                                                </div>
+                                                <h2 className="text-sm font-semibold">
+                                                    {address.addressType}
+                                                </h2>
+                                            </div>
+                                        </div>
 
-                                    <button
-                                        onClick={() => confirmDeleteAddress(address.id)}
-                                        className="flex items-center gap-2 text-red-600 text-sm"
-                                    >
-                                        <MdDelete size={16} />
-                                        Delete
-                                    </button>
-                                </div>
+                                        {/* Details */}
+                                        <div className="p-2 space-y-2">
+                                            <div className="flex gap-3">
+                                                <IoLocationSharp size={20} className="text-red-500 mt-1" />
+                                                <div>
+                                                    <p className="font-medium text-gray-800 text-sm">
+                                                        {address.houseNumber}, {address.street}
+                                                    </p>
+                                                    <p className="text-gray-600 text-xs">
+                                                        {address.city}, {address.state} - {address.postalCode}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex gap-3 items-center">
+                                                <MdPhone size={18} className="text-gray-500" />
+                                                <p className="text-gray-600 text-sm">
+                                                    {address.phoneNumber}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Actions */}
+                                        <div className="flex justify-between pt-2 border-t mt-auto">
+                                            <button
+                                                onClick={() => {
+                                                    setEditAddressData(address);
+                                                    setAddaddressModal(true);
+                                                }}
+                                                className="flex items-center gap-2 text-blue-600 text-sm"
+                                            >
+                                                <MdEdit size={16} />
+                                                Edit
+                                            </button>
+
+                                            <button
+                                                onClick={() => confirmDeleteAddress(address.id)}
+                                                className="flex items-center gap-2 text-red-600 text-sm"
+                                            >
+                                                <MdDelete size={16} />
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+
                             </div>
-                        ))}
-
-                    </div>
-                ) : (
-                    <div className="flex flex-col items-center mt-20">
-                        <div className="w-24 h-24 bg-purple-100 rounded-full flex items-center justify-center">
-                            <FaMapMarkerAlt size={45} className="text-purple-600" />
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-800 mt-4">
-                            No Address Found!
-                        </h3>
-                    </div>
+                        ) : (
+                            <div className="flex flex-col items-center mt-20">
+                                <div className="w-24 h-24 bg-purple-100 rounded-full flex items-center justify-center">
+                                    <FaMapMarkerAlt size={45} className="text-purple-600" />
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-800 mt-4">
+                                    No Address Found!
+                                </h3>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
 
             {/* ADD / EDIT ADDRESS MODAL */}
             {addAddressModal && (
                 <div className="fixed inset-0 backdrop-brightness-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg shadow-lg max-w-5xl w-full h-[90vh] overflow-y-auto p-2 relative">
+                    <div className="bg-white rounded-lg shadow-lg max-w-5xl w-full  overflow-y-auto p-2 relative">
 
                         <AddnewAddress
-                            onClose={() => {
+                            onSucess={() => {
                                 fetchAddresses();
                                 setAddaddressModal(false);
                                 setEditAddressData(null);
                             }}
-                            editData={editAddressData} // **THIS IS THE MAIN POINT**
+                            onClose={() => {
+                                setAddaddressModal(false);
+                                setEditAddressData(null);
+                            }}
+                            editData={editAddressData}
                         />
                     </div>
                 </div>

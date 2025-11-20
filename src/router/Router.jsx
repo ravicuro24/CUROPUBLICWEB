@@ -17,6 +17,7 @@ import FamilyMedicalHIstory from '../component/familyMedical/FamilyMedicalHIstor
 import MedicineOrder from '../pages/medicine/MedicineOrder'
 import LabRouting from './LabRouting'
 import ManageProfile from '../component/profile/ManageProfile'
+import MedicineTrackorder from '../pages/medicine/MedicineTrackorder'
 
 function Router() {
   return (
@@ -25,8 +26,8 @@ function Router() {
         <Route path='/' element={<LandingPage />} />
         <Route path='/medicine/delivery' element={<MedicineHome />} />
         <Route path='/login' element={<Login />} />
-        <Route path='/manage_profile' element={<ManageProfile />} />
         <Route path='/profile' element={<MyProfile />} />
+        <Route path='/manage_profile' element={<ManageProfile />} />
         <Route path='/medicine/category/subcategory/product/:id' element={<MedicneSUbcategoryProduct />} />
         <Route path='/medicine/cart' element={<MedicineCartItems />} />
         <Route path='/medicine/shopbyhealthconcern/medicine/:name' element={<ShopByHealthConcernMedicne />} />
@@ -37,6 +38,8 @@ function Router() {
         <Route path='/medicine/checkout/order-confirm' element={<MedicneOrderConfirm />} />
         <Route path='/familyMedical_history' element={<FamilyMedicalHIstory />} />
         <Route path='/medicine/order' element={<MedicineOrder />} />
+        <Route path='/medicine_trackOrder' element={<MedicineTrackorder />} />
+        
       </Routes>
       <LabRouting />
     </div>

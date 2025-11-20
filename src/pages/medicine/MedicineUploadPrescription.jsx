@@ -1,3 +1,4 @@
+// src/pages/medicine/MedicineUploadPrescription.jsx
 import React, { useState, useRef, useEffect } from "react";
 import { IoClose } from "react-icons/io5";
 import { FiCamera, FiUpload, FiUser, FiUsers } from "react-icons/fi";
