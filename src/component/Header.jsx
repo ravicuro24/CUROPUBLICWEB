@@ -94,7 +94,7 @@ const Navbar = () => {
                 key={item.name}
                 to={item.path}
                 className={`flex items-center space-x-1 px-2 py-1 rounded-md duration-600 transition-all hover:text-teal-600 hover:bg-teal-100 
-                  ${currentPath === item.path ? "text-teal-600 font-semibold" : ""}`}
+                  ${currentPath === item.path ? "text-teal-600 font-semibold bg-teal-100 " : ""}`}
               >
                 <span>{item.name}</span>
               </Link>

@@ -10,6 +10,7 @@ import SimilarMedicineProduct from "./SimilarMedicineProduct";
 function MedicneSubcategoryProduct() {
     const { id } = useParams(); // category ID
     const { latitude, longitude } = useAuth();
+    const [fetching, setFetching] = useState(false)
 
     const [subcategories, setSubcategories] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -30,6 +31,7 @@ function MedicneSubcategoryProduct() {
     const getProductBySubCategory = async (item, index) => {
         setActiveIndex(index);
         setSubCatName(item.subCatname);
+        setFetching(true)
 
         try {
             const response = await axiosInstance.get(
@@ -37,8 +39,10 @@ function MedicneSubcategoryProduct() {
             );
 
             setProductList(response.data.dtoList || []);
+            setFetching(false)
         } catch (error) {
             console.log(error);
+            setFetching(false)
         }
     };
 
@@ -76,7 +80,7 @@ function MedicneSubcategoryProduct() {
                 <p className="text-center capitalize font-bold">{`${subCatName}`}</p>
             </div>
 
-            <div className="flex flex-row justify-between items-start p-1">
+            <div className="flex flex-row justify-start items-start p-1 gap-4">
 
                 {/* Subcategory List */}
                 <div className="grid grid-cols-1 gap-4">
@@ -106,8 +110,12 @@ function MedicneSubcategoryProduct() {
                 </div>
 
                 {/* Product List */}
-                <MedicineProductBySubCategory productList={productList} />
+                <div className="">
+                    <MedicineProductBySubCategory productList={productList} loading={fetching} />
+                </div>
+
             </div>
+
 
             {/* No Data */}
             {!loading && subcategories.length === 0 && (

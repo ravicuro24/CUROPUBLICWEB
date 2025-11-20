@@ -1,3 +1,4 @@
+// src/pages/lab/labhome/LabPopularPackages.jsx
 import React from 'react'
 
 function LabPopularPackages() {

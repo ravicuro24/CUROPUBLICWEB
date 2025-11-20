@@ -3,99 +3,94 @@ import React, { useState } from "react";
 import { useAuth } from "../../Authorization/AuthContext";
 import axiosInstance from "../../Authorization/axiosInstance";
 import { useNavigate } from "react-router-dom";
+import Loader from "../../component/Loader";
 
-function MedicineProductBySubCategory({ productList = [] }) {
-    const { userData, getAllMedicineCartItems } = useAuth()
-    const [addingCartId, setAddingCartItd] = useState(null)
-    const navigate = useNavigate()
-    const userId = userData?.id
-    console.log("product list", productList)
+function MedicineProductBySubCategory({ productList = [], loading }) {
+    const { userData, getAllMedicineCartItems } = useAuth();
+    const [addingCartId, setAddingCartId] = useState(null);
+    const navigate = useNavigate();
+    const userId = userData?.id;
 
+    console.log("product list", productList);
 
     const handleAddtocart = async (item) => {
         try {
-            setAddingCartItd(item?.pharmacyMedicineBatch.id)
+            setAddingCartId(item?.pharmacyMedicineBatch?.id);
             const response = await axiosInstance.post(
-                `/endUserEndPoint/addToCart?userId=${userId}&batchId=${item?.pharmacyMedicineBatch.id}`
+                `/endUserEndPoint/addToCart?userId=${userId}&batchId=${item?.pharmacyMedicineBatch?.id}`
             );
             await getAllMedicineCartItems(userId);
-            console.log("Add to Cart In ShopMedicine", response)
-            setAddingCartItd(null)
+            console.log("Add to Cart In ShopMedicine", response);
+            setAddingCartId(null);
         } catch (error) {
-            console.log("error add to cart", error.respose)
-            setAddingCartItd(null)
+            console.error("Error adding to cart:", error?.response || error);
+            setAddingCartId(null);
         }
-    }
+    };
+
+
+
+    const defaultImageURL =
+        "https://png.pngtree.com/png-clipart/20240619/original/pngtree-drug-capsule-pill-from-prescription-in-drugstore-pharmacy-for-treatment-health-png-image_15366552.png";
 
     return (
-        <div className="space-y-3 md:space-y-4 px-3 h-screen  w-full">
+
+        <div className="flex flex-wrap justify-start items-start gap-2 mx-2">
+          
             {productList.map((item, index) => (
                 <div
+                    key={index}
                     onClick={() =>
-                        navigate('/medicine/subCategory/medicine_details', {
-                            state: { medicineList: item }
+                        navigate("/medicine/subCategory/medicine_details", {
+                            state: { medicineList: item },
                         })
                     }
-                    key={index}
-                    className="flex items-center bg-white border border-gray-200 rounded-md p-3 shadow-sm"
+                    className="flex flex-col bg-white border border-gray-200 shadow-sm rounded-xl w-32 md:w-40 h-70 cursor-pointer hover:shadow-md transition"
                 >
-                    {/* Image */}
-                    <div className="w-20 h-20 md:w-28 md:h-28 ">
-                        <img
-                            src={item?.pharmacyMedicineBatch?.medicine?.imagesUrl[0]}
-                            alt="medicine"
-                            className="h-full w-full object-contain rounded-md"
-                        />
-                        {/* <BinImage
-                            url={item?.pharmacyMedicineBatch?.medicine?.imagesUrl?.[0]}
-                            alt="medicine"
-                        /> */}
-                    </div>
+                    <img
+                        className="w-full h-24 rounded-t-xl object-contain"
+                        src={item?.pharmacyMedicineBatch?.medicine?.image || defaultImageURL}
+                        alt={item?.pharmacyMedicineBatch?.medicine?.name || "Medicine"}
+                    />
 
-                    {/* Content */}
-                    <div className="ml-3 flex flex-col justify-between w-full">
-                        {/* Name */}
-                        <p className="font-semibold text-sm md:text-base line-clamp-2">
+                    <div className="p-3 md:p-4 flex flex-col justify-between flex-grow">
+                        <p className="text-xs md:text-sm line-clamp-2">
                             {item?.pharmacyMedicineBatch?.medicine?.name}
                         </p>
 
-                        {/* Category */}
-                        <p className="text-xs md:text-sm text-gray-500 mt-1">
-                            {item?.pharmacyMedicineBatch?.medicine?.packagingType} • {item?.pharmacyMedicineBatch?.medicine?.packagingSize}
+                        <p className="text-[10px] md:text-xs text-gray-500 mt-1">
+                            {item?.pharmacyMedicineBatch?.medicine?.packagingType} •{" "}
+                            {item?.pharmacyMedicineBatch?.medicine?.packagingSize}
                         </p>
 
-                        {/* Price & Distance */}
-                        <div className="flex  justify-between items-center mt-2">
-                            <div className="flex flex-col justify-start items-start mt-2">
-                                <p className="text-green-700 font-semibold text-sm md:text-lg">
-                                    ₹{item?.pharmacyMedicineBatch?.effectiveCostPrice}
-                                </p>
+                        <div className="mt-2">
+                            <p className="text-green-700 font-semibold text-sm md:text-lg">
+                                ₹{item?.pharmacyMedicineBatch?.effectiveCostPrice}
+                            </p>
 
-                                <p className="text-[10px] md:text-xs text-gray-400">
-                                    {item?.distance?.toFixed(2)} km away
-                                </p>
-                            </div>
-                            <div>
-                                <button
-                                    onClick={() => handleAddtocart(item)}
-                                    className="bg-green-500 text-white px-4 py-1 rounded-md"
-                                >
-                                    {addingCartId === item?.pharmacyMedicineBatch.id ? (
-                                        <span className="loading loading-spinner loading-sm"></span>
-                                    ) : (
-                                        " Add "
-                                    )}
-                                </button>
-
-                            </div>
+                            <p className="text-[10px] md:text-xs text-gray-400">
+                                {item?.distance?.toFixed(2)} km away
+                            </p>
                         </div>
+
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleAddtocart(item);
+                            }}
+                            className="mt-2 bg-green-500 text-white px-4 py-1 rounded-md hover:bg-green-600 transition"
+                        >
+                            {addingCartId === item?.pharmacyMedicineBatch?.id ? (
+                                <span className="loading loading-spinner loading-sm"></span>
+                            ) : (
+                                "Add"
+                            )}
+                        </button>
                     </div>
                 </div>
             ))}
-
         </div>
-
-
     );
 }
 

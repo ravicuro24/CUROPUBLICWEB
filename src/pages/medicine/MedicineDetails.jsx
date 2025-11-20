@@ -13,7 +13,7 @@ export default function MedicineDetails() {
     const medicine = state?.medicine;
     const [addingCart, setAddingCart] = useState(false);
     const [activeImage, setActiveImage] = useState(
-        medicine?.medicine?.imagesUrl?.[0] || ""
+        medicine?.medicine?.imagesUrl?.[0] || "https://thumbs.dreamstime.com/b/herbal-medicine-herbs-21119245.jpg"
     );
 
     if (!medicine) return <div>No medicine data found.</div>;
@@ -62,10 +62,11 @@ export default function MedicineDetails() {
                         {/* Main Image */}
                         <div className="w-full md:w-1/2 flex justify-center items-center p-2 bg-white rounded-lg shadow-sm">
                             <img
-                                src={activeImage}
+                                src={activeImage || "https://thumbs.dreamstime.com/b/herbal-medicine-herbs-21119245.jpg"}
                                 alt="medicine"
                                 className="w-full h-64 md:h-72 object-contain"
                             />
+
                         </div>
 
                         {/* Product Text */}

@@ -118,7 +118,7 @@ function MedicineCartItems() {
             <h2 className="text-2xl font-bold text-gray-700">Your Cart is Empty</h2>
             <p className="text-gray-500 mb-4">Start adding items to your cart!</p>
             <button
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/medicine/delivery")}
                 className="bg-green-500 text-white px-6 py-2 rounded-md shadow"
             >
                 Browse Products
