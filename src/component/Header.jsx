@@ -10,8 +10,15 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import GetCurrentLocation from "../Authorization/GetCurrentLocation";
 import logo from "../assets/logo.png";
 import { useAuth } from "../Authorization/AuthContext";
+const placeholders = [
+  "Search for medicine",
+  "Search for pain relief",
+  "Search for vitamins",
+  "Search for health products",
+];
 
 const Navbar = () => {
+  const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const { logout, token, setAuthModal, allmedicineIncart, getAllMedicineCartItems, userData } = useAuth();
@@ -20,6 +27,16 @@ const Navbar = () => {
   const id = userData?.id;
   const profileRef = useRef(null);
   const currentPath = location.pathname;
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPlaceholderIndex((prev) =>
+        prev === placeholders.length - 1 ? 0 : prev + 1
+      );
+    }, 2000); // change every 2 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   const menu = [
     { name: "Pharmacy", path: "/medicine/delivery", icon: <MdLocalPharmacy size={18} /> },
@@ -112,7 +129,11 @@ const Navbar = () => {
             {/* SEARCH BAR */}
             <div className="hidden sm:flex items-center bg-gray-100 px-3 py-1.5 rounded-full w-56">
               <FiSearch className="text-gray-500 mr-2" />
-              <input type="text" placeholder="Search for medicine" className="bg-transparent outline-none text-sm w-full border-0" />
+              <input
+                type="text"
+                placeholder={placeholders[placeholderIndex]}
+                className="bg-transparent outline-none text-sm w-full border-0 transition-all duration-300"
+              />
             </div>
 
             {/* CART */}

@@ -18,6 +18,8 @@ import MedicineOrder from '../pages/medicine/MedicineOrder'
 import LabRouting from './LabRouting'
 import ManageProfile from '../component/profile/ManageProfile'
 import MedicineTrackorder from '../pages/medicine/MedicineTrackorder'
+import DoctorRouting from './DoctorRouting'
+import AmbulanceRouting from './AmbulanceRouting'
 
 function Router() {
   return (
@@ -39,9 +41,11 @@ function Router() {
         <Route path='/familyMedical_history' element={<FamilyMedicalHIstory />} />
         <Route path='/medicine/order' element={<MedicineOrder />} />
         <Route path='/medicine_trackOrder' element={<MedicineTrackorder />} />
-        
+
       </Routes>
       <LabRouting />
+      <DoctorRouting />
+      <AmbulanceRouting />
     </div>
   )
 }
