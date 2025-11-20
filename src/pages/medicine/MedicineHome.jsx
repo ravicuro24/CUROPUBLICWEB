@@ -5,8 +5,7 @@ import MedicineHero from './MedicineHero'
 function MedicineHome() {
   return (
     <div>
-      <MedicineHero/>
-      
+      <MedicineHero/>      
     </div>
   )
 }

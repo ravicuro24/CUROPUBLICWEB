@@ -15,6 +15,8 @@ import MedicneOrderConfirm from '../pages/medicine/MedicneOrderConfirm'
 import SubCategoryMedicineDetails from '../pages/medicine/SubCategoryMedicineDetails'
 import FamilyMedicalHIstory from '../component/familyMedical/FamilyMedicalHIstoryWrapper'
 import MedicineOrder from '../pages/medicine/MedicineOrder'
+import LabRouting from './LabRouting'
+import ManageProfile from '../component/profile/ManageProfile'
 
 function Router() {
   return (
@@ -23,19 +25,20 @@ function Router() {
         <Route path='/' element={<LandingPage />} />
         <Route path='/medicine/delivery' element={<MedicineHome />} />
         <Route path='/login' element={<Login />} />
+        <Route path='/manage_profile' element={<ManageProfile />} />
         <Route path='/profile' element={<MyProfile />} />
         <Route path='/medicine/category/subcategory/product/:id' element={<MedicneSUbcategoryProduct />} />
         <Route path='/medicine/cart' element={<MedicineCartItems />} />
-        <Route path='/medicine/shopbyhealthconcern/medicine/:name' element={<ShopByHealthConcernMedicne />}/>
-        <Route path='/medicine/shopbyhealthconcern/medicine_details' element={<MedicineDetails />}/>
-        <Route path='/medicine/subCategory/medicine_details' element={<SubCategoryMedicineDetails />}/>
-        <Route path='/medicine/checkout' element={<MedicineCheckout />}/>
-        <Route path='/medicine/payemnt' element={<MedicinePaymentMethod />}/>
-        <Route path='/medicine/checkout/order-confirm' element={<MedicneOrderConfirm />}/>
-        <Route path='/familyMedical_history' element={<FamilyMedicalHIstory />}/>
-        <Route path='/medicine/order' element={<MedicineOrder />}/>
-
+        <Route path='/medicine/shopbyhealthconcern/medicine/:name' element={<ShopByHealthConcernMedicne />} />
+        <Route path='/medicine/shopbyhealthconcern/medicine_details' element={<MedicineDetails />} />
+        <Route path='/medicine/subCategory/medicine_details' element={<SubCategoryMedicineDetails />} />
+        <Route path='/medicine/checkout' element={<MedicineCheckout />} />
+        <Route path='/medicine/payemnt' element={<MedicinePaymentMethod />} />
+        <Route path='/medicine/checkout/order-confirm' element={<MedicneOrderConfirm />} />
+        <Route path='/familyMedical_history' element={<FamilyMedicalHIstory />} />
+        <Route path='/medicine/order' element={<MedicineOrder />} />
       </Routes>
+      <LabRouting />
     </div>
   )
 }

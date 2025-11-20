@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { IoCaretBackSharp, IoCaretForwardSharp } from "react-icons/io5";
 
 export default function SimilarMedicineProduct({ name }) {
+   
     const [medicines, setMedicines] = useState([]);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate()

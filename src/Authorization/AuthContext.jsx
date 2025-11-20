@@ -11,8 +11,8 @@ export const AuthProvider = ({ children }) => {
   const [authModal, setAuthModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const [latitude, setLatitude] = useState(null);
-  const [longitude, setLongitude] = useState(null);
+  const [latitude, setLatitude] = useState(25.33297); //25.33297
+  const [longitude, setLongitude] = useState(82.966293); // 82.966293
 
   const [allmedicineIncart, setAllMedicineInCart] = useState([]);
 

@@ -11,4 +11,5 @@ export default defineConfig({
     strictPort: true,   // do not switch to another port if 300 is in use
     host: true,         // allows access from network (optional)
   },
+  
 })

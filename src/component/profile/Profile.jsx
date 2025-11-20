@@ -348,8 +348,6 @@ const MyProfile = () => {
 
                     </div>
                 </div>
-                <SavedAddress />
-
             </div>
 
             {/* GENDER MODAL */}

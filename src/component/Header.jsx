@@ -5,11 +5,11 @@ import { MdLocalPharmacy } from "react-icons/md";
 import { BiTestTube } from "react-icons/bi";
 import { FaUserMd, FaAmbulance, FaUserCircle } from "react-icons/fa";
 import { HiHome, HiOutlineLocationMarker } from "react-icons/hi";
-import { useAuth } from "../Authorization/AuthContext";
 import Swal from "sweetalert2";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import GetCurrentLocation from "../Authorization/GetCurrentLocation";
 import logo from "../assets/logo.png";
+import { useAuth } from "../Authorization/AuthContext";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -29,11 +29,11 @@ const Navbar = () => {
     { name: "Ambulance", path: "/ambulance", icon: <FaAmbulance size={18} /> },
   ];
 
-  // CLICK OUTSIDE PROFILE CLOSE
+  // CLICK OUTSIDE PROFILE
   useEffect(() => {
     function handleClickOutside(event) {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
-        setProfileOpen(false);
+        // Prevent close unless clicking outside
       }
     }
 
@@ -49,6 +49,7 @@ const Navbar = () => {
     };
   }, []);
 
+  // LOGOUT FUNCTION
   const handleLogout = () => {
     Swal.fire({
       title: "Logout?",
@@ -68,44 +69,37 @@ const Navbar = () => {
     });
   };
 
-  // CLOSE PROFILE WHEN CLICKING MENU ITEMS
+  // Close sidebar after clicking item
   const handleProfileMenuClick = (action) => {
-    setProfileOpen(false); // <-- FIX: closes submenu on click
+    setProfileOpen(false);
     action();
   };
 
   return (
     <nav className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
-
-        {/* MAIN NAV */}
         <div className="flex justify-between items-center h-16">
 
           {/* LOGO */}
-          <div className="flex items-center">
+          <div className="flex items-center mx-4">
             <Link to="/">
-              <img src={logo} alt="" className="h-8 w-36" />
+              <img src={logo} alt="" className="md:h-5 md:w-30 lg:h-8 xl:h-5 xl:w-30 lg:w-36 h-3 w-14" />
             </Link>
           </div>
 
           {/* DESKTOP MENU */}
           <div className="hidden md:flex items-center space-x-6 text-gray-700 text-sm font-medium">
-
             {menu.map((item) => (
               <Link
                 key={item.name}
                 to={item.path}
-                className={`flex items-center space-x-1 hover:text-teal-600 
+                className={`flex items-center space-x-1 px-2 py-1 rounded-md duration-600 transition-all hover:text-teal-600 hover:bg-teal-100 
                   ${currentPath === item.path ? "text-teal-600 font-semibold" : ""}`}
               >
-                <span className={`${currentPath === item.path ? "text-teal-600" : ""}`}>
-                  {item.icon}
-                </span>
                 <span>{item.name}</span>
               </Link>
             ))}
 
-            {/* Location */}
             <div className="flex items-center space-x-1">
               <HiOutlineLocationMarker size={18} />
               <GetCurrentLocation />
@@ -129,42 +123,15 @@ const Navbar = () => {
               </span>
             </button>
 
-
-            {/* PROFILE */}
+            {/* PROFILE ICON */}
             {token ? (
-              <div className="relative" ref={profileRef}>
+              <div>
                 <img
                   src="https://randomuser.me/api/portraits/women/44.jpg"
                   alt="Profile"
                   className="w-8 h-8 rounded-full border cursor-pointer"
-                  onClick={() => setProfileOpen(!profileOpen)}
+                  onClick={() => setProfileOpen(true)}
                 />
-
-                {profileOpen && (
-                  <div className="absolute right-0 mt-2 w-40 bg-white shadow-md rounded-md py-2 border z-50">
-
-                    <button
-                      onClick={() => handleProfileMenuClick(() => navigate("/profile"))}
-                      className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                    >
-                      Profile
-                    </button>
-
-                    <button
-                      onClick={() => handleProfileMenuClick(() => navigate("/medicine/order"))}
-                      className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                    >
-                      My Orders
-                    </button>
-
-                    <button
-                      onClick={() => handleProfileMenuClick(handleLogout)}
-                      className="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600"
-                    >
-                      Logout
-                    </button>
-                  </div>
-                )}
               </div>
             ) : (
               <FaUserCircle onClick={() => setAuthModal(true)} size={22} className="cursor-pointer" />
@@ -182,17 +149,75 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* MOBILE MENU */}
-      {menuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-200 px-4 pb-4 space-y-3 text-gray-700 text-sm">
+      {/* ============================
+            RIGHT SIDE PROFILE SLIDE BAR (SLOW MOTION)
+      ============================= */}
+      {profileOpen && (
+        <>
+          {/* BACKDROP WITH FADE */}
+          <div
+            onClick={() => setProfileOpen(false)}
+            className={`fixed inset-0 bg-black/40 z-40 transition-opacity duration-500 
+            ${profileOpen ? "opacity-100" : "opacity-0"}`}
+          ></div>
 
+          {/* SLIDING PROFILE PANEL */}
+          <div
+            ref={profileRef}
+            className={`
+              fixed top-0 right-0 h-full w-64 bg-white shadow-2xl z-50 
+              transform transition-transform duration-500 ease-in-out
+              ${profileOpen ? "translate-x-0" : "translate-x-full"}
+            `}
+          >
+            <div className="p-4 border-b flex justify-between items-center">
+              <h2 className="text-lg font-semibold">My Account</h2>
+              <button onClick={() => setProfileOpen(false)} className="text-gray-600 text-xl">✕</button>
+            </div>
+
+            <div className="flex flex-col mt-3">
+              <button
+                onClick={() => handleProfileMenuClick(() => navigate("/manage_profile"))}
+                className="w-full text-left px-4 py-3 hover:bg-gray-100 cursor-pointer"
+              >
+                Manage Profile
+              </button>
+
+              <button
+                onClick={() => handleProfileMenuClick(() => navigate("/medicine/order"))}
+                className="w-full text-left px-4 py-3 hover:bg-gray-100"
+              >
+                My Orders
+              </button>
+
+              <button
+                onClick={() => handleProfileMenuClick(handleLogout)}
+                className="w-full text-left px-4 py-3 text-red-600 hover:bg-gray-100"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ============================
+            MOBILE MENU (BOTTOM SLIDER)
+      ============================= */}
+      {menuOpen && (
+        <div
+          className={`
+            md:hidden bg-white border-t border-gray-200 px-4 pb-4 space-y-3 text-gray-700 text-sm
+            transform transition-transform duration-500 ease-in-out
+            ${menuOpen ? "translate-y-0" : "translate-y-full"}
+          `}
+        >
           {menu.map((item) => (
             <Link
               key={item.name}
               to={item.path}
               onClick={() => setMenuOpen(false)}
-              className={`flex items-center space-x-2 py-2 
-                hover:text-teal-600 
+              className={`flex items-center space-x-2 py-2 hover:text-teal-600 
                 ${currentPath === item.path ? "text-teal-600 font-semibold" : ""}`}
             >
               <span>{item.icon}</span>
@@ -204,9 +229,9 @@ const Navbar = () => {
             <HiOutlineLocationMarker size={18} />
             <GetCurrentLocation />
           </div>
-
         </div>
       )}
+
     </nav>
   );
 };

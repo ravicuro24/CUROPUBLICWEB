@@ -141,7 +141,7 @@ export default function MedicineDetails() {
 
             <div className="mt-10">
                 <SimilarMedicineProduct
-                    name={
+                    name={medicine.medicine?.name ||
                         medicine.medicine?.prescribedFor ||
                         medicine.medicine?.symptoms?.[0]
                     }

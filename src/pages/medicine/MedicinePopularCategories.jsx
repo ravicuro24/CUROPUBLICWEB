@@ -45,7 +45,7 @@ function MedicinePopularCategories() {
                         className="shadow-md bg-white hover:shadow-2xl rounded-md p-3 flex flex-col items-center justify-center text-center transition cursor-pointer"
                     >
                         <img
-                            src={item.imageUrl}
+                            src={item.imageUrl || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQTfAEcls00hkcIVfM7Znr95z3vkKn8K4e2tgAHtAgw3A&s'}
                             alt={item.name}
                             className="h-16 w-full md:h-24 md:w-full object-cover rounded-md"
                         />

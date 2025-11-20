@@ -15,7 +15,7 @@ function MedicneSubcategoryProduct() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    const [distance] = useState(5);
+    const [distance] = useState(1200);
     const [productList, setProductList] = useState([]);
     const [subCatName, setSubCatName] = useState("");
     const [activeIndex, setActiveIndex] = useState(0);
