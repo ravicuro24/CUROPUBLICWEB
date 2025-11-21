@@ -1,0 +1,33 @@
+name: CICD
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v3
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+      - name: Build Docker Image
+        run: docker build -t rdvisionuat/curo24frontend .
+      - name: Publish image to Docker Hub
+        run: docker push rdvisionuat/curo24frontend:latest   
+
+  deploy: 
+    needs: build
+    runs-on: self-hosted    
+    steps:
+      - name: Login to Docker Hub (Deploy)
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+      - name: Pull image from Docker Hub
+        run: docker pull rdvisionuat/curo24frontend:latest 
+      - name: Delete Old Container
+        run: docker rm -f reactContainer || true
+      - name: Run Docker Container
+        run: docker run -d -p 80:3000 --name reactContainer rdvisionuat/curo24frontend
