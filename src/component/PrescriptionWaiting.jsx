@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 function PrescriptionWaiting() {
     const { connected, subscribe } = useStomp();
     const [subscription, setSubscription] = useState(null);
+    const [isPrepared, setIsPrepared] = useState(false)
 
     const recentUploadedPrescriptionId = localStorage.getItem("recentUplaodedPrescriptionIs");
     const [recentAcceptedPrescriptionId, setRecentAcceptedPrescriptionId] = useState(
@@ -59,7 +60,7 @@ function PrescriptionWaiting() {
             subscribeToEndpoint(
                 `/topic/prescription-prepared-${recentAcceptedPrescriptionId}`,
                 (msg) => {
-                    alert(`Pharmacist prepared your prescription: ${msg.message}`);
+                    setIsPrepared(true)
                 }
             );
         }
@@ -113,28 +114,31 @@ function PrescriptionWaiting() {
 
             {/* --- EXISTING UI BELOW --- */}
             <div className="bg-white shadow-xl rounded-2xl p-6 sm:p-8 lg:p-10 w-full max-w-sm sm:max-w-md lg:max-w-lg text-center border-t-4 border-teal-600">
-
-                <div className="flex justify-center mb-6">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 border-4 border-teal-600 border-t-transparent rounded-full animate-spin"></div>
+                {isPrepared ? <div >
+                    
                 </div>
-
+                    :
+                    <div className="flex justify-center mb-6">
+                        <div className="w-12 h-12 sm:w-14 sm:h-14 border-4 border-teal-600 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                }
                 <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-gray-800">
                     Prescription Uploaded Successfully!
                 </h1>
 
-                <p className="text-gray-600 mt-3 text-sm sm:text-base leading-relaxed">
+                {!isPrepared && <p className="text-gray-600 mt-3 text-sm sm:text-base leading-relaxed">
                     {recentAcceptedPrescriptionId
                         ? "Pharmacist accepted your prescription. Preparing your order..."
                         : "Please wait while our pharmacist reviews your prescription."}
-                </p>
+                </p>}
 
-                <div className="mt-6 bg-teal-50 text-teal-800 rounded-xl p-3 sm:p-4 border border-teal-200">
+                {isPrepared ? <div className="p-3 text-green-100 rounded-2xl bg-green-600 mt-10"> Prescription prepared now you can preview and place order ...</div> : <div className="mt-6 bg-teal-50 text-teal-800 rounded-xl p-3 sm:p-4 border border-teal-200">
                     <p className="text-sm sm:text-base font-medium">
                         {recentAcceptedPrescriptionId
                             ? "⏳ Preparing your prescription…"
                             : "⏳ Waiting for pharmacist response…"}
                     </p>
-                </div>
+                </div>}
 
                 <div className="mt-8">
                     <div className="w-full h-2 bg-teal-100 rounded-full overflow-hidden">
@@ -144,7 +148,7 @@ function PrescriptionWaiting() {
             </div>
 
             <div className="mt-5">
-                {recentAcceptedPrescriptionId && <PrescriptionMedicineCart />}
+                {recentAcceptedPrescriptionId && <PrescriptionMedicineCart prepared={isPrepared}/>}
             </div>
         </div>
     );

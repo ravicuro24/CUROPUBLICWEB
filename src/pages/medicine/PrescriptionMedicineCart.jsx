@@ -3,14 +3,28 @@ import React, { useEffect, useState } from "react";
 import axiosInstance from "../../Authorization/axiosInstance";
 import { useAuth } from "../../Authorization/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useStomp } from "../../notification/StompSocket";
 
-function PrescriptionMedicineCart() {
+function PrescriptionMedicineCart({ prepared }) {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const { userData } = useAuth();
     const [handlingChareg, setHandlingChareg] = useState(12)
     const navigate = useNavigate()
+    const { connected, subscribe } = useStomp();
+    const [subscription, setSubscription] = useState(null);
+
+
+    const subscribeToEndpoint = (endpoint, onMessage) => {
+        if (!connected) return;
+
+        // Unsubscribe old if exists
+        if (subscription) subscription.unsubscribe();
+
+        const sub = subscribe(endpoint, onMessage);
+        setSubscription(sub);
+    };
 
     // Fetch cart items added by pharmacist
     const fetchCartItems = async () => {
@@ -19,9 +33,6 @@ function PrescriptionMedicineCart() {
             const response = await axiosInstance.get(
                 `/endUserEndPoint/getMedicineCartAddedByPharmacy?userId=${userData.id}`
             );
-
-            console.log("🧾 Cart medicines fetched:", response.data.dtoList);
-
             setItems(response.data.dtoList || []);
         } catch (error) {
             console.log("❌ Error fetching prescription cart:", error);
@@ -32,7 +43,11 @@ function PrescriptionMedicineCart() {
     };
 
     useEffect(() => {
+        subscribeToEndpoint("/topic/cart-update-" + userData.id, (msg) => {
+            fetchCartItems()
+        })
         fetchCartItems();
+
     }, []);
 
     const totalAmount = items.reduce(
@@ -133,6 +148,7 @@ function PrescriptionMedicineCart() {
                 {items.length > 0 && !loading && (
                     <div className="mt-8">
                         <button
+                            disabled={!prepared}
                             onClick={() => navigate("/medicine/payment/Prescription",
                                 {
                                     state: {
