@@ -2,27 +2,33 @@
 
 import React, { useEffect } from 'react'
 import { useLabAuth } from '../../../Authorization/LabAuthContext';
+import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../../../Authorization/axiosInstance';
 
 function LabCartItems() {
-    const { userData, getAllCartItems, labCartItems } = useLabAuth()
-    const id = userData?.id
+    const { userData, getAllLabCartItems, labCartItems } = useLabAuth()
+    const navigate = useNavigate()
+    const id = userData?.id;
 
     useEffect(() => {
-        getAllCartItems()
+        getAllLabCartItems()
     }, [])
 
     const calculateTotal = () => {
         return labCartItems.reduce((total, item) => total + (item.unitPrice * item.numberOfPatients), 0);
     }
 
-    const handleRemoveItem = (itemId) => {
-        // Implement remove functionality
-        console.log('Remove item:', itemId);
+    const handleRemoveItem = async (item) => {
+        try {
+            const response = await axiosInstance.put(`/endUserEndPoint/removeTestPackageFromCart?cartItemId=${item.id}`)
+            await getAllLabCartItems();
+        } catch (error) {
+            console.error("Error removing item:", error?.response || error);
+        }
     }
 
     const handleProceedToCheckout = () => {
-        // Implement checkout functionality
-        console.log('Proceed to checkout');
+        navigate('/lab/package/selectSlot', { state: labCartItems })
     }
 
     return (
@@ -117,7 +123,7 @@ function LabCartItems() {
 
                                                         {/* Remove Button */}
                                                         <button
-                                                            onClick={() => handleRemoveItem(item.id)}
+                                                            onClick={() => handleRemoveItem(item)}
                                                             className="flex items-center gap-1 hover:bg-red-100 px-2 py-1 transition ease-in-out duration-300 rounded-lg cursor-pointer text-red-600 hover:text-red-700 font-medium text-sm transition-colors duration-200"
                                                         >
                                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -152,25 +158,15 @@ function LabCartItems() {
                                         <span className="text-gray-600">Tax</span>
                                         <span className="text-gray-900">₹0</span>
                                     </div>
-                                    <div className="border-t border-gray-200 pt-3">
-                                        <div className="flex justify-between text-base font-semibold">
-                                            <span className="text-gray-900">Total</span>
-                                            <span className="text-teal-600">₹{calculateTotal().toLocaleString()}</span>
-                                        </div>
-                                    </div>
+
                                 </div>
 
                                 {/* Checkout Button */}
                                 <button
-                                    onClick={handleProceedToCheckout}
-                                    className="w-full bg-teal-600 cursor-pointer hover:bg-teal-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+                                    onClick={() => handleProceedToCheckout()}
+                                    className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
                                 >
-                                    Proceed to Checkout
-                                </button>
-
-                                {/* Continue Shopping */}
-                                <button className="w-full mt-3 cursor-pointer bg-white hover:bg-gray-50 text-gray-700 font-medium py-2.5 px-4 border border-gray-300 rounded-lg transition-colors duration-200">
-                                    Continue Shopping
+                                    Select Slot
                                 </button>
 
                                 {/* Security Badge */}

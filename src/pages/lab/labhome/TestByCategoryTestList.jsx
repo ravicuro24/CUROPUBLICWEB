@@ -2,19 +2,25 @@
 import React, { useEffect, useState } from 'react'
 import axiosInstance from '../../../Authorization/axiosInstance'
 import { useAuth } from '../../../Authorization/AuthContext'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { useLabAuth } from '../../../Authorization/LabAuthContext'
 
 function TestByCategoryTestList() {
     const { latitude, longitude } = useAuth()
+    const { userData, getAllLabCartItems, labCartItems } = useLabAuth()
+    const id = userData?.id
     const [size] = useState(10)
     const [distance] = useState(5)
     const [pageNumber, setPageNumber] = useState(1)
     const location = useLocation()
+    const navigate = useNavigate()
     const item = location.state
     const [organName, setOrganName] = useState(item?.name || '')
-
     const [testList, setTestList] = useState([])
     const [loading, setLoading] = useState(false)
+    const [addingId, setAddingId] = useState(null)
+
+    console.log("lab cart items", labCartItems)
 
     useEffect(() => {
         getAllTestByOrganList()
@@ -38,22 +44,27 @@ function TestByCategoryTestList() {
         }
     }
 
-    // Function to get a default test image if package image is not available
     const getPackageImage = (pkg) => {
-        if (pkg.labPackage.packageImage) {
-            return pkg.labPackage.packageImage;
-        }
-        // Use the first test's image if available, otherwise use a default
-        const firstTest = pkg.labPackage.tests[0];
-        if (firstTest?.imagesUrl?.length > 0) {
-            return firstTest.imagesUrl[0];
-        }
-        return 'https://via.placeholder.com/300x200/3B82F6/FFFFFF?text=Medical+Test';
+        if (pkg.labPackage.packageImage) return pkg.labPackage.packageImage
+        const firstTest = pkg.labPackage.tests[0]
+        if (firstTest?.imagesUrl?.length > 0) return firstTest.imagesUrl[0]
+        return 'https://via.placeholder.com/300x200/3B82F6/FFFFFF?text=Medical+Test'
     }
 
-    // Calculate discounted price
     const calculateDiscountedPrice = (price, discount) => {
-        return price - (price * discount / 100);
+        return price - (price * discount / 100)
+    }
+
+    const handleAddToCart = async (pkg) => {
+        setAddingId(pkg.labPackage.id)
+        try {
+            await axiosInstance.post(`endUserEndPoint/addTestPackageToCart?userId=${id}&packageId=${pkg.labPackage.id}`)
+            await getAllLabCartItems()
+            setAddingId(null)
+        } catch (error) {
+            console.error("Error adding to cart:", error?.response || error.message)
+            setAddingId(null)
+        }
     }
 
     return (
@@ -89,18 +100,13 @@ function TestByCategoryTestList() {
                         </div>
                     )}
                 </div>
-                {/* Header */}
 
-
-
-                {/* Loading State */}
                 {loading && (
                     <div className="flex justify-center items-center py-12">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
                     </div>
                 )}
 
-                {/* Empty State */}
                 {!loading && testList.length === 0 && (
                     <div className="text-center py-12">
                         <div className="text-gray-400 text-6xl mb-4">🔍</div>
@@ -113,33 +119,31 @@ function TestByCategoryTestList() {
                     </div>
                 )}
 
-                {/* Test Packages Grid */}
                 {!loading && testList.length > 0 && (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {testList.map((pkg) => {
                             const discountedPrice = calculateDiscountedPrice(
                                 pkg.labPackage.price,
                                 pkg.labPackage.discount
-                            );
+                            )
+
+                            const isInCart = labCartItems.some(item => item.labPackage.id === pkg.labPackage.id)
 
                             return (
                                 <div
                                     key={pkg.labPackage.id}
                                     className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 flex flex-col h-full"
                                 >
-                                    {/* Package Image */}
                                     <div className="relative h-48 bg-gray-200 overflow-hidden">
                                         <img
-                                            src="https://images.pexels.com/photos/2280571/pexels-photo-2280571.jpeg"
+                                            src={getPackageImage(pkg)}
                                             alt={pkg.labPackage.packageName}
                                             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                                             onError={(e) => {
                                                 e.target.src =
-                                                    "https://via.placeholder.com/300x200/3B82F6/FFFFFF?text=Medical+Test";
+                                                    "https://via.placeholder.com/300x200/3B82F6/FFFFFF?text=Medical+Test"
                                             }}
                                         />
-
-                                        {/* Discount Badge */}
                                         {pkg.labPackage.discount > 0 && (
                                             <div className="absolute top-3 right-3">
                                                 <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
@@ -147,8 +151,6 @@ function TestByCategoryTestList() {
                                                 </span>
                                             </div>
                                         )}
-
-                                        {/* Popular Badge */}
                                         {pkg.labPackage.popular && (
                                             <div className="absolute top-3 left-3">
                                                 <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
@@ -158,20 +160,15 @@ function TestByCategoryTestList() {
                                         )}
                                     </div>
 
-                                    {/* Card Body Content */}
                                     <div className="p-5 flex flex-col flex-grow justify-between">
                                         <div>
-                                            {/* Package Name */}
                                             <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
                                                 {pkg.labPackage.packageName}
                                             </h3>
-
-                                            {/* Description */}
                                             <p className="text-gray-600 text-sm mb-4 line-clamp-2">
                                                 {pkg.labPackage.description}
                                             </p>
 
-                                            {/* Price Section */}
                                             <div className="flex items-center justify-between mb-4">
                                                 <div className="flex items-center space-x-2">
                                                     <span className="text-2xl font-bold text-gray-900">
@@ -188,7 +185,6 @@ function TestByCategoryTestList() {
                                                 </div>
                                             </div>
 
-                                            {/* Distance */}
                                             <div className="flex items-center justify-between mb-4 text-sm">
                                                 <div className="flex items-center text-gray-600">
                                                     <svg className="w-4 h-4 mr-1 text-teal-500" fill="currentColor" viewBox="0 0 20 20">
@@ -205,7 +201,6 @@ function TestByCategoryTestList() {
                                                 </div>
                                             </div>
 
-                                            {/* Test count preview */}
                                             <div className="border-t pt-4">
                                                 <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
                                                     <svg className="w-4 h-4 mr-2 text-teal-500" fill="currentColor" viewBox="0 0 20 20">
@@ -240,20 +235,32 @@ function TestByCategoryTestList() {
                                             </div>
                                         </div>
 
-                                        {/* Book Now Button at Bottom */}
-                                        <button className="w-full mt-4 bg-teal-700 hover:bg-teal-800 cursor-pointer text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
-                                            Add
-                                        </button>
+                                        {/* Conditional Button */}
+                                        {isInCart ? (
+                                            <button
+                                                onClick={() => navigate('/lab/cart')}
+                                                className="w-full mt-4 bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200"
+                                            >
+                                                Go to Cart
+                                            </button>
+                                        ) : (
+                                            <button
+                                                onClick={() => handleAddToCart(pkg)}
+                                                className="w-full mt-4 bg-teal-700 hover:bg-teal-800 cursor-pointer text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+                                            >
+                                                {addingId === pkg.labPackage.id ? (
+                                                    <span className="loading loading-spinner loading-sm"></span>
+                                                ) : (
+                                                    'Add to Cart'
+                                                )}
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
-                            );
+                            )
                         })}
                     </div>
-
                 )}
-
-                {/* Pagination (You can implement this later) */}
-
             </div>
         </div>
     )

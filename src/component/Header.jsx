@@ -23,7 +23,7 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const { logout, token, setAuthModal, allmedicineIncart, getAllMedicineCartItems, userData } = useAuth();
-  const { screen, setScreen, getAllCartItems ,labCartItems } = useLabAuth();
+  const { screen, setScreen, getAllLabCartItems, labCartItems } = useLabAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const id = userData?.id;
@@ -42,7 +42,7 @@ const Navbar = () => {
   }, []);
 
   useEffect(() => {
-    getAllCartItems()
+    getAllLabCartItems()
   }, [])
 
   const menu = [

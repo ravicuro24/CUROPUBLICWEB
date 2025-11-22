@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import axiosInstance from "./axiosInstance";
 
+
 const LabAuthContext = createContext();
 export const useLabAuth = () => useContext(LabAuthContext);
 
@@ -9,13 +10,14 @@ export const LabAuthProvider = ({ children }) => {
     const [token, setToken] = useState(null);
     const [userData, setUserdata] = useState(null);
     const [loading, setLoading] = useState(true);
+
     const [screen, setScreen] = useState("Pharmacy");
     const [latitude, setLatitude] = useState(25.33297);
     const [longitude, setLongitude] = useState(82.966293);
-    const [labCartItems, setLabCartItems] = useState([]);   // <<< NEW STATE
-    const [labCartLoading, setLabCartLoading] = useState(false);
 
-    const id = userData?.id;
+    const [labCartItems, setLabCartItems] = useState([]);
+    const [labCartLoading, setLabCartLoading] = useState(false);
+    const [selectedSlots, setSelectedSlots] = useState({});
 
     useEffect(() => {
         const storedUser = localStorage.getItem("userData");
@@ -27,17 +29,18 @@ export const LabAuthProvider = ({ children }) => {
         setLoading(false);
     }, []);
 
-    const getAllCartItems = async () => {
-        if (!id) return;
+    // API call to fetch lab cart items
+    const getAllLabCartItems = async () => {
+        if (!userData?.id) return;
         setLabCartLoading(true);
         try {
             const response = await axiosInstance.get(
-                `/endUserEndPoint/getLabCartItems?userId=${id}`
+                `/endUserEndPoint/getLabCartItems?userId=${userData.id}`
             );
-            console.log("Lab cart items response: ", response.data);
-            setLabCartItems(response.data.dtoList);    // <<< SAVE DATA HERE
+            const items = response.data?.dtoList || [];
+            setLabCartItems(items);
         } catch (error) {
-            console.log("Error fetching cart items:", error?.response);
+            console.error("Error fetching cart items:", error?.response || error);
         } finally {
             setLabCartLoading(false);
         }
@@ -49,9 +52,11 @@ export const LabAuthProvider = ({ children }) => {
         latitude, setLatitude,
         longitude, setLongitude,
         screen, setScreen,
-        labCartItems,                 // <<< EXPOSE FOR UI
+        labCartItems,
         labCartLoading,
-        getAllCartItems
+        getAllLabCartItems,
+        selectedSlots,
+        setSelectedSlots
     };
 
     return (
