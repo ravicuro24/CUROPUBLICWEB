@@ -150,7 +150,7 @@ function MedicneSubcategoryProduct() {
             {!loading && subcategories.length === 0 && (
                 <p className="text-gray-500 mt-4">No subcategories found.</p>
             )}
-            <SimilarMedicineProduct name={subCatName ?? "Headache"} />
+            <SimilarMedicineProduct name={subCatName} />
             <NewArrivalsMedicine />
 
         </div>

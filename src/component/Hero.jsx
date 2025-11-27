@@ -58,7 +58,7 @@ const Hero = () => {
         <section className="w-full relative overflow-hidden">
             {/* Background Gradient */}
             <div className="absolute inset-0 bg-gradient-to-br from-teal-50 via-blue-50 to-purple-50"></div>
-            
+
             {/* Animated Background Elements */}
             <div className="absolute inset-0 overflow-hidden">
                 <motion.div
@@ -102,7 +102,7 @@ const Hero = () => {
             <div className="relative w-full py-16 md:py-24 container mx-auto px-4 md:px-6">
                 <div className="w-full mx-auto flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12">
                     {/* Left Content */}
-                    <motion.div 
+                    <motion.div
                         className="flex-1 text-center md:text-left"
                         variants={containerVariants}
                         initial="hidden"
@@ -118,7 +118,7 @@ const Hero = () => {
                             </div>
                         </motion.div>
 
-                        <motion.h1 
+                        <motion.h1
                             variants={itemVariants}
                             className="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight"
                         >
@@ -127,7 +127,7 @@ const Hero = () => {
                             </span>
                         </motion.h1>
 
-                        <motion.h2 
+                        <motion.h2
                             variants={itemVariants}
                             className="text-xl md:text-3xl lg:text-4xl font-semibold mt-2 md:mt-4"
                         >
@@ -149,7 +149,7 @@ const Hero = () => {
                             </span>
                         </motion.h2>
 
-                        <motion.p 
+                        <motion.p
                             variants={itemVariants}
                             className="text-gray-600 mt-4 md:mt-6 text-lg md:text-xl max-w-2xl leading-relaxed"
                         >
@@ -157,7 +157,7 @@ const Hero = () => {
                         </motion.p>
 
                         {/* Search Bar */}
-                        <motion.div 
+                        <motion.div
                             variants={itemVariants}
                             className="mt-8 max-w-2xl"
                         >
@@ -170,7 +170,7 @@ const Hero = () => {
                                     placeholder="Search medicines, doctors, lab tests, health products..."
                                     className="w-full border-0 outline-none text-base bg-transparent placeholder-gray-400"
                                 />
-                                <motion.button 
+                                <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
                                     className="ml-2 bg-gradient-to-r from-teal-500 to-blue-600 text-white px-6 py-2 rounded-xl font-semibold flex items-center gap-2 hover:shadow-lg transition-all duration-300"
@@ -182,10 +182,10 @@ const Hero = () => {
                         </motion.div>
 
                         {/* Quick Actions */}
-                        
+
 
                         {/* Features */}
-                        <motion.div 
+                        <motion.div
                             variants={itemVariants}
                             className="mt-8 grid grid-cols-2 md:grid-cols-3 gap-4 max-w-2xl"
                         >
@@ -194,7 +194,7 @@ const Hero = () => {
                                 { icon: FiClock, text: "24/7 Available" },
                                 { icon: FiStar, text: "4.8/5 Rating" }
                             ].map((feature, index) => (
-                                <motion.div 
+                                <motion.div
                                     key={index}
                                     whileHover={{ scale: 1.05 }}
                                     className="flex items-center gap-2 text-sm text-gray-600"
@@ -207,7 +207,7 @@ const Hero = () => {
                     </motion.div>
 
                     {/* Right Image */}
-                    <motion.div 
+                    <motion.div
                         className="flex-1 flex justify-center"
                         variants={imageVariants}
                         initial="hidden"
@@ -215,7 +215,7 @@ const Hero = () => {
                     >
                         <div className="relative">
                             {/* Main Image Container */}
-                            <motion.div 
+                            <motion.div
                                 className="relative"
                                 animate={floatingAnimation}
                             >
@@ -224,7 +224,7 @@ const Hero = () => {
                                     alt="Doctor illustration"
                                     className="w-80 md:w-96 lg:w-[500px] object-contain drop-shadow-2xl"
                                 />
-                                
+
                                 {/* Floating Elements */}
                                 <motion.div
                                     className="absolute -top-4 -right-4 bg-white rounded-2xl p-4 shadow-2xl border border-gray-100"
@@ -240,7 +240,7 @@ const Hero = () => {
                                 >
                                     <div className="flex items-center gap-2">
                                         <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                                        <span className="text-xs font-semibold text-gray-700">Live Chat</span>
+                                        <span className="text-xs font-semibold text-gray-700">Quick Response</span>
                                     </div>
                                 </motion.div>
 
@@ -270,7 +270,7 @@ const Hero = () => {
                 </div>
 
                 {/* Bottom Stats */}
-                <motion.div 
+                <motion.div
                     className="mt-16 md:mt-20 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto"
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -282,7 +282,7 @@ const Hero = () => {
                         { number: "100+", label: "Cities Across India" },
                         { number: "24/7", label: "Support Available" }
                     ].map((stat, index) => (
-                        <motion.div 
+                        <motion.div
                             key={index}
                             whileHover={{ scale: 1.05 }}
                             className="text-center bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-white/80 shadow-sm hover:shadow-md transition-all duration-300"

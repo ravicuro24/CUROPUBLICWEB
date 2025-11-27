@@ -11,7 +11,6 @@ function TestByCategory() {
     const navigate = useNavigate()
     const [distance, setDistance] = useState(5);
     const [categoryList, setCategoryList] = useState([]);
-    const [deasesList, setDeasesList] = useState([]);
     const [symtomList, setSymtomList] = useState([]);
     const [vitalOrganList, setVitalOrganList] = useState([]);
     const [activeTab, setActiveTab] = useState('category');
@@ -21,7 +20,6 @@ function TestByCategory() {
     useEffect(() => {
         if (organList?.response) {
             setCategoryList(organList.response.category || []);
-            setDeasesList(organList.response.disease || []);
             setSymtomList(organList.response.symptom || []);
             setVitalOrganList(organList.response.vitalOrgan || []);
         }
@@ -38,8 +36,8 @@ function TestByCategory() {
             switch (type) {
                 case 'category':
                     return {
-                        gradient: 'from-teal-500 via-teal-700 to-teal-900',
-                        bg: 'bg-blue-50',
+                        gradient: 'from-teal-500 via-teal-700 to-teal-400',
+                        bg: '',
                         text: 'text-blue-600',
                         icon: (
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -95,15 +93,11 @@ function TestByCategory() {
         return (
 
             <div
-                className={`relative p-0.5 rounded-2xl  bg-gradient-to-r ${styles.gradient} transition-all duration-500 transform hover:cursor-pointer hover:shadow-2xl group`}
+                className={`relative p-0.5 rounded-2xl  bg-gradient-to-r ${styles.gradient} transition-all  duration-500 transform hover:cursor-pointer hover:shadow-2xl group`}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 onClick={() => navigate('/lab/package/Alltests', { state: item })}
-             >
-                {/* Animated gradient border */}
-                <div className={`absolute inset-0 rounded-md bg-gradient-to-r ${styles.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${isHovered ? 'animate-gradient-x' : ''
-                    }`}></div>
-
+            >
                 <div className="relative bg-white rounded-2xl p-4 h-full backdrop-blur-sm">
                     {/* Header */}
                     <div className="flex items-center justify-between mb-3">
@@ -129,7 +123,7 @@ function TestByCategory() {
 
 
                     {/* Action Button */}
-                    <button className={`w-full py-2 text-xs font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 border-2 border-transparent bg-gradient-to-r ${styles.gradient} text-white hover:shadow-lg`}>
+                    <button className={`w-full cursor-pointer py-2 text-xs font-semibold rounded-xl transition-all duration-300 transform border border-gray-300 text-teal-700 hover:bg-teal-50 hover:scale-105 flex items-center justify-center mt-4 group`} >
                         View Tests
                         <svg className="w-3 h-3 inline-block ml-1 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -144,8 +138,8 @@ function TestByCategory() {
         <button
             onClick={() => setActiveTab(tab)}
             className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 font-medium text-sm border-2 ${isActive
-                    ? 'border-teal-500 bg-teal-50 text-teal-700 shadow-md'
-                    : 'border-gray-200 bg-white text-gray-700 hover:border-teal-300 hover:bg-teal-50'
+                ? 'border-teal-500 bg-teal-50 text-teal-700 shadow-md'
+                : 'border-gray-200 bg-white text-gray-700 hover:border-teal-300 hover:bg-teal-50'
                 }`}
         >
             {icon}
@@ -162,7 +156,6 @@ function TestByCategory() {
     const renderContent = () => {
         const data =
             activeTab === 'category' ? categoryList :
-                activeTab === 'disease' ? deasesList :
                     activeTab === 'symptom' ? symtomList :
                         vitalOrganList;
 
@@ -265,17 +258,7 @@ function TestByCategory() {
                         </svg>
                     }
                 />
-                <TabButton
-                    tab="disease"
-                    label="Diseases"
-                    count={deasesList.length}
-                    isActive={activeTab === 'disease'}
-                    icon={
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                        </svg>
-                    }
-                />
+                
                 <TabButton
                     tab="symptom"
                     label="Symptoms"
@@ -310,7 +293,6 @@ function TestByCategory() {
                         {' '}
                         <span className="font-semibold text-teal-700">
                             {activeTab === 'category' ? categoryList.length :
-                                activeTab === 'disease' ? deasesList.length :
                                     activeTab === 'symptom' ? symtomList.length :
                                         vitalOrganList.length}
                         </span>{' '}

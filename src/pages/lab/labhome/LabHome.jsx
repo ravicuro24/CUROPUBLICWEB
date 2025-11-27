@@ -5,6 +5,7 @@ import LabHero from './LabHero'
 import LabPopularPackages from './LabPopularPackages'
 import TestByCategory from './TestByCategory'
 import Testimonial from '../../../component/Testomonial'
+import TestByVitalOrganList from './TestByVitalOrganList'
 
 function LabHome() {
   return (
@@ -13,6 +14,7 @@ function LabHome() {
       <UploadLabPrescrotpion />
       <TestByCategory />
       <LabPopularPackages />
+      <TestByVitalOrganList/>
       <Testimonial/>
 
     </div>

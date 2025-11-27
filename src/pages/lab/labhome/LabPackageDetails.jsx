@@ -34,7 +34,7 @@ function LabPackageDetails() {
         const lastTwo = phone.slice(-2);
         return `+91-xxxxxxx${lastTwo}`;
     };
-
+    console.log("labPackage details:", labPackage);
     // Mask email → s*****t@domain.com
     const maskEmail = (email) => {
         if (!email) return "";
@@ -67,7 +67,7 @@ function LabPackageDetails() {
                         {/* Image Section */}
                         <div className="w-full relative">
                             <img
-                                src="https://images.pexels.com/photos/3199033/pexels-photo-3199033.jpeg"
+                                src={labPackage?.tests[0]?.imagesUrl[0]}
                                 alt={labPackage?.packageName}
                                 className="w-full h-40 md:h-full object-cover"
                             />
@@ -202,12 +202,12 @@ function LabPackageDetails() {
                                             <Shield size={16} className="text-gray-600" />
                                             <span className="text-sm text-gray-600">License Status:</span>
                                         </div>
-                                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${labPackage?.lab?.licenceVerified
+                                        {/* <span className={`px-3 py-1 rounded-full text-sm font-semibold ${labPackage?.lab?.licenceVerified
                                             ? "bg-green-100 text-green-800"
                                             : "bg-yellow-100 text-yellow-800"
                                             }`}>
                                             {labPackage?.lab?.licenceVerified ? "Verified" : "Pending Verification"}
-                                        </span>
+                                        </span> */}
                                     </div>
                                     <p className="text-xs text-gray-500 mt-2 break-all">
                                         GST: {labPackage?.lab?.gstRegistrationNumber}

@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import { IoCaretBackSharp, IoCaretForwardSharp } from "react-icons/io5";
 
 export default function SimilarMedicineProduct({ name }) {
-
     const [medicines, setMedicines] = useState([]);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
@@ -49,6 +48,18 @@ export default function SimilarMedicineProduct({ name }) {
         return () => clearInterval(interval);
     }, [medicines]);
 
+    // ⛔ Show message when no similar products found
+    if (!loading && medicines.length === 0) {
+        return (
+            <div className="mt-8 px-2 md:px-0">
+                <div className="bg-white p-4 rounded-lg flex flex-col">
+                    <h2 className="text-lg font-semibold mb-4">Similar products</h2>
+                    <p className="text-gray-500">No similar products found.</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="mt-8 px-2 md:px-0">
             <div className="bg-white p-4 rounded-lg flex flex-col">
@@ -61,7 +72,7 @@ export default function SimilarMedicineProduct({ name }) {
                         <button
                             onClick={scrollLeft}
                             className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 
-                                        bg-white shadow-md p-2 rounded-full z-10 hover:bg-gray-100"
+                                bg-white shadow-md p-2 rounded-full z-10 hover:bg-gray-100"
                         >
                             <IoCaretBackSharp />
                         </button>
@@ -82,8 +93,8 @@ export default function SimilarMedicineProduct({ name }) {
                                         }
                                         key={item.id}
                                         className="min-w-[150px] sm:min-w-[180px] md:min-w-[200px] 
-                                                   rounded-xl p-3 bg-white shadow-sm 
-                                                   hover:shadow-md transition-all cursor-pointer"
+                                            rounded-xl p-3 bg-white shadow-sm 
+                                            hover:shadow-md transition-all cursor-pointer"
                                     >
                                         <span className="bg-teal-600 text-white text-xs px-2 py-1 rounded-md font-semibold">
                                             SALE
@@ -124,15 +135,8 @@ export default function SimilarMedicineProduct({ name }) {
                                         </p>
 
                                         <div className="mt-2">
-                                            <p className="text-gray-500 text-[10px]">
-                                                MRP <span className="line-through">
-                                                    ₹{item.unitPrice || m.mrp || (item.effectiveCostPrice + 20)}
-                                                </span>{" "}
-                                                <span className="text-teal-600 font-semibold">5% off</span>
-                                            </p>
-
                                             <p className="text-base font-bold text-gray-800">
-                                                ₹{item.effectiveCostPrice || 0}
+                                                ₹{item.unitPrice || 0}
                                             </p>
                                         </div>
                                     </div>
@@ -144,7 +148,7 @@ export default function SimilarMedicineProduct({ name }) {
                         <button
                             onClick={scrollRight}
                             className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 
-                                        bg-white shadow-md p-2 rounded-full z-10 hover:bg-gray-100"
+                                bg-white shadow-md p-2 rounded-full z-10 hover:bg-gray-100"
                         >
                             <IoCaretForwardSharp />
                         </button>

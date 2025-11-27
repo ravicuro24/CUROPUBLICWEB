@@ -77,7 +77,8 @@ function MedicineProductBySubCategory({ productList = [], loading }) {
 
                         <div>
                             <p className="text-teal-700 font-semibold text-sm md:text-lg">
-                                ₹{item?.pharmacyMedicineBatch?.effectiveCostPrice}
+                                ₹{item?.pharmacyMedicineBatch?.unitPrice
+                                }
                             </p>
                             <p className="text-[10px] md:text-xs text-gray-400">
                                 {item?.distance?.toFixed(2)} km away
@@ -100,33 +101,26 @@ function MedicineProductBySubCategory({ productList = [], loading }) {
                                 type="button"
                                 onClick={(e) => {
                                     e.stopPropagation();
-
-                                    if (!item?.pharmacyMedicineBatch?.medicine?.otc) {
-                                        // NOT OTC → show alert and stop further action
-                                        return alert("Prescription required to add this medicine.");
-                                    }
-
-                                    // OTC → allow add to cart API call
-                                    handleAddtocart(item);
+                                    handleAddtocart(item); // ⬅️ No OTC checking, always allow
                                 }}
                                 className={`mt-2 px-1 md:px-4 md:py-2 py-1 rounded-md transition text-xs md:text-md
-                                    ${item?.pharmacyMedicineBatch?.medicine?.otc
-                                        ? "bg-teal-500 text-white hover:bg-teal-600 cursor-pointer"
-                                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                    }`}
-                            >
+                                    bg-teal-500 text-white hover:bg-teal-600 cursor-pointer
+                                    `}
+                             >
                                 {addingCartId === item?.pharmacyMedicineBatch?.id ? (
                                     <span className="loading loading-spinner loading-sm"></span>
                                 ) : (
-                                    <span className="text-[9px] text-md">{item?.pharmacyMedicineBatch?.medicine?.otc ? "Add" : "Add Prescription"}</span>
+                                    <span className="text-[9px] text-md">Add</span>
                                 )}
                             </button>
+
 
 
                         )}
                     </div>
                 </div>
             ))}
+            
         </div>
     );
 }

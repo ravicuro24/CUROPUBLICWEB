@@ -248,12 +248,12 @@ const MedicineHero = () => {
                         ))}
                     </div>
                 </div>
-
-
             </div>
 
             <MedicinePopularCategories />
             <ShopByHealthConcern />
+          
+          
 
             {/* UPLOAD PRESCRIPTION MODAL */}
             {uploadPrescriptionModal && (

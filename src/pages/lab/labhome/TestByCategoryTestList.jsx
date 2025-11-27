@@ -23,8 +23,11 @@ function TestByCategoryTestList() {
     console.log("lab cart items", labCartItems)
 
     useEffect(() => {
-        getAllTestByOrganList()
-    }, [pageNumber])
+        getAllTestByOrganList();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+
+    }, [pageNumber]);
+
 
     const getAllTestByOrganList = async () => {
         setLoading(true)

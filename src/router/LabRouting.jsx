@@ -9,6 +9,7 @@ import SelectSlot from '../pages/lab/labhome/SelectSlot'
 import LabAppointmentConfirm from '../pages/lab/labhome/LabAppoitmentConfirm'
 import LabCollectionType from '../pages/lab/labhome/LabCollectionType'
 import LabCollectionTypeSinglePackage from '../pages/lab/labhome/LabCollectionTypeSinglePackage'
+import LabVitalOrganListApi from '../pages/lab/labhome/TestByVitalOrganListApi'
 
 function LabRouting() {
   return (
@@ -22,6 +23,7 @@ function LabRouting() {
             <Route path='/lab/package/typeCollection' element={<LabCollectionType/>}/>
             <Route path='/lab/package/single/package' element={<LabCollectionTypeSinglePackage/>}/>
             <Route path='/lab/appointment/confirm' element={<LabAppointmentConfirm/>}/>
+            <Route path='/lab/vital/organlist' element={<LabVitalOrganListApi/>}/>
 
         </Routes>
     </div>

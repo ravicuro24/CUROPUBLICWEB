@@ -102,6 +102,7 @@ function LabAppointmentList() {
             onChange={(e) => { setStatus(e.target.value); setPageNo(1); }}
             className="px-3 py-2 border border-gray-300 rounded-lg shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
           >
+            <option value="">All</option>
             <option value="PENDING">Pending</option>
             <option value="CONFIRMED">Confirmed</option>
             <option value="ACCEPTED">Accepted</option>

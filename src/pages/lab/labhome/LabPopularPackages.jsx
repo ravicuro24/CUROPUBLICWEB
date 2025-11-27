@@ -64,7 +64,7 @@ function LabPopularPackages() {
             {/* Top Section */}
             <div className="relative">
               <img
-                src="https://images.pexels.com/photos/7722852/pexels-photo-7722852.jpeg"
+                src={item.labPackage.tests[0].imagesUrl[0]}
                 alt="Package"
                 className="w-full h-32 md:h-36 object-cover group-hover:scale-105 transition-transform duration-300"
               />
