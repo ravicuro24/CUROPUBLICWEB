@@ -16,6 +16,9 @@ function SubCategoryMedicineDetails() {
     const images = medicine.medicine?.imagesUrl || [];
     const [activeImage, setActiveImage] = useState(images[0]);
     const [addingCart, setAddingCart] = useState(false)
+    const [showAll, setShowAll] = useState(false);
+    const symptoms = medicine.medicine?.symptoms || [];
+    const displayedSymptoms = showAll ? symptoms : symptoms.slice(0, 4);
 
     if (!data) {
         return (
@@ -116,13 +119,21 @@ function SubCategoryMedicineDetails() {
 
                             {/* Highlights */}
                             <div className="mt-6">
-                                <h2 className="font-semibold text-gray-700">Product highlights</h2>
-                                <ul className="mt-2 text-gray-600 list-disc pl-5">
-                                    <li>It can help manage your blood sugar levels</li>
-                                    <li>The tablets can help stimulate secretion of insulin</li>
-                                    <li>It can help manage metabolism & produce key enzymes</li>
-                                    <li>It can aid in repairing beta cells</li>
+                                <h2 className="font-semibold text-gray-700">Product highlights symptoms</h2>
+                                <ul className="list-disc ml-6">
+                                    {displayedSymptoms.map((ele, index) => (
+                                        <li key={index} className="mb-1">{ele}</li>
+                                    ))}
                                 </ul>
+
+                                {symptoms.length > 4 && (
+                                    <button
+                                        onClick={() => setShowAll(!showAll)}
+                                        className="mt-2 text-teal-600 font-medium hover:underline"
+                                    >
+                                        {showAll ? 'Show Less' : `Show All (${symptoms.length})`}
+                                    </button>
+                                )}
                             </div>
 
                             {/* Symptoms */}
@@ -140,39 +151,47 @@ function SubCategoryMedicineDetails() {
                 </div>
 
                 {/* RIGHT SECTION – ADD TO CART CARD */}
-                <div className="bg-white rounded-xl p-6 shadow-sm  sticky top-10">
-                    {!medicine.medicine?.otc && (
-                        <p className="text-red-500 flex items-center gap-1 mt-2 text-sm font-semibold">
-                            <MdErrorOutline size={18} />
-                            Prescription Required Medicine
+                <div className="bg-white rounded-xl p-6 shadow-sm sticky top-10 flex flex-col justify-between h-[300px]">
+                    <div>
+                        {!medicine.medicine?.otc && (<p className="text-red-500 flex items-center gap-1 mt-2 text-sm font-semibold"> <MdErrorOutline size={18} /> Prescription Required Medicine </p>)}
+                        <p className="text-teal-600 text-2xl font-bold">
+                            ₹{medicine?.unitPrice}
                         </p>
-                    )}
 
-                    <p className="text-teal-600 text-2xl font-bold">
-                        ₹{medicine?.unitPrice}
-                    </p>
+                        <div className="flex items-center gap-2 mt-2">
+                            <p className="text-teal-600 font-semibold text-lg">
+                                {data?.discount || 0}% off
+                            </p>
+                        </div>
 
-                    <div className="flex items-center gap-2 mt-2">
-                        {/* <p className="line-through text-gray-500 text-lg">₹120</p> */}
-                        <p className="text-teal-600 font-semibold text-lg">
-                            {data?.discount || 0}% off
+                        <p className="text-gray-500 text-sm mt-1">
+                            Inclusive of all taxes
                         </p>
                     </div>
 
-                    <p className="text-gray-500 text-sm mt-1">
-                        Inclusive of all taxes
-                    </p>
-
                     {/* Add to Cart */}
-                    {!medicine.medicine?.otc ?
-                        <button disabled className="mt-5 w-full disabled:cursor-not-allowed bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-semibold transition">Prescription required</button>
-                        : <button
-                            onClick={() => handleAddtocart(data)}
-                            className="mt-5 w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-semibold transition"
-                        >
-                            {addingCart ? <span className="loading loading-spinner loading-sm"></span> : "Add to cart"}
-                        </button>}
+                    <button
+                        onClick={() => {
+                            if (medicine.medicine?.otc) {
+                                handleAddtocart(data);
+                            } else {
+                                alert("Please upload your prescription to proceed.");
+                            }
+                        }}
+                        className="mt-5 w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-lg font-semibold transition"
+                    >
+                        {addingCart ? (
+                            <span className="loading loading-spinner loading-sm"></span>
+                        ) : medicine.medicine?.otc ? (
+                            "Add to cart"
+                        ) : (
+                            "Upload your Prescription"
+                        )}
+                    </button>
+
+
                 </div>
+
             </div>
             <SimilarMedicineProduct name={medicine.medicine?.prescribedFor || medicine.medicine?.name} />
         </div>

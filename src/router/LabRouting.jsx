@@ -14,18 +14,17 @@ import LabVitalOrganListApi from '../pages/lab/labhome/TestByVitalOrganListApi'
 function LabRouting() {
   return (
     <div>
-        <Routes>
-            <Route path='/lab' element={<LabHome/>}/>
-            <Route path='/lab_cartitems' element={<LabCartItems/>}/>
-            <Route path='/labPackage_details' element={<LabPackageDetails/>}/>
-            <Route path='/lab/package/Alltests' element={<TestByCategoryTestList/>}/>
-            <Route path='/lab/package/selectSlot' element={<SelectSlot/>}/>
-            <Route path='/lab/package/typeCollection' element={<LabCollectionType/>}/>
-            <Route path='/lab/package/single/package' element={<LabCollectionTypeSinglePackage/>}/>
-            <Route path='/lab/appointment/confirm' element={<LabAppointmentConfirm/>}/>
-            <Route path='/lab/vital/organlist' element={<LabVitalOrganListApi/>}/>
-
-        </Routes>
+      <Routes>
+        <Route path='/lab' element={<LabHome />} />
+        <Route path='/lab_cartitems' element={<LabCartItems />} />
+        <Route path='/labPackage_details' element={<LabPackageDetails />} />
+        <Route path='/lab/package/Alltests' element={<TestByCategoryTestList />} />
+        <Route path='/lab/package/selectSlot' element={<SelectSlot />} />
+        <Route path='/lab/package/typeCollection' element={<LabCollectionType />} />
+        <Route path='/lab/package/single/package' element={<LabCollectionTypeSinglePackage />} />
+        <Route path='/lab/appointment/confirm' element={<LabAppointmentConfirm />} />
+        <Route path='/lab/vital/organlist' element={<LabVitalOrganListApi />} />
+      </Routes>
     </div>
   )
 }

@@ -165,14 +165,18 @@ function MedicineCartItems() {
                                 key={item.id}
                                 className="p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-300"
                             >
+
                                 <div className="flex gap-4 w-full md:w-auto">
-                                    <img
-                                        src={
-                                            medicine?.imagesUrl?.[0] ||
-                                            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQywcmMUL-iZxqJ_yZYp67MaZefH7aXhMPS5w&s"
-                                        }
-                                        className="w-20 h-20 object-contain bg-gray-100 rounded"
-                                    />
+                                    <div>
+                                        {!medicine.otc && <p className="text-[8px] bg-amber-200 border-amber-500 text-amber-500 px-1 rounded-full">Prescription Required</p>}
+                                        <img
+                                            src={
+                                                medicine?.imagesUrl?.[0] ||
+                                                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQywcmMUL-iZxqJ_yZYp67MaZefH7aXhMPS5w&s"
+                                            }
+                                            className="w-20 h-20 object-contain bg-gray-100 rounded"
+                                        />
+                                    </div>
                                     <div>
                                         <h3 className="font-semibold text-gray-900 line-clamp-2">
                                             {medicine?.name || "Medicine"}

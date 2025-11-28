@@ -1,7 +1,6 @@
 // src/pages/lab/labhome/LabSinglePackageHomeCollection.jsx
-
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useLabAuth } from "../../../Authorization/LabAuthContext";
 import axiosInstance from "../../../Authorization/axiosInstance";
 
@@ -23,6 +22,15 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
   const [selections, setSelections] = useState({});
   const [applyToAllEnabled, setApplyToAllEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // --- Normalize labCartItems to ensure labPackage exists ---
+  const normalizedLabCartItems = labCartItems?.map((pkg) => {
+    if (!pkg) return null;
+    const labPackage = pkg.labPackage || pkg.item?.labPackage;
+    return labPackage ? { ...pkg, labPackage } : null;
+  }).filter(Boolean);
+
+  console.log("home", normalizedLabCartItems);
 
   // --- API Calls ---
   const fetchSlots = async (labId) => {
@@ -68,7 +76,7 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
 
   useEffect(() => {
     if (activePackage) {
-      const pkg = labCartItems.find((p) => p.labPackage.id === activePackage);
+      const pkg = normalizedLabCartItems.find((p) => p.labPackage.id === activePackage);
       if (pkg) {
         fetchSlots(pkg.labPackage.lab.id);
         setActiveStep("slots");
@@ -81,7 +89,7 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
 
   useEffect(() => {
     if (activePackage) {
-      const pkg = labCartItems.find((p) => p.labPackage.id === activePackage);
+      const pkg = normalizedLabCartItems.find((p) => p.labPackage.id === activePackage);
       if (pkg) fetchSlots(pkg.labPackage.lab.id);
     }
   }, [appointmentDate]);
@@ -108,7 +116,7 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
       const firstSelection = selections[firstPkgId];
       const newSelections = {};
 
-      labCartItems.forEach((pkg) => {
+      normalizedLabCartItems.forEach((pkg) => {
         const pkgId = pkg.labPackage.id;
         newSelections[pkgId] = { ...firstSelection, selectedPackageId: String(pkgId) };
       });
@@ -153,7 +161,6 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
 
   const handleCheckout = async () => {
     setLoading(true);
-    // Only include selections that have all required IDs
     const order = Object.values(selections)
       .filter(
         s =>
@@ -181,13 +188,10 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
         payload
       );
       console.log("Order response:", response.data);
-      await getAllLabCartItems()
+      await getAllLabCartItems();
       navigate('/lab/appointment/confirm', { state: { orderResponse: response.data } });
-
-      // navigate('/lab/appointment/confirm');
     } catch (error) {
       console.error("Order error:", error.response?.data || error.message);
-      // You might want to add error notification here
     } finally {
       setLoading(false);
     }
@@ -283,7 +287,7 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
     isPackageCompleted(pkgId)
   ).length;
 
-  const allPackagesCompleted = completedPackagesCount === labCartItems.length;
+  const allPackagesCompleted = completedPackagesCount === normalizedLabCartItems.length;
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -298,7 +302,6 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
           </p>
         </div>
 
-
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Left Sidebar - Progress Summary */}
           <div className="lg:w-1/4">
@@ -310,20 +313,20 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm font-medium text-gray-700">Packages Completed</span>
                     <span className="text-sm font-semibold text-gray-900">
-                      {completedPackagesCount}/{labCartItems.length}
+                      {completedPackagesCount}/{normalizedLabCartItems.length}
                     </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
                       className="bg-green-600 h-2 rounded-full transition-all duration-500"
-                      style={{ width: `${(completedPackagesCount / labCartItems.length) * 100}%` }}
+                      style={{ width: `${(completedPackagesCount / normalizedLabCartItems.length) * 100}%` }}
                     ></div>
                   </div>
                 </div>
 
                 <div className="text-center">
                   <div className="text-2xl font-bold text-gray-900 mb-1">
-                    {Math.round((completedPackagesCount / labCartItems.length) * 100)}%
+                    {Math.round((completedPackagesCount / normalizedLabCartItems.length) * 100)}%
                   </div>
                   <div className="text-xs text-gray-500">Complete</div>
                 </div>
@@ -359,7 +362,7 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
           <div className="lg:w-3/4">
             {/* Packages List */}
             <div className="space-y-4 mb-8">
-              {labCartItems?.map((pkg, index) => {
+              {normalizedLabCartItems?.map((pkg, index) => {
                 const pkgId = pkg.labPackage.id;
                 const completed = isPackageCompleted(pkgId);
                 const isActive = activePackage === pkgId;
@@ -411,7 +414,7 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
                                   <div key={idx}>
                                     <span>{tst.testName}</span>
                                     <div>
-                                      {tst.symptoms.map((symp, index) => (
+                                      {tst.symptoms?.map((symp, index) => (
                                         <div key={index} className="text-xs text-gray-500">
                                           - {symp}
                                         </div>
@@ -459,148 +462,57 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
                               value={appointmentDate}
                               onChange={(e) => setAppointmentDate(e.target.value)}
                               min={new Date().toISOString().split('T')[0]}
-                              className="block px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors text-base font-medium"
+                              className="block px-4 py-2 border border-gray-300 rounded-md"
                             />
-                            <span className="text-sm text-gray-500">
-                              Select your preferred appointment date
-                            </span>
                           </div>
                         </div>
 
-                        {/* Slots Selection */}
+                        {/* Slots */}
                         {activeStep === "slots" && (
-                          <div className="bg-white p-4 rounded-lg border border-gray-200">
-                            <h4 className="text-base font-medium text-gray-900 mb-4">
-                              Available Time Slots
-                            </h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-                              {slots.length === 0 ? (
-                                <div className="col-span-full text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                                  <div className="text-lg mb-2">No slots available</div>
-                                  <p className="text-sm">Please try selecting a different date</p>
-                                </div>
-                              ) : (
-                                slots.map((slot) => {
-                                  const isChosen = selections[pkgId]?.selectedSlotId === String(slot.id);
-                                  return (
-                                    <button
-                                      key={slot.id}
-                                      onClick={() => onSelectSlot(slot)}
-                                      className={`p-4 rounded-lg border text-left transition-colors ${isChosen
-                                        ? "border-green-500 bg-green-50 ring-1 ring-green-200"
-                                        : "border-gray-200 bg-white hover:border-teal-400 hover:bg-teal-50"
-                                        }`}
-                                    >
-                                      <div className="flex items-center justify-between mb-2">
-                                        <div className="font-medium text-gray-900">
-                                          {slot.startAt} - {slot.endAt}
-                                        </div>
-                                        {isChosen && (
-                                          <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                                            <span className="text-white text-xs">✓</span>
-                                          </div>
-                                        )}
-                                      </div>
-                                      <div className="text-xs text-gray-600">
-                                        {slot.capacity} slots available
-                                      </div>
-                                    </button>
-                                  );
-                                })
-                              )}
-                            </div>
+                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {slots?.length ? (
+                              slots.map((slot) => (
+                                <button
+                                  key={slot.id}
+                                  onClick={() => onSelectSlot(slot)}
+                                  className="px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-teal-50 transition-colors"
+                                >
+                                  {slot.startAt} - {slot.endAt}
+                                </button>
+                              ))
+                            ) : (
+                              <p>No slots available for selected date</p>
+                            )}
                           </div>
                         )}
 
-                        {/* Family Members Selection */}
+                        {/* Family Members */}
                         {activeStep === "family" && (
-                          <div className="bg-white p-4 rounded-lg border border-gray-200">
-                            <h4 className="text-base font-medium text-gray-900 mb-4">
-                              Select Patient
-                            </h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                              {familyMembers.length === 0 ? (
-                                <div className="col-span-full text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                                  <div className="text-lg mb-2">No family members found</div>
-                                  <p className="text-sm">Add family members in your profile</p>
-                                </div>
-                              ) : (
-                                familyMembers.map((fm) => {
-                                  const chosen = selections[pkgId]?.patientId === String(fm.id);
-                                  return (
-                                    <button
-                                      key={fm.id}
-                                      onClick={() => onSelectFamily(fm)}
-                                      className={`p-4 rounded-lg border text-left transition-colors ${chosen
-                                        ? "border-green-500 bg-green-50 ring-1 ring-green-200"
-                                        : "border-gray-200 bg-white hover:border-teal-400 hover:bg-teal-50"
-                                        }`}
-                                    >
-                                      <div className="flex items-center justify-between mb-2">
-                                        <div className="font-medium text-gray-900">
-                                          {fm.name}
-                                        </div>
-                                        {chosen && (
-                                          <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                                            <span className="text-white text-xs">✓</span>
-                                          </div>
-                                        )}
-                                      </div>
-                                      {fm.relationship && (
-                                        <div className="text-xs text-gray-600">
-                                          {fm.relationship}
-                                        </div>
-                                      )}
-                                    </button>
-                                  );
-                                })
-                              )}
-                            </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {familyMembers.map((fm) => (
+                              <button
+                                key={fm.id}
+                                onClick={() => onSelectFamily(fm)}
+                                className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-teal-50 transition-colors"
+                              >
+                                {fm.name}
+                              </button>
+                            ))}
                           </div>
                         )}
 
-                        {/* Address Selection */}
+                        {/* Addresses */}
                         {activeStep === "address" && (
-                          <div className="bg-white p-4 rounded-lg border border-gray-200">
-                            <h4 className="text-base font-medium text-gray-900 mb-4">
-                              Select Address
-                            </h4>
-                            <div className="grid grid-cols-1 gap-3">
-                              {addresses.length === 0 ? (
-                                <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                                  <div className="text-lg mb-2">No addresses found</div>
-                                  <p className="text-sm">Add addresses in your profile</p>
-                                </div>
-                              ) : (
-                                addresses.map((ad) => {
-                                  const chosen = selections[pkgId]?.selectedAddressId === String(ad.id);
-                                  return (
-                                    <button
-                                      key={ad.id}
-                                      onClick={() => onSelectAddress(ad)}
-                                      className={`p-4 rounded-lg border text-left transition-colors ${chosen
-                                        ? "border-green-500 bg-green-50 ring-1 ring-green-200"
-                                        : "border-gray-200 bg-white hover:border-teal-400 hover:bg-teal-50"
-                                        }`}
-                                    >
-                                      <div className="flex items-center justify-between mb-2">
-                                        <div className="font-medium text-gray-900">
-                                          {ad.city}
-                                        </div>
-                                        {chosen && (
-                                          <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                                            <span className="text-white text-xs">✓</span>
-                                          </div>
-                                        )}
-                                      </div>
-                                      <div className="text-sm text-gray-600">
-                                        {ad.houseNumber || ad.fullAddress}
-                                      </div>
-                                    </button>
-                                  );
-                                })
-                              )}
-                            </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {addresses.map((ad) => (
+                              <button
+                                key={ad.id}
+                                onClick={() => onSelectAddress(ad)}
+                                className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-teal-50 transition-colors"
+                              >
+                                {ad.city} - {ad.houseNumber || ad.fullAddress}
+                              </button>
+                            ))}
                           </div>
                         )}
                       </div>
@@ -611,37 +523,18 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
             </div>
 
             {/* Checkout Button */}
-            {allPackagesCompleted && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
-                  <div>
-                    <div className="text-lg font-semibold text-gray-900 mb-1">
-                      Ready to Book
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      All {labCartItems.length} packages are scheduled and confirmed
-                    </div>
-                  </div>
-                  <button
-                    onClick={handleCheckout}
-                    disabled={loading}
-                    className={`px-8 py-3 rounded-lg font-semibold text-white transition-colors min-w-[140px] ${loading
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-teal-600 hover:bg-teal-700"
-                      }`}
-                  >
-                    {loading ? (
-                      <div className="flex items-center justify-center gap-2">
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        Processing...
-                      </div>
-                    ) : (
-                      `Book All Tests`
-                    )}
-                  </button>
-                </div>
-              </div>
-            )}
+            <div className="mt-8 text-center">
+              <button
+                disabled={!allPackagesCompleted || loading}
+                onClick={handleCheckout}
+                className={`px-8 py-3 rounded-lg font-semibold text-white ${allPackagesCompleted
+                  ? "bg-teal-600 hover:bg-teal-700"
+                  : "bg-gray-400 cursor-not-allowed"
+                  }`}
+              >
+                {loading ? "Processing..." : "Checkout"}
+              </button>
+            </div>
           </div>
         </div>
       </div>

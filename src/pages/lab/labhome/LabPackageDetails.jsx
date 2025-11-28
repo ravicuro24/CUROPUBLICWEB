@@ -9,57 +9,45 @@ import {
     Clock,
     Shield,
     Star,
-    ArrowLeft,
     Calendar,
-    FileText,
-    Percent
+    FileText
 } from "lucide-react";
 
 function LabPackageDetails() {
     const location = useLocation();
     const navigate = useNavigate();
-    const item = location.state;
+
+    const rawData = location.state;
+
+    // Normalize data
+    const item = rawData?.labPackage ? rawData : rawData?.pkg;
+    const labPackage = item?.labPackage || item?.pkg?.labPackage;
+    const distance = item?.distance || item?.pkg?.distance;
+    const latitude = item?.latitude || item?.pkg?.latitude;
+    const longitude = item?.longitude || item?.pkg?.longitude;
+
+    const discountedPrice = labPackage?.price * (1 - (labPackage?.discount || 0) / 100);
+
     useEffect(() => {
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-        });
+        window.scrollTo({ top: 0, behavior: "smooth" });
     }, []);
 
-    const { labPackage, distance, latitude, longitude } = item;
-    const discountedPrice = labPackage?.price * (1 - labPackage?.discount / 100);
-    // Mask phone → +91-xxxxxxx97
     const maskPhone = (phone) => {
         if (!phone) return "";
         const lastTwo = phone.slice(-2);
         return `+91-xxxxxxx${lastTwo}`;
     };
-    console.log("labPackage details:", labPackage);
-    // Mask email → s*****t@domain.com
+
     const maskEmail = (email) => {
         if (!email) return "";
-
         const [name, domain] = email.split("@");
         if (!domain) return email;
-
-        if (name.length <= 2) {
-            return name[0] + "*****@" + domain;
-        }
-
-        return (
-            name[0] +
-            "*".repeat(name.length - 2) +
-            name[name.length - 1] +
-            "@" +
-            domain
-        );
+        if (name.length <= 2) return name[0] + "*****@" + domain;
+        return name[0] + "*".repeat(name.length - 2) + name[name.length - 1] + "@" + domain;
     };
-
 
     return (
         <div className="min-h-screen bg-gray-50">
-
-
             <div className="container mx-auto px-4 py-4 lg:py-6">
                 {/* Package Header Card */}
                 <div className="bg-white rounded-xl lg:rounded-2xl shadow-sm lg:shadow-xl overflow-hidden mb-6 lg:mb-8 ">
@@ -71,8 +59,6 @@ function LabPackageDetails() {
                                 alt={labPackage?.packageName}
                                 className="w-full h-40 md:h-full object-cover"
                             />
-
-                            {/* Overlay Badge */}
                             {labPackage?.popular && (
                                 <div className="absolute top-4 right-4 lg:left-20 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-2 rounded-full shadow-lg flex items-center space-x-1">
                                     <Star size={16} fill="currentColor" />
@@ -93,7 +79,7 @@ function LabPackageDetails() {
                                         <div className="flex items-center space-x-2 bg-gray-100 px-2 lg:px-3 py-1 lg:py-1.5 rounded-lg">
                                             <Calendar size={14} className="text-blue-600" />
                                             <span className="font-medium text-xs lg:text-sm">
-                                                Created: {new Date(labPackage?.createdAt).toLocaleDateString('en-IN')}
+                                                Created: {new Date(labPackage?.createdAt).toLocaleDateString("en-IN")}
                                             </span>
                                         </div>
                                     </div>
@@ -117,7 +103,6 @@ function LabPackageDetails() {
                                     </div>
                                 </div>
 
-                                {/* Additional Price Info */}
                                 {labPackage?.discount > 0 && (
                                     <div className="mt-3 lg:mt-4 pt-3 lg:pt-4 border-t border-gray-200 border-dashed">
                                         <div className="flex items-center justify-between text-sm text-gray-600">
@@ -186,13 +171,9 @@ function LabPackageDetails() {
                                         <span className="break-all">{maskEmail(labPackage?.lab?.email)}</span>
                                     </div>
 
-                                    {/* <div className="flex items-center space-x-2 lg:space-x-3 text-gray-600 text-sm lg:text-base">
-                                        <MapPin size={16} />
-                                        <span className="break-words">Lat {latitude}, Long {longitude}</span>
-                                    </div> */}
                                     <div className="flex items-center space-x-2 lg:space-x-3 text-gray-600 text-sm lg:text-base">
                                         <Clock size={16} />
-                                        <span>{labPackage?.lab?.operatingHours || "Standard Hours"}</span>
+                                        <span>{labPackage?.lab?.operatingHours}</span>
                                     </div>
                                 </div>
 
@@ -202,12 +183,6 @@ function LabPackageDetails() {
                                             <Shield size={16} className="text-gray-600" />
                                             <span className="text-sm text-gray-600">License Status:</span>
                                         </div>
-                                        {/* <span className={`px-3 py-1 rounded-full text-sm font-semibold ${labPackage?.lab?.licenceVerified
-                                            ? "bg-green-100 text-green-800"
-                                            : "bg-yellow-100 text-yellow-800"
-                                            }`}>
-                                            {labPackage?.lab?.licenceVerified ? "Verified" : "Pending Verification"}
-                                        </span> */}
                                     </div>
                                     <p className="text-xs text-gray-500 mt-2 break-all">
                                         GST: {labPackage?.lab?.gstRegistrationNumber}
@@ -219,11 +194,11 @@ function LabPackageDetails() {
                         {/* Tests Included Card */}
                         <div className="bg-white rounded-xl shadow-sm  p-4 lg:p-6">
                             <h2 className="text-lg lg:text-xl font-bold text-gray-900 mb-3 lg:mb-4">
-                                Tests Included ({labPackage?.tests?.length})
+                                Tests Included ({labPackage?.tests?.length ?? 0})
                             </h2>
 
                             <div className="space-y-3 lg:space-y-4">
-                                {labPackage?.tests?.map((test, index) => (
+                                {labPackage?.tests?.map((test) => (
                                     <div
                                         key={test.id}
                                         className="border-l-4 border-teal-500 bg-teal-50 p-3 lg:p-4 rounded-r-lg"
@@ -232,15 +207,21 @@ function LabPackageDetails() {
                                             <h3 className="font-semibold text-gray-900 text-base lg:text-lg">
                                                 {test.testName}
                                             </h3>
+
                                             <span className="bg-white text-teal-600 px-2 py-1 rounded text-sm font-medium self-start">
                                                 {test.testType}
                                             </span>
                                         </div>
-                                        <p className="text-gray-700 text-sm lg:text-base mb-2 lg:mb-3">{test.description}</p>
+
+                                        <p className="text-gray-700 text-sm lg:text-base mb-2 lg:mb-3">
+                                            {test.description}
+                                        </p>
+
                                         <div className="flex flex-wrap gap-2">
                                             <span className="bg-white text-gray-600 px-2 lg:px-3 py-1 rounded-full text-xs lg:text-sm border">
                                                 Sample: {test.sampleType}
                                             </span>
+
                                             {test.preparation && (
                                                 <span className="bg-white text-gray-600 px-2 lg:px-3 py-1 rounded-full text-xs lg:text-sm border">
                                                     Prep: {test.preparation}
@@ -261,8 +242,9 @@ function LabPackageDetails() {
 
                             <div className="space-y-2 lg:space-y-3">
                                 <button
-                                    onClick={() => navigate('/lab/package/single/package', { state: item })}
-                                    className="w-full bg-teal-600 hover:bg-teal-700 text-white py-3 px-4 rounded-lg font-semibold transition-colors duration-200 text-sm lg:text-base">
+                                    onClick={() => navigate('/lab/package/single/package', { state: { item } })}
+                                    className="w-full bg-teal-600 hover:bg-teal-700 text-white py-3 px-4 rounded-lg font-semibold transition-colors duration-200 text-sm lg:text-base"
+                                >
                                     Book This Package
                                 </button>
 

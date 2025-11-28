@@ -11,7 +11,6 @@ import {
 import {
   MdLocalPharmacy,
   MdOutlineManageAccounts,
-  MdOutlineMedicalServices
 } from "react-icons/md";
 
 import { BiTestTube } from "react-icons/bi";
@@ -32,7 +31,6 @@ import logo from "../assets/logo.png";
 import { useAuth } from "../Authorization/AuthContext";
 import { useLabAuth } from "../Authorization/LabAuthContext";
 import { Sidebar } from 'primereact/sidebar';
-import { Button } from "primereact/button";
 import Map from "./Map";
 
 const placeholders = [

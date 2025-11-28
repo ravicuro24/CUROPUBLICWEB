@@ -80,8 +80,10 @@ const LabHero = () => {
     const handleSearch = (text) => {
         if (!text.trim()) return;
         saveSearchHistory(text);
-        navigate(`/medicine/shopbyhealthconcern/medicine/${text}`);
+        navigate('/lab/vital/organlist', { state: { organName: text } });
     };
+
+
 
     return (
         <section className="w-full container mx-auto px-4">
@@ -101,6 +103,12 @@ const LabHero = () => {
                                     1500,
                                     "Your Wellness Matters",
                                     1500,
+                                    "Accurate Lab Tests, Trusted Results", // lab-related
+                                    1500,
+                                    "Fast & Reliable Diagnostics",         // lab-related
+                                    1500,
+                                    "Your Lab Reports, Anytime, Anywhere", // lab-related
+                                    1500,
                                 ]}
                                 wrapper="span"
                                 speed={50}
@@ -109,8 +117,9 @@ const LabHero = () => {
                         </span>
                     </h1>
 
+
                     <h2 className="text-lg md:text-2xl font-semibold text-gray-800 mt-1">
-                        Fast & Reliable Pharmacy Services
+                        Fast & Reliable Lab Services
                     </h2>
 
                     <p className="text-gray-600 mt-3 max-w-md mx-auto md:mx-0 text-sm md:text-base">

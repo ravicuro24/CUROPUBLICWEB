@@ -48,7 +48,7 @@ function TestByVitalOrganList() {
     <div className=" py-4">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Tests by Vital Organ</h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 md:gap-8 gap-2">
         {organs.map((organ, index) => (
           <div
             onClick={() => navigate('/lab/vital/organlist', { state: { organName: organ.name } })}

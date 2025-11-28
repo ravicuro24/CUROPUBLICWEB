@@ -12,6 +12,9 @@ export default function MedicineDetails() {
     const { state } = useLocation();
     const medicine = state?.medicine;
     const [addingCart, setAddingCart] = useState(false);
+    const [showAll, setShowAll] = useState(false);
+    const symptoms = medicine.medicine?.symptoms || [];
+    const displayedSymptoms = showAll ? symptoms : symptoms.slice(0, 4);
     const [activeImage, setActiveImage] = useState(
         medicine?.medicine?.imagesUrl?.[0] || "https://thumbs.dreamstime.com/b/herbal-medicine-herbs-21119245.jpg"
     );
@@ -86,7 +89,8 @@ export default function MedicineDetails() {
 
                             <div className="flex items-center gap-3">
                                 <p className="text-xl font-semibold text-teal-600 flex items-center gap-1">
-                                    ₹{medicine.effectiveCostPrice}
+                                    ₹{medicine.unitPrice
+}
                                 </p>
                                 <p className="line-through text-gray-500 text-sm">₹363</p>
                                 <p className="text-teal-600 font-medium text-sm">35% off</p>
@@ -96,20 +100,33 @@ export default function MedicineDetails() {
                                 {medicine.medicine?.prescribedFor || "NA"}
                             </p>
 
-                            <div className="text-gray-700 text-sm leading-relaxed">
-                                <p className="font-semibold mb-1">Product highlights</p>
-                                <ul className="list-disc ml-4 space-y-1">
-                                    <li>It can help manage your blood sugar levels</li>
-                                    <li>The tablets can help stimulate the secretion of insulin</li>
-                                    <li>It can help manage your metabolism and produce key enzymes</li>
-                                    <li>It can aid in repairing beta cells</li>
+
+
+                            <div className="mt-6">
+                                <h2 className="font-semibold text-gray-700">Product highlights symptoms</h2>
+                                <ul className="list-disc ml-6">
+                                    {displayedSymptoms.map((ele, index) => (
+                                        <li key={index} className="mb-1">{ele}</li>
+                                    ))}
                                 </ul>
+
+                                {symptoms.length > 4 && (
+                                    <button
+                                        onClick={() => setShowAll(!showAll)}
+                                        className="mt-2 text-teal-600 font-medium hover:underline"
+                                    >
+                                        {showAll ? 'Show Less' : `Show All (${symptoms.length})`}
+                                    </button>
+                                )}
                             </div>
 
-                            {medicine.medicine?.symptoms?.length > 0 && (
-                                <p className="flex flex-wrap leading-relaxed items-center gap-2 text-gray-700 md:text-sm font-semibold">
-                                    {medicine.medicine.symptoms.join(", ")}
-                                </p>
+                            {/* Symptoms */}
+                            {medicine?.diseases?.length > 0 && (
+                                <div className="mt-6">
+                                    <p className="text-gray-600 mt-1 text-sm">
+                                        {medicine.diseases.join(", ")}
+                                    </p>
+                                </div>
                             )}
                         </div>
                     </div>
@@ -119,7 +136,8 @@ export default function MedicineDetails() {
                 <div className="w-full md:w-1/4 bg-white p-4 rounded-lg shadow-md flex-shrink-0">
                     <div className="space-y-4">
                         <p className="text-xl font-semibold text-teal-600">
-                            ₹{medicine.effectiveCostPrice}
+                            ₹{medicine.unitPrice
+}
                         </p>
                         <div className="flex gap-2">
                             <p className="line-through text-gray-500 text-sm">₹363</p>

@@ -93,7 +93,7 @@ function TestByCategory() {
         return (
 
             <div
-                className={`relative p-0.5 rounded-2xl  bg-gradient-to-r ${styles.gradient} transition-all  duration-500 transform hover:cursor-pointer hover:shadow-2xl group`}
+                className={`relative p-0.5 rounded-2xl m-2 bg-gradient-to-r ${styles.gradient} transition-all  duration-500 transform hover:cursor-pointer hover:shadow-2xl group`}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 onClick={() => navigate('/lab/package/Alltests', { state: item })}

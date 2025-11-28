@@ -28,9 +28,12 @@ function LabCartItems() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
     useEffect(() => {
-        getAllLabCartItems()
-    }, [])
+        // Fetch cart items
+        getAllLabCartItems();
 
+        // Smooth scroll to top
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }, []);
     const calculateTotal = () => {
         return labCartItems.reduce((total, item) => total + (item.unitPrice * item.numberOfPatients), 0);
     }
@@ -123,7 +126,7 @@ function LabCartItems() {
                             whileTap={{ scale: 0.98 }}
                             onClick={() => navigate('/lab')}
                             className="bg-gradient-to-r cursor-pointer from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-semibold py-3 px-8 rounded-xl transition-all duration-200 shadow-lg shadow-teal-500/25"
-                        > 
+                        >
                             Browse Packages
                         </motion.button>
                     </motion.div>
@@ -188,7 +191,7 @@ function LabCartItems() {
                                                                     <p className="text-md md:text-2xl font-bold text-teal-600">
                                                                         ₹{item.unitPrice?.toLocaleString()}
                                                                     </p>
-                                                                   
+
                                                                 </div>
 
                                                                 <motion.button
@@ -220,7 +223,6 @@ function LabCartItems() {
                         <div className="lg:col-span-1">
                             <motion.div variants={itemVariants} className="bg-white rounded-xl shadow-sm  p-6 sticky top-8">
                                 <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                                    <IndianRupee className="w-5 h-5 text-teal-500" />
                                     Order Summary
                                 </h3>
 
@@ -231,10 +233,10 @@ function LabCartItems() {
                                         <span className="text-gray-900 font-semibold">₹{calculateTotal().toLocaleString()}</span>
                                     </div>
 
-                                    <div className="flex justify-between items-center">
+                                    {/* <div className="flex justify-between items-center">
                                         <span className="text-gray-600">Discount</span>
                                         <span className="text-teal-600 font-semibold">-₹{calculateDiscount().toLocaleString()}</span>
-                                    </div>
+                                    </div> */}
 
                                     <div className="flex justify-between items-center text-sm">
                                         <span className="text-gray-500">Taxes & Fees</span>
@@ -243,8 +245,8 @@ function LabCartItems() {
 
                                     <div className="border-t border-gray-200 pt-4">
                                         <div className="flex justify-between items-center">
-                                            <span className="text-lg font-semibold text-gray-900">Total Amount</span>
-                                            <span className="text-2xl font-bold text-teal-600">₹{calculateFinalTotal().toLocaleString()}</span>
+                                            <span className="text-lg font-semibold text-teal-700">Total Amount</span>
+                                            <span className="text-gray-900 font-semibold">₹{calculateTotal().toLocaleString()}</span>
                                         </div>
                                     </div>
                                 </div>

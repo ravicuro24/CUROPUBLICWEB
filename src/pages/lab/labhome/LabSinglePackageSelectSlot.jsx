@@ -1,28 +1,35 @@
 // src/pages/lab/labhome/LabSinglePackageSelectSlot.jsx
-
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useLabAuth } from "../../../Authorization/LabAuthContext";
 import axiosInstance from "../../../Authorization/axiosInstance";
 
 function LabSinglePackageSelectSlot({ labCartItems }) {
   console.log("LabSinglePackageSelectSlot labCartItems:", labCartItems);
+
   const { userData, getAllLabCartItems } = useLabAuth();
   const userId = userData?.id;
   const navigate = useNavigate();
+
   const [appointmentDate, setAppointmentDate] = useState(
     new Date().toISOString().split("T")[0]
   );
-
   const [slots, setSlots] = useState([]);
   const [familyMembers, setFamilyMembers] = useState([]);
-
   const [activePackage, setActivePackage] = useState(null);
   const [activeStep, setActiveStep] = useState(null);
-
   const [selections, setSelections] = useState({});
   const [applyToAllEnabled, setApplyToAllEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Normalize labCartItems to ensure labPackage exists
+  const normalizedLabCartItems = labCartItems
+    ?.map(pkg => {
+      if (!pkg) return null;
+      const labPackage = pkg.labPackage || pkg.item?.labPackage;
+      return labPackage ? { ...pkg, labPackage } : null;
+    })
+    .filter(Boolean);
 
   // --- API Calls ---
   const fetchSlots = async (labId) => {
@@ -55,7 +62,7 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
 
   useEffect(() => {
     if (activePackage) {
-      const pkg = labCartItems.find((p) => p.labPackage.id === activePackage);
+      const pkg = normalizedLabCartItems.find((p) => p.labPackage.id === activePackage);
       if (pkg) {
         fetchSlots(pkg.labPackage.lab.id);
         setActiveStep("slots");
@@ -68,7 +75,7 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
 
   useEffect(() => {
     if (activePackage) {
-      const pkg = labCartItems.find((p) => p.labPackage.id === activePackage);
+      const pkg = normalizedLabCartItems.find((p) => p.labPackage.id === activePackage);
       if (pkg) fetchSlots(pkg.labPackage.lab.id);
     }
   }, [appointmentDate]);
@@ -91,15 +98,12 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
     if (!applyToAllEnabled) {
       const firstPkgId = Object.keys(selections)[0];
       if (!firstPkgId) return;
-
       const firstSelection = selections[firstPkgId];
       const newSelections = {};
-
-      labCartItems.forEach((pkg) => {
+      normalizedLabCartItems.forEach((pkg) => {
         const pkgId = pkg.labPackage.id;
         newSelections[pkgId] = { ...firstSelection, selectedPackageId: String(pkgId) };
       });
-
       setSelections(newSelections);
       setApplyToAllEnabled(true);
     } else {
@@ -125,7 +129,7 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
     updateSelectionForActivePackage({
       patientId: String(fm.id),
       patientName: fm.name,
-      selectedAddressId: null // Set addressId to null
+      selectedAddressId: null
     });
     setActivePackage(null);
     setActiveStep(null);
@@ -133,21 +137,20 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
 
   const handleCheckout = async () => {
     setLoading(true);
-    // Only include selections that have all required IDs
     const order = Object.values(selections)
       .filter(
         s =>
           s &&
           s.appointmentDate &&
           s.selectedSlotId &&
-          s.selectedAddressId !== undefined && // Check if addressId is defined (can be null)
+          s.selectedAddressId !== undefined &&
           s.selectedPackageId &&
           s.patientId
       )
       .map(s => ({
         appointmentDate: s.appointmentDate,
         selectedSlotId: s.selectedSlotId,
-        selectedAddressId: s.selectedAddressId, // This will be null
+        selectedAddressId: s.selectedAddressId,
         selectedPackageId: s.selectedPackageId,
         patientId: s.patientId
       }));
@@ -161,11 +164,10 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
         payload
       );
       console.log("Order response:", response.data);
-      await getAllLabCartItems()
+      await getAllLabCartItems();
       navigate('/lab/appointment/confirm', { state: { orderResponse: response.data } });
     } catch (error) {
       console.error("Order error:", error.response?.data || error.message);
-      // You might want to add error notification here
     } finally {
       setLoading(false);
     }
@@ -177,7 +179,7 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
       s &&
       s.appointmentDate &&
       s.selectedSlotId &&
-      s.selectedAddressId !== undefined && // Check if addressId is defined (can be null)
+      s.selectedAddressId !== undefined &&
       s.selectedPackageId &&
       s.patientId
     );
@@ -218,7 +220,6 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
       { key: "slots", label: "Select Slot", icon: "🕒" },
       { key: "family", label: "Select Patient", icon: "👨‍👩‍👧‍👦" }
     ];
-
     const currentIndex = steps.findIndex(step => step.key === activeStep);
 
     return (
@@ -255,12 +256,11 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
     isPackageCompleted(pkgId)
   ).length;
 
-  const allPackagesCompleted = completedPackagesCount === labCartItems.length;
+  const allPackagesCompleted = completedPackagesCount === normalizedLabCartItems.length;
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="mb-8 flex flex-col items-start">
           <h1 className="text-md md:text-3xl font-bold text-gray-900 mb-1">
             Schedule Lab Tests
@@ -271,7 +271,7 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Left Sidebar - Progress Summary */}
+          {/* Left Sidebar */}
           <div className="lg:w-1/4">
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Booking Progress</h3>
@@ -281,20 +281,20 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm font-medium text-gray-700">Packages Completed</span>
                     <span className="text-sm font-semibold text-gray-900">
-                      {completedPackagesCount}/{labCartItems.length}
+                      {completedPackagesCount}/{normalizedLabCartItems.length}
                     </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
                       className="bg-green-600 h-2 rounded-full transition-all duration-500"
-                      style={{ width: `${(completedPackagesCount / labCartItems.length) * 100}%` }}
+                      style={{ width: `${(completedPackagesCount / normalizedLabCartItems.length) * 100}%` }}
                     ></div>
                   </div>
                 </div>
 
                 <div className="text-center">
                   <div className="text-2xl font-bold text-gray-900 mb-1">
-                    {Math.round((completedPackagesCount / labCartItems.length) * 100)}%
+                    {Math.round((completedPackagesCount / normalizedLabCartItems.length) * 100)}%
                   </div>
                   <div className="text-xs text-gray-500">Complete</div>
                 </div>
@@ -330,7 +330,7 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
           <div className="lg:w-3/4">
             {/* Packages List */}
             <div className="space-y-4 mb-8">
-              {labCartItems?.map((pkg, index) => {
+              {normalizedLabCartItems?.map((pkg, index) => {
                 const pkgId = pkg.labPackage.id;
                 const completed = isPackageCompleted(pkgId);
                 const isActive = activePackage === pkgId;
@@ -378,11 +378,11 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
                                 </div>
                               </div>
                               <div>
-                                {pkg.labPackage.tests.map((tst, idx) => (
+                                {pkg.labPackage.tests?.map((tst, idx) => (
                                   <div key={idx}>
                                     <span>{tst.testName}</span>
                                     <div>
-                                      {tst.symptoms.map((symp,index) => (
+                                      {tst.symptoms?.map((symp, index) => (
                                         <div key={index} className="text-xs text-gray-500">
                                           - {symp}
                                         </div>
@@ -545,7 +545,7 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
                       Ready to Book
                     </div>
                     <div className="text-sm text-gray-600">
-                      All {labCartItems.length} packages are scheduled and confirmed
+                      All {normalizedLabCartItems.length} packages are scheduled and confirmed
                     </div>
                   </div>
                   <button

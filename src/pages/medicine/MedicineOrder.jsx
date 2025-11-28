@@ -165,14 +165,14 @@ function MedicineOrder() {
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-3">
                         <img
-                          src={item.medicineBatch?.medicine?.imagesUrl[0] || '/placeholder-medicine.jpg'}
+                          src={item.medicineBatch?.medicine?.imagesUrl?.[0] || '/placeholder-medicine.jpg'}
                           alt={""}
                           className="w-12 h-12 object-cover rounded-lg border border-gray-200"
 
                         />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-900 truncate">
-                            {item.medicineBatch?.medicine?.name}
+                            {item.medicineBatch?.medicine?.name.slice(0,50)}
                           </p>
                           <p className="text-sm text-gray-500 truncate">
                             Batch: {item.medicineBatch?.batchNumber || 'N/A'}

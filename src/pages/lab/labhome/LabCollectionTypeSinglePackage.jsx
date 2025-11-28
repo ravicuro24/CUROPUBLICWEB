@@ -12,6 +12,7 @@ function LabCollectionTypeSinglePackage() {
     const [collectionType, setCollectionType] = useState('home');
     const location = useLocation();
     const labCartItems = location.state || [];
+    console.log("all Data",labCartItems)
 
     useEffect(() => {
         window.scrollTo({
