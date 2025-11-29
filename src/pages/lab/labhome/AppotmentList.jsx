@@ -68,13 +68,13 @@ const AppointmentsList = ({ appointments }) => {
                         >
                             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                                 {/* Left Section - Basic Info */}
-                                <div className="flex-1">
+                                <div className="flex-1 ">
                                     <div className="flex items-center space-x-4">
                                         <div>
                                             {/* <h3 className="text-lg font-semibold text-gray-900">
                                                 {appointment.bookedFor?.name || 'N/A'}
                                             </h3> */}
-                                            <p className="text-lg font-semibold text-teal-700">
+                                            <p className="text-sm md:text-md font-semibold text-teal-700">
                                                 {appointment.appointmentNumber}
                                             </p>
                                         </div>
@@ -89,21 +89,37 @@ const AppointmentsList = ({ appointments }) => {
                                 </div>
 
                                 {/* Middle Section - Date & Time */}
-                                <div className="flex-1 mt-2 md:mt-0">
-                                    <div className="flex items-center text-sm text-gray-600">
-                                        <img className='h-4 w-4 mr-2' src="https://cdn-icons-png.flaticon.com/128/10691/10691802.png" alt="" />
-                                        <span>{appointment.appointmentDate}</span>
-                                        <span className="mx-2">•</span>
-                                        <RxStopwatch size={14} className='text-blue-700 mx-2' />
-                                        <span className='text-red-400'>{formatTimeTo12Hour(appointment.bookedSlot?.startAt)} - {formatTimeTo12Hour(appointment.bookedSlot?.endAt)}</span>
+                                <div className="flex-1 mt-2 md:mt-0  ">
+                                    <div className="flex flex-col items-start gap-2 text-sm text-gray-600 flex-nowrap">
+
+                                        <div className='flex ml-2'>
+                                            <img
+                                                className="h-4 w-4 mr-2"
+                                                src="https://cdn-icons-png.flaticon.com/128/10691/10691802.png"
+                                                alt=""
+                                            />
+
+                                            <span>{appointment.appointmentDate}</span>
+                                        </div>
+                                        <div className='flex'>
+                                            <RxStopwatch size={14} className="text-blue-700 mx-2" />
+
+                                            <span className="text-red-400 whitespace-nowrap">
+                                                {formatTimeTo12Hour(appointment.bookedSlot?.startAt)}
+                                                {" - "}
+                                                {formatTimeTo12Hour(appointment.bookedSlot?.endAt)}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
 
+
                                 {/* Right Section - Patient Info & Action */}
-                                <div className="flex-1 mt-2 md:mt-0 md:text-right">
+                                <div className="flex-1 mt-2 md:mt-0 md:text-right ">
                                     <div className="text-sm text-gray-600">
                                         <p className="text-gray-500 ">
-                                            Patient: <span className='font-bold capitalize'>{appointment.bookedFor?.name} ({appointment.bookedFor?.age || 'N/A'}{appointment.bookedFor?.gender === "Male" ? 'M' : appointment.bookedFor?.gender === "Female" ? 'F' : "O"})</span>
+                                            <span className='font-bold capitalize'>{appointment.bookedFor?.name?.split(" ").slice(0, 2).join(" ")}
+                                                ({appointment.bookedFor?.age || 'N/A'} {appointment.bookedFor?.gender === "Male" ? 'M' : appointment.bookedFor?.gender === "Female" ? 'F' : "O"})</span>
                                         </p>
                                     </div>
                                 </div>

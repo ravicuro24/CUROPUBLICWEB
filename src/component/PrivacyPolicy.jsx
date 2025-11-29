@@ -205,7 +205,7 @@ const PrivacyCenter = () => {
                     <h1 className="text-lg md:text-3xl font-bold text-gray-900 mb-4">
                         Privacy Center
                     </h1>
-                    <p className="text-xs md:text-lg text-gray-600 max-w-3xl">
+                    <p className="text-xs md:text-[14px] text-gray-600 max-w-3xl">
                         Your privacy and data protection are our top priorities. Learn how we collect, use, and protect your information.
                     </p>
                 </div>
@@ -222,7 +222,7 @@ const PrivacyCenter = () => {
                                 className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 text-left hover:border-teal-500 hover:transform hover:-translate-y-1"
                             >
                                 <div className="flex items-center mb-3">
-                                    <span className="text-[12px] md:text-2xl mr-4">{action.icon}</span>
+                                    <span className="text-[12px] md:text-xl mr-4">{action.icon}</span>
                                     <h3 className="font-semibold text-gray-900 text-lg">{action.title}</h3>
                                 </div>
                                 <p className="text-gray-600 text-sm leading-relaxed">{action.description}</p>
@@ -249,13 +249,13 @@ const PrivacyCenter = () => {
                                         <div className="flex items-center justify-center h-6 w-6 md:w-12 md:h-12 bg-teal-100 rounded-lg mr-4 flex-shrink-0">
                                             <span className=" text-xs md:text-xl">{section.icon}</span>
                                         </div>
-                                        <h3 className=" text-md md:text-xl  font-semibold text-gray-900 md:mt-2">
+                                        <h3 className=" text-md md:text-md  font-semibold text-gray-900 md:mt-2">
                                             {section.title}
                                         </h3>
                                     </div>
 
                                     <div className="md:ml-16">
-                                        <p className="text-gray-700 leading-7 whitespace-pre-line text-xs md:text-lg">
+                                        <p className="text-gray-700 leading-7 whitespace-pre-line text-xs md:text-[14px]">
                                             {section.content}
                                         </p>
                                     </div>

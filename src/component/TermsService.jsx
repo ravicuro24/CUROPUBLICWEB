@@ -176,7 +176,7 @@ const TermsAndConditions = () => {
 
                 {/* Quick Links */}
                 <div className="mb-6">
-                    <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900 mb-3 ml-1">
+                    <h3 className="text-[10px] sm:text-lg lg:text-xl font-semibold text-gray-900 mb-3 ml-1">
                         Quick Links
                     </h3>
                     <div className="flex flex-wrap -mx-1">

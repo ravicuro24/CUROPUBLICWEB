@@ -61,7 +61,7 @@ function DoctorHome() {
           <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-8 text-white text-center shadow-2xl transform  transition-transform duration-300 animate-pulse-slow">
             <div className="flex items-center justify-center mb-4">
               <div className="w-3 h-3 bg-red-400 rounded-full animate-ping mr-2"></div>
-              <span className="text-red-500 font-semibold">COMING SOON</span>
+              <span className="text-red-500 text-3xl font-semibold">COMING SOON</span>
             </div>
             <h2 className="text-3xl font-bold mb-4">
               Next Generation Healthcare Platform
