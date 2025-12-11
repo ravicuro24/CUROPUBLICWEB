@@ -274,21 +274,21 @@ export default function QuickViewDoctorDetails() {
                                     <p className="text-sm text-gray-500">30-45 minutes • Available today</p>
                                 </div>
 
-                                <div
+                                {/* <div
                                     onClick={handleClinicSelect}
                                     className={`cursor-pointer rounded-xl p-4 border transition-all duration-200 ${
                                         consultTypeClinic 
                                             ? "bg-teal-100 border-teal-300 shadow-md" 
                                             : "bg-white border-gray-200 hover:bg-gray-50"
                                     }`}
-                                >
+                                 >
                                     <div className="flex justify-between items-center mb-2">
                                         {console.log("check",doctor)}
                                         <span className="font-medium text-gray-700">In-Person Visit</span>
                                         <span className="text-lg font-bold text-teal-600">₹ {doctor?.consultationFee + 150 }</span>
                                     </div>
                                     <p className="text-sm text-gray-500">60 minutes • By appointment</p>
-                                </div>
+                                </div> */}
                             </div>
 
                             <div className="space-y-3">

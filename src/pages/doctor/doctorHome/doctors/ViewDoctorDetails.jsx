@@ -1,21 +1,29 @@
 // src/pages/doctor/doctorHome/doctors/ViewDoctorDetails.jsx
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { FaStar, FaGraduationCap, FaHospitalAlt, FaCheckCircle } from "react-icons/fa";
+import { FaStar, FaGraduationCap, FaHospitalAlt, FaCheckCircle, FaCalendarAlt } from "react-icons/fa";
 import { MdWork, MdOutlineLanguage } from "react-icons/md";
 import { IoPersonCircleOutline, IoSchoolOutline } from "react-icons/io5";
-import { TbHeartPlus } from "react-icons/tb";
+import SelectSlotModal from './SelectSlotModal';
 
 export default function ViewDoctorDetails() {
     const [consultTypeClinic, setConsultTypeClinic] = useState(null);
     const [consultTypeVideo, setConsultTypeVideo] = useState(null);
     const [selectedFee, setSelectedFee] = useState(0);
+    const [showDateModal, setShowDateModal] = useState(false);
+    const [selectedDate, setSelectedDate] = useState('');
+    const [selectedTimeSlot, setSelectedTimeSlot] = useState('');
 
     useEffect(() => {
         window.scrollTo({
             top: 0,
             behavior: 'smooth'
         });
+
+        // Initialize with today's date
+        const today = new Date();
+        const formattedDate = today.toISOString().split('T')[0];
+        setSelectedDate(formattedDate);
     }, []);
 
     const { state } = useLocation();
@@ -31,9 +39,24 @@ export default function ViewDoctorDetails() {
         recentConsultations: 120,
         image: "/doctor-image.jpg"
     };
-    console.log("check data", doctor)
+
+    console.log("view dotro", doctor)
 
     const navigate = useNavigate();
+
+    const handleVideoSelect = () => {
+        setConsultTypeVideo(true);
+        setConsultTypeClinic(false);
+        setSelectedFee(doctor?.fee || doctor?.fees);
+        setShowDateModal(true);
+    };
+
+    const handleClinicSelect = () => {
+        setConsultTypeVideo(false);
+        setConsultTypeClinic(true);
+        setSelectedFee((doctor?.fee || doctor?.fees || 0) + 150);
+        setShowDateModal(true);
+    };
 
     const handleProceedToPay = () => {
         if (!consultTypeVideo && !consultTypeClinic) {
@@ -41,32 +64,64 @@ export default function ViewDoctorDetails() {
             return;
         }
 
+        if (!selectedDate || !selectedTimeSlot) {
+            alert("Please select both date and time slot");
+            return;
+        }
+
         const consultationData = {
             doctor,
             consultationType: consultTypeVideo ? "Video Consultation" : "In-Person Visit",
-            fee: selectedFee
+            fee: selectedFee,
+            appointmentDate: selectedDate,
+            appointmentTime: selectedTimeSlot,
+            formattedDate: new Date(selectedDate).toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            })
         };
-        console.log(consultationData)
+        console.log("Appointment Data:", consultationData);
 
+        // Close modal and navigate to payment
+        setShowDateModal(false);
         navigate('/doctor/quick-consult/payment', { state: consultationData });
     };
 
-    const handleVideoSelect = () => {
-        setConsultTypeVideo(true);
-        setConsultTypeClinic(false);
-        setSelectedFee(doctor?.consultationFee || doctor.fees || 0);
+    const formatSelectedDate = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
     };
 
-    const handleClinicSelect = () => {
-        setConsultTypeVideo(false);
-        setConsultTypeClinic(true);
-        setSelectedFee((doctor?.consultationFee || doctor.fees || 0) + 150);
+    const closeModal = () => {
+        setShowDateModal(false);
+        // Reset selection if no date/time selected
+        if (!selectedTimeSlot) {
+            setConsultTypeVideo(false);
+            setConsultTypeClinic(false);
+            setSelectedFee(0);
+        }
     };
 
+    const handleSlotSelection = (date, timeSlot) => {
+        setSelectedDate(date);
+        setSelectedTimeSlot(timeSlot);
+    };
+
+    const handleConfirmSlot = () => {
+        handleProceedToPay();
+    };
 
     return (
-        <div className="min-h-screen ">
-            <div className="container mx-auto px-4 sm:px-6 py-6 ">
+        <div className="min-h-screen">
+            <div className="container mx-auto px-4 sm:px-6 py-6">
                 {/* Header Section */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
                     <div className="flex items-start justify-between mb-6">
@@ -119,9 +174,8 @@ export default function ViewDoctorDetails() {
                                 <ul className="space-y-2 pl-7">
                                     <li className="flex items-start">
                                         <FaCheckCircle className="w-4 h-4 text-teal-500 mt-1 mr-2 flex-shrink-0" />
-                                        <span className='uppercase'>{doctor?.qualification}</span>
+                                        <span className='uppercase'>{doctor?.qualification || doctor?.education}</span>
                                     </li>
-
                                 </ul>
                             </div>
 
@@ -134,14 +188,6 @@ export default function ViewDoctorDetails() {
                                     </div>
                                     <p className="text-lg font-bold text-gray-900">{doctor?.experience} years</p>
                                 </div>
-
-                                {/* <div className="flex justify-center items-center gap-2 rounded-xl">
-                                    <div className="flex items-center">
-                                        <TbHeartPlus className="w-5 h-5 text-teal-600 mr-2" />
-                                        <span className="font-semibold text-gray-700">Consultation Fee:</span>
-                                    </div>
-                                    <p className="text-lg font-bold text-gray-900">₹{doctor?.consultationFee}</p>
-                                </div> */}
                             </div>
 
                             {/* Languages */}
@@ -252,6 +298,23 @@ export default function ViewDoctorDetails() {
                     <div className="lg:col-span-1">
                         <div className="bg-gradient-to-br from-teal-50 to-blue-50 rounded-2xl shadow-sm border border-teal-100 p-6 sticky top-6">
                             <h3 className="text-lg font-bold text-gray-900 mb-4">Schedule Consultation</h3>
+
+                            {/* Display selected appointment details if any */}
+                            {(selectedDate && selectedTimeSlot) && (
+                                <div className="mb-4 p-3 bg-white rounded-lg border border-teal-200">
+                                    <div className="flex items-center text-teal-600 mb-1">
+                                        <FaCalendarAlt className="w-4 h-4 mr-2" />
+                                        <span className="font-medium">Selected Appointment:</span>
+                                    </div>
+                                    <p className="text-sm text-gray-700">
+                                        {formatSelectedDate(selectedDate)} at {selectedTimeSlot}
+                                    </p>
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        {consultTypeVideo ? "Video Consultation" : "Clinic Visit"}
+                                    </p>
+                                </div>
+                            )}
+
                             <div className="space-y-4 mb-6">
                                 <div
                                     onClick={handleVideoSelect}
@@ -285,8 +348,8 @@ export default function ViewDoctorDetails() {
                             <div className="space-y-3">
                                 <button
                                     onClick={handleProceedToPay}
-                                    disabled={!selectedFee}
-                                    className={`w-full font-semibold py-3 px-4 rounded-xl transition duration-200 flex items-center justify-center ${selectedFee
+                                    disabled={!selectedDate || !selectedTimeSlot}
+                                    className={`w-full font-semibold py-3 px-4 rounded-xl transition duration-200 flex items-center justify-center ${(selectedDate && selectedTimeSlot)
                                         ? "bg-teal-600 hover:bg-teal-700 text-white"
                                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                         }`}
@@ -294,7 +357,7 @@ export default function ViewDoctorDetails() {
                                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                                     </svg>
-                                    {selectedFee ? "Proceed to Pay & Connect" : "Select Consultation Type"}
+                                    {(selectedDate && selectedTimeSlot) ? "Proceed to Pay & Connect" : "Select Date & Time"}
                                 </button>
                             </div>
 
@@ -323,6 +386,25 @@ export default function ViewDoctorDetails() {
                     </div>
                 </div>
             </div>
+
+            {/* Date & Time Selection Modal */}
+            {showDateModal && (
+                <div
+                    onClick={closeModal}
+                    className="fixed inset-0 backdrop-brightness-50 flex items-center justify-center z-50 p-4">
+                    <SelectSlotModal
+                        isOpen={showDateModal}
+                        onClose={closeModal}
+                        onConfirm={handleConfirmSlot}
+                        onSlotSelect={handleSlotSelection}
+                        selectedDate={selectedDate}
+                        selectedTimeSlot={selectedTimeSlot}
+                        consultTypeVideo={consultTypeVideo}
+                        consultTypeClinic={consultTypeClinic}
+                        selectedFee={selectedFee}
+                    />
+                </div>
+            )}
         </div>
     );
 }
