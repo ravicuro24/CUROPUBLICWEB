@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaf
 import { useAuth } from "../Authorization/AuthContext";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import { MdOutlineMyLocation } from "react-icons/md";
 
 // Fix Leaflet icon issue
 delete L.Icon.Default.prototype._getIconUrl;
@@ -78,7 +79,7 @@ function Map() {
       );
 
       const data = await res.json();
-      console.log("address Data",data)
+      console.log("address Data", data)
       if (data?.display_name) setAddress(data.display_name);
       else setAddress("Address not available");
     } catch (e) {
@@ -173,10 +174,14 @@ function Map() {
   }
 
   return (
-    <div className="p-4">
-
+    <div className="">
       {/* Search Box */}
-      <form onSubmit={handleSearch} className="flex gap-2 mb-4">
+      <form onSubmit={handleSearch} className="flex gap-2 mb-4 justify-center items-center">
+        <button
+          onClick={handleUseCurrentLocation}
+          className="cursor-pointer">
+          <MdOutlineMyLocation className="text-2xl text-teal-700" />
+        </button>
         <input
           type="text"
           className="border px-3 py-2 w-full rounded"
@@ -193,12 +198,7 @@ function Map() {
         </button>
       </form>
 
-      <button
-        className="mb-4 border px-4 py-2 rounded text-teal-600 border-teal-600"
-        onClick={handleUseCurrentLocation}
-      >
-        Use Current Location
-      </button>
+    
 
       {error && (
         <div className="text-red-600 mb-3">{error}</div>
@@ -208,7 +208,7 @@ function Map() {
       <MapContainer
         center={selectedLocation}
         zoom={14}
-        style={{ height: "400px", width: "100%" }}
+        style={{ height: "450px", width: "100%" }}
         whenCreated={setMap}
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />

@@ -181,7 +181,7 @@ function Header2() {
                 visible={visible}
                 onHide={() => setVisible(false)}
                 position="right"
-                style={{ width: "50vw" }}
+                style={{ width: "40vw" }}
             >
                 <Map />
             </Sidebar>
