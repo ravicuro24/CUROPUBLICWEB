@@ -203,7 +203,7 @@ function PrescriptionDocument({ data }) {
 
             {/* Loader */}
             {loading && (
-                <LoadingAnimation/>
+                <LoadingAnimation />
             )}
 
             {/* Empty */}
@@ -211,7 +211,8 @@ function PrescriptionDocument({ data }) {
                 <div className="text-center py-10 bg-white rounded-xl shadow-sm border border-gray-100">
                     <MdFilterList size={22} className="mx-auto mb-3 text-gray-400" />
                     <h3 className="text-base md:text-lg font-medium text-gray-900 mb-1">
-                        No prescriptions found
+                        Try searching with a different name or upload a prescription.
+
                     </h3>
                     <p className="text-gray-500 text-sm">
                         {filterDate || prescriptionType !== "Pharmacy"

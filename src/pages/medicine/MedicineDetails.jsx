@@ -48,7 +48,7 @@ export default function MedicineDetails() {
                 <div className="flex flex-col md:flex-row w-full gap-5">
                     {/* Thumbnail Column */}
                     <div className="flex flex-row md:flex-col gap-3 md:w-20 w-full overflow-x-auto md:overflow-x-visible">
-                        {medicine.medicine?.imagesUrl?.map((img, i) => (
+                        {/* {medicine.medicine?.imagesUrl?.map((img, i) => (
                             <img
                                 key={i}
                                 src={img}
@@ -57,15 +57,23 @@ export default function MedicineDetails() {
                                 ${activeImage === img ? "ring-2 ring-blue-500" : "hover:scale-105"}`}
                                 alt=""
                             />
-                        ))}
+                        ))} */}
                     </div>
 
                     {/* Main Image + Details */}
                     <div className="flex flex-col md:flex-row w-full gap-4">
                         {/* Main Image */}
-                        <div className="w-full md:w-1/2 flex justify-center items-center p-2 bg-white rounded-lg shadow-sm">
+                        {/* <div className="w-full md:w-1/2 flex justify-center items-center p-2 bg-white rounded-lg shadow-sm">
                             <img
                                 src={activeImage || "https://thumbs.dreamstime.com/b/herbal-medicine-herbs-21119245.jpg"}
+                                alt="medicine"
+                                className="w-full h-64 md:h-72 object-contain"
+                            />
+
+                        </div> */}
+                        <div className="w-full md:w-1/2 flex justify-center items-center p-2 bg-white rounded-lg shadow-sm">
+                            <img
+                                src={`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBeTXqOJnhL2W_vZewM6uL7UcNmfknP9MvEQ&s`}
                                 alt="medicine"
                                 className="w-full h-64 md:h-72 object-contain"
                             />
@@ -90,7 +98,7 @@ export default function MedicineDetails() {
                             <div className="flex items-center gap-3">
                                 <p className="text-xl font-semibold text-teal-600 flex items-center gap-1">
                                     ₹{medicine.unitPrice
-}
+                                    }
                                 </p>
                                 <p className="line-through text-gray-500 text-sm">₹363</p>
                                 <p className="text-teal-600 font-medium text-sm">35% off</p>
@@ -137,7 +145,7 @@ export default function MedicineDetails() {
                     <div className="space-y-4">
                         <p className="text-xl font-semibold text-teal-600">
                             ₹{medicine.unitPrice
-}
+                            }
                         </p>
                         <div className="flex gap-2">
                             <p className="line-through text-gray-500 text-sm">₹363</p>

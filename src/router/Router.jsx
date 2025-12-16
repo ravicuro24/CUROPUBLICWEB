@@ -26,6 +26,8 @@ import PrivacyCenter from '../component/PrivacyPolicy'
 import TermsAndConditions from '../component/TermsService'
 import ReturnRefundPolicy from '../component/ReturnRefundPolicy'
 import ContactUs from '../component/ContactUs'
+import BloodBankRouting from './BloodBankRouting'
+import InsuranceRouting from './InsuranceRouting'
 
 function Router() {
   return (
@@ -61,6 +63,8 @@ function Router() {
         <LabRouting />
         <DoctorRouting />
         <AmbulanceRouting />
+        <BloodBankRouting/>
+        <InsuranceRouting/>
       </div>
     </StompProvider>
   )

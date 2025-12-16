@@ -132,9 +132,12 @@ function MedicineOrder() {
           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
             <div className="flex flex-col">
               <span className="font-semibold">{formatCurrency(order.totalAmount)}</span>
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border mt-1 ${getStatusColor(order.status)}`}>
+              <span
+                className={`inline-flex w-fit items-center px-2.5 py-0.5 rounded-full text-xs font-medium border mt-1 ${getStatusColor(order.status)}`}
+              >
                 {order.status}
               </span>
+
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -185,10 +188,11 @@ function MedicineOrder() {
         <td className="px-6 py-4">
           <div className="flex items-center space-x-3">
             <img
-              src={item.medicineBatch?.medicine?.imagesUrl?.[0] || 'https://cdn-icons-png.flaticon.com/128/4599/4599096.png'}
+              src={`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBeTXqOJnhL2W_vZewM6uL7UcNmfknP9MvEQ&s` || 'https://cdn-icons-png.flaticon.com/128/4599/4599096.png'}
+              // src={item.medicineBatch?.medicine?.imagesUrl?.[0] || 'https://cdn-icons-png.flaticon.com/128/4599/4599096.png'}
               alt={item.medicineBatch?.medicine?.name || 'Medicine'}
               className="w-12 h-12 object-cover rounded-lg "
-              
+
             />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900 truncate">
@@ -210,9 +214,12 @@ function MedicineOrder() {
               <span className="text-sm font-semibold text-gray-900">
                 {formatCurrency(order.totalAmount)}
               </span>
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border mt-2 ${getStatusColor(order.status)}`}>
+              <span
+                className={`inline-flex w-fit items-center px-2.5 py-0.5 rounded-full text-xs font-medium border mt-1 ${getStatusColor(order.status)}`}
+              >
                 {order.status}
               </span>
+
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -438,10 +445,11 @@ function MedicineOrder() {
                     {selectedOrder.orderItems?.map((item) => (
                       <div key={item.id} className="flex items-center space-x-4 bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
                         <img
-                          src={item.medicineBatch?.medicine?.imagesUrl?.[0] || 'https://cdn-icons-png.flaticon.com/128/4599/4599096.png'}
+                          // src={item.medicineBatch?.medicine?.imagesUrl?.[0] || 'https://cdn-icons-png.flaticon.com/128/4599/4599096.png'}
+                          src={`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBeTXqOJnhL2W_vZewM6uL7UcNmfknP9MvEQ&s` || 'https://cdn-icons-png.flaticon.com/128/4599/4599096.png'}
                           alt={item.medicineBatch?.medicine?.name}
                           className="w-16 h-16 object-cover rounded-lg "
-                         
+
                         />
                         <div className="flex-1 min-w-0">
                           <h5 className="font-semibold text-gray-900 md:text-md text-xs mb-1">

@@ -4,8 +4,10 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useLabAuth } from "../../../Authorization/LabAuthContext";
 import axiosInstance from "../../../Authorization/axiosInstance";
+import AddNewFamily from "../../../component/familyMedical/AddNewFamily";
 
 function VisitLabSelectSlot({ labCartItems }) {
+    const [addNewPatientModal, setAddNewPatientMdoal] = useState(false)
     const { userData, getAllLabCartItems } = useLabAuth();
     const userId = userData?.id;
     const navigate = useNavigate();
@@ -33,7 +35,7 @@ function VisitLabSelectSlot({ labCartItems }) {
 
         slots.forEach(slot => {
             const startHour = parseInt(slot.startAt.split(':')[0]);
-            
+
             // Determine category based on start time
             if (startHour >= 6 && startHour < 12) {
                 categorized.morning.push(slot);
@@ -163,8 +165,8 @@ function VisitLabSelectSlot({ labCartItems }) {
             labCartItems.forEach((pkg) => {
                 const pkgId = pkg.labPackage.id;
                 // Create a copy of the first selection but with the correct package ID
-                newSelections[pkgId] = { 
-                    ...firstSelection, 
+                newSelections[pkgId] = {
+                    ...firstSelection,
                     selectedPackageId: String(pkgId),
                 };
             });
@@ -205,16 +207,16 @@ function VisitLabSelectSlot({ labCartItems }) {
             selectedAddressId: null,
             addressName: "Not Required"
         });
-        
+
         // If apply to all is enabled, apply this selection to all packages
         if (applyToAllEnabled) {
             const currentSelection = selections[activePackage];
             const newSelections = {};
-            
+
             labCartItems.forEach((pkg) => {
                 const pkgId = pkg.labPackage.id;
-                newSelections[pkgId] = { 
-                    ...currentSelection, 
+                newSelections[pkgId] = {
+                    ...currentSelection,
                     selectedPackageId: String(pkgId),
                     patientId: String(fm.id),
                     patientName: fm.name,
@@ -222,10 +224,10 @@ function VisitLabSelectSlot({ labCartItems }) {
                     addressName: "Not Required"
                 };
             });
-            
+
             setSelections(newSelections);
         }
-        
+
         // Skip address step and complete the selection
         setActivePackage(null);
         setActiveStep(null);
@@ -358,7 +360,7 @@ function VisitLabSelectSlot({ labCartItems }) {
     // Function to render categorized time slots
     const renderCategorizedSlots = (pkgId) => {
         const categorizedSlots = categorizeSlots(slots);
-        
+
         return (
             <div className="space-y-6">
                 {/* Morning Slots */}
@@ -384,10 +386,10 @@ function VisitLabSelectSlot({ labCartItems }) {
                                             // If apply to all is enabled, apply this slot to all packages
                                             if (applyToAllEnabled) {
                                                 const newSelections = {};
-                                                
+
                                                 labCartItems.forEach((pkg) => {
                                                     const otherPkgId = pkg.labPackage.id;
-                                                    newSelections[otherPkgId] = { 
+                                                    newSelections[otherPkgId] = {
                                                         ...(selections[otherPkgId] || {}),
                                                         selectedPackageId: String(otherPkgId),
                                                         selectedSlotId: String(slot.id),
@@ -396,7 +398,7 @@ function VisitLabSelectSlot({ labCartItems }) {
                                                         appointmentDate
                                                     };
                                                 });
-                                                
+
                                                 setSelections(newSelections);
                                             }
                                         }}
@@ -451,10 +453,10 @@ function VisitLabSelectSlot({ labCartItems }) {
                                             // If apply to all is enabled, apply this slot to all packages
                                             if (applyToAllEnabled) {
                                                 const newSelections = {};
-                                                
+
                                                 labCartItems.forEach((pkg) => {
                                                     const otherPkgId = pkg.labPackage.id;
-                                                    newSelections[otherPkgId] = { 
+                                                    newSelections[otherPkgId] = {
                                                         ...(selections[otherPkgId] || {}),
                                                         selectedPackageId: String(otherPkgId),
                                                         selectedSlotId: String(slot.id),
@@ -463,7 +465,7 @@ function VisitLabSelectSlot({ labCartItems }) {
                                                         appointmentDate
                                                     };
                                                 });
-                                                
+
                                                 setSelections(newSelections);
                                             }
                                         }}
@@ -518,10 +520,10 @@ function VisitLabSelectSlot({ labCartItems }) {
                                             // If apply to all is enabled, apply this slot to all packages
                                             if (applyToAllEnabled) {
                                                 const newSelections = {};
-                                                
+
                                                 labCartItems.forEach((pkg) => {
                                                     const otherPkgId = pkg.labPackage.id;
-                                                    newSelections[otherPkgId] = { 
+                                                    newSelections[otherPkgId] = {
                                                         ...(selections[otherPkgId] || {}),
                                                         selectedPackageId: String(otherPkgId),
                                                         selectedSlotId: String(slot.id),
@@ -530,7 +532,7 @@ function VisitLabSelectSlot({ labCartItems }) {
                                                         appointmentDate
                                                     };
                                                 });
-                                                
+
                                                 setSelections(newSelections);
                                             }
                                         }}
@@ -775,7 +777,7 @@ function VisitLabSelectSlot({ labCartItems }) {
                                                                     const newSelections = {};
                                                                     labCartItems.forEach((pkg) => {
                                                                         const otherPkgId = pkg.labPackage.id;
-                                                                        newSelections[otherPkgId] = { 
+                                                                        newSelections[otherPkgId] = {
                                                                             ...(selections[otherPkgId] || {}),
                                                                             selectedPackageId: String(otherPkgId),
                                                                             appointmentDate: newDate
@@ -819,7 +821,7 @@ function VisitLabSelectSlot({ labCartItems }) {
                                                                                     const newSelections = {};
                                                                                     labCartItems.forEach((pkg) => {
                                                                                         const otherPkgId = pkg.labPackage.id;
-                                                                                        newSelections[otherPkgId] = { 
+                                                                                        newSelections[otherPkgId] = {
                                                                                             ...(selections[otherPkgId] || {}),
                                                                                             selectedPackageId: String(otherPkgId),
                                                                                             patientId: String(fm.id),
@@ -852,6 +854,9 @@ function VisitLabSelectSlot({ labCartItems }) {
                                                                     );
                                                                 })
                                                             )}
+                                                            <button
+                                                                onClick={() => setAddNewPatientMdoal(true)}
+                                                                className="bg-teal-700 text-white py-2 rounded-md cursor-pointer">Add New Patient</button>
                                                         </div>
                                                     </div>
                                                 )}
@@ -904,6 +909,18 @@ function VisitLabSelectSlot({ labCartItems }) {
                     </div>
                 </div>
             </div>
+            {addNewPatientModal &&
+                <div className="fixed inset-0 backdrop-brightness-50 flex justify-center items-center z-50">
+
+                    {/* Modal Box */}
+                    <div className="bg-white w-full max-w-2xl max-h-[90vh] rounded-md shadow-lg relative overflow-y-auto">
+                        {/* Content */}
+                        <div className="p-4">
+                            <AddNewFamily onClose={() => setAddNewPatientMdoal(false)} onSuccess={() => fetchFamilyMembers()} />
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
     );
 }

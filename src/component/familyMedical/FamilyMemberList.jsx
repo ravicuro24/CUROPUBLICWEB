@@ -249,10 +249,10 @@ const FamilyMemeberList = () => {
                 <div className="fixed inset-0 backdrop-brightness-50 flex justify-center items-center z-50">
 
                     {/* Modal Box */}
-                    <div className="bg-white w-full max-w-2xl max-h-[75vh] rounded-md shadow-lg relative overflow-y-auto">
+                    <div className="bg-white w-full max-w-2xl max-h-[90vh] rounded-md shadow-lg relative overflow-y-auto">
 
                         {/* Header */}
-                        <div className="flex justify-between items-center py-3 px-4 bg-teal-200 rounded-t-md">
+                        {/* <div className="flex justify-between items-center py-3 px-4 bg-teal-200 rounded-t-md">
                             <p className="font-semibold text-gray-800"></p>
 
                             <button
@@ -261,7 +261,7 @@ const FamilyMemeberList = () => {
                             >
                                 ×
                             </button>
-                        </div>
+                        </div> */}
 
                         {/* Content */}
                         <div className="p-4">

@@ -376,7 +376,7 @@ function BookAppointment() {
 
                             {/* Select Patient */}
                             <motion.div variants={itemVariants}>
-                                <h3 className="text-lg font-semibold text-gray-700 mb-4">Select Patient</h3>
+                                <h3 className="text-lg font-semibold text-gray-700 mb-4">Select Patient ji</h3>
                                 <div className="space-y-3">
                                     {patients.map((p) => (
                                         <motion.label

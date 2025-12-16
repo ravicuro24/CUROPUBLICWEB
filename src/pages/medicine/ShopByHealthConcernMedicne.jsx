@@ -151,11 +151,17 @@ const ShopByHealthConcernMedicne = () => {
                                     {/* Image Container */}
                                     <div className="relative w-full h-48 bg-gradient-to-br from-gray-50 to-gray-100 rounded-t-xl overflow-hidden p-6">
                                         <img
-                                            src={item.medicine?.imagesUrl?.[0]}
+                                            src={`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBeTXqOJnhL2W_vZewM6uL7UcNmfknP9MvEQ&s`}
                                             alt={item.medicine?.name}
                                             className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
 
                                         />
+                                        {/* <img
+                                            src={item.medicine?.imagesUrl?.[0]}
+                                            alt={item.medicine?.name}
+                                            className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
+
+                                        /> */}
                                         <span className="absolute top-2 left-2 text-[8px] bg-amber-300 text-amber-900 rounded-full px-2">{item.medicine?.otc ? "" : "Prescription required"}</span>
                                     </div>
 
@@ -291,14 +297,10 @@ const ShopByHealthConcernMedicne = () => {
                 {!loading && medicines.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
                         <div className="bg-blue-50 rounded-full p-8 mb-6">
-                            <svg className="w-16 h-16 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                            </svg>
+                           <img src="https://cdn-icons-png.flaticon.com/128/13983/13983163.png" alt="" />
                         </div>
                         <h3 className="text-2xl font-semibold text-gray-900 mb-3">No Medicines Found</h3>
-                        <p className="text-gray-600 text-lg max-w-md mb-6">
-                            We couldn't find any medicines matching "{searchtext}". Try adjusting your search terms or browse other categories.
-                        </p>
+                       
                         <button
                             onClick={() => {
                                 setSearchtext(name);
@@ -307,11 +309,11 @@ const ShopByHealthConcernMedicne = () => {
                             }}
                             className="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all duration-200 font-medium"
                         >
-                            Reset Search
+                            Retry
                         </button>
                     </div>
                 )}
-                <SimilarMedicineProduct name={search ? searchtext : name} />
+                <SimilarMedicineProduct name={search ? searchtext : name ||'para'} />
             </div>
         </div>
     );

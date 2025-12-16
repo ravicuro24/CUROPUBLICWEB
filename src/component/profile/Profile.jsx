@@ -22,6 +22,10 @@ const MyProfile = () => {
         mobileNumber: "",
         gender: "",
         age: "",
+        weight: "",
+        heightCm: "",
+        heightFeet: "",
+        heightInches: "",
     });
 
     const [originalData, setOriginalData] = useState({});
@@ -34,6 +38,7 @@ const MyProfile = () => {
     const [showGenderModal, setShowGenderModal] = useState(false);
     const [showEmailModal, setShowEmailModal] = useState(false);
     const [emailInput, setEmailInput] = useState("");
+    const [showHeightModal, setShowHeightModal] = useState(false);
 
     const genderOptions = [
         { label: "Male", value: "Male" },
@@ -48,6 +53,8 @@ const MyProfile = () => {
         mobileNumber: "📱",
         gender: "⚧️",
         age: "🎂",
+        weight: "⚖️",
+        height: "📏",
     };
 
     useEffect(() => {
@@ -67,6 +74,10 @@ const MyProfile = () => {
                 mobileNumber: userData.mobileNumber || "",
                 gender: userData.gender || "",
                 age: userData.age || "",
+                weight: userData.weight || "",
+                heightCm: userData.heightCm || "",
+                heightFeet: userData.heightFeet || "",
+                heightInches: userData.heightInches || "",
             };
             setProfileData(newProfile);
             setOriginalData(newProfile);
@@ -132,6 +143,13 @@ const MyProfile = () => {
             if (num < 1 || num > 120) return "Age between 1–120";
         }
 
+        if (field === "weight") {
+            if (!value.trim()) return "Weight required";
+            const num = Number(value);
+            if (isNaN(num)) return "Numbers only";
+            if (num < 1 || num > 300) return "Weight between 1–300 kg";
+        }
+
         return "";
     };
 
@@ -157,6 +175,62 @@ const MyProfile = () => {
 
         await updateProfileFieldAPI(updates);
         setEditingField(null);
+    };
+
+    // Function to format height display
+    const formatHeightDisplay = () => {
+        const feet = profileData.heightFeet || "";
+        const inches = profileData.heightInches || "";
+        const cm = profileData.heightCm || "";
+        
+        if (feet && inches) {
+            return `${feet} ft ${inches} inch`;
+        } else if (cm) {
+            return `${cm} cm`;
+        }
+        return "No height set";
+    };
+
+    // Function to save height
+    const saveHeight = async () => {
+        const feet = tempData.heightFeet || "";
+        const inches = tempData.heightInches || "";
+        const cm = tempData.heightCm || "";
+
+        // Validate feet and inches
+        if (feet || inches) {
+            const feetNum = Number(feet);
+            const inchesNum = Number(inches);
+            
+            if (feet && (feetNum < 2 || feetNum > 8)) {
+                setErrors({ height: "Feet should be between 2-8" });
+                return;
+            }
+            if (inches && (inchesNum < 0 || inchesNum >= 12)) {
+                setErrors({ height: "Inches should be 0-11" });
+                return;
+            }
+        }
+        
+        // Validate cm
+        if (cm) {
+            const cmNum = Number(cm);
+            if (cmNum < 50 || cmNum > 250) {
+                setErrors({ height: "Height should be 50-250 cm" });
+                return;
+            }
+        }
+
+        const updates = {};
+        if (feet !== profileData.heightFeet) updates.heightFeet = feet;
+        if (inches !== profileData.heightInches) updates.heightInches = inches;
+        if (cm !== profileData.heightCm) updates.heightCm = cm;
+
+        if (Object.keys(updates).length > 0) {
+            await updateProfileFieldAPI(updates);
+        }
+        setShowHeightModal(false);
+        setErrors({});
     };
 
     return (
@@ -261,7 +335,7 @@ const MyProfile = () => {
 
                                     {editingField === "age" ? (
                                         <input
-                                            className={`border-2 text-xs md:text-md rounded-md px-4 py-2 ${errors.age ? "border-red-400" : "border-green-400"
+                                            className={`border-2 text-xs md:text-md rounded-md px-4  py-2 ${errors.age ? "border-red-400" : "border-green-400"
                                                 }`}
                                             value={tempData.age || ""}
                                             onChange={(e) =>
@@ -309,6 +383,95 @@ const MyProfile = () => {
                             </div>
                         </div>
 
+                        {/* WEIGHT FIELD */}
+                        <div className="px-6 py-2 border-b border-gray-100">
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center flex-1 gap-3">
+                                    <span className="text-xs md:text-md bg-green-500/20 p-2 rounded-md">
+                                        {fieldIcons.weight}
+                                    </span>
+
+                                    {editingField === "weight" ? (
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                className={`border-2 text-xs md:text-md rounded-md px-4 py-2 w-24 ${errors.weight ? "border-red-400" : "border-green-400"
+                                                    }`}
+                                                value={tempData.weight || ""}
+                                                onChange={(e) =>
+                                                    setTempData({ ...tempData, weight: e.target.value })
+                                                }
+                                                placeholder="Enter weight"
+                                            />
+                                            <span className="text-gray-500">kg</span>
+                                        </div>
+                                    ) : (
+                                        <p className='text-xs'>{profileData.weight ? `${profileData.weight} kg` : "No weight set"}</p>
+                                    )}
+                                </div>
+
+                                {editingField === "weight" ? (
+                                    <div className="flex flex-col gap-2 ml-2">
+                                        <button
+                                            onClick={() => setEditingField(null)}
+                                            className="px-3 py-2 border rounded-md"
+                                        >
+                                            <XMarkIcon size={18} />
+                                        </button>
+
+                                        <button
+                                            onClick={async () => {
+                                                const err = validateField("weight", tempData.weight || "");
+                                                if (err) return setErrors({ weight: err });
+
+                                                await updateProfileFieldAPI({ weight: tempData.weight });
+                                                setEditingField(null);
+                                            }}
+                                            className="px-3 py-2 bg-green-500 text-white rounded-md"
+                                        >
+                                            <CheckIcon size={18} />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button
+                                        onClick={() => {
+                                            setEditingField("weight");
+                                            setTempData({ weight: profileData.weight });
+                                        }}
+                                    >
+                                        <PencilIcon size={18} className="text-green-600" />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* HEIGHT FIELD */}
+                        <div className="px-6 py-2 border-b border-gray-100">
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center flex-1 gap-3">
+                                    <span className="text-xs md:text-md bg-green-500/20 p-2 rounded-md">
+                                        {fieldIcons.height}
+                                    </span>
+                                    <p className="text-gray-900 text-xs md:text-md">
+                                        {formatHeightDisplay()}
+                                    </p>
+                                </div>
+
+                                <button
+                                    onClick={() => {
+                                        setShowHeightModal(true);
+                                        setTempData({
+                                            heightFeet: profileData.heightFeet,
+                                            heightInches: profileData.heightInches,
+                                            heightCm: profileData.heightCm,
+                                        });
+                                        setErrors({});
+                                    }}
+                                >
+                                    <PencilIcon size={18} className="text-green-600" />
+                                </button>
+                            </div>
+                        </div>
+
                         {/* EMAIL, GENDER, MOBILE */}
                         {["email", "gender", "mobileNumber"].map((field) => (
                             <div
@@ -345,7 +508,6 @@ const MyProfile = () => {
                     </div>
                     <div className="w-full md:w-1/2">
                         <MedicalInformation />
-
                     </div>
                 </div>
             </div>
@@ -422,6 +584,114 @@ const MyProfile = () => {
                         >
                             Update
                         </button>
+                    </div>
+                </div>
+            )}
+
+            {/* HEIGHT MODAL */}
+            {showHeightModal && (
+                <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50">
+                    <div className="bg-white w-full max-w-md p-6 rounded-md relative">
+                        <button
+                            className="absolute top-2 right-2 bg-red-500 p-1 rounded-full text-white"
+                            onClick={() => {
+                                setShowHeightModal(false);
+                                setErrors({});
+                            }}
+                        >
+                            <XMarkIcon size={14} />
+                        </button>
+
+                        <h2 className="text-lg font-bold mb-3">Update Height</h2>
+                        <p className="text-gray-500 text-sm mb-4">Enter height in either format</p>
+
+                        {/* Feet and Inches Input */}
+                        <div className="mb-6">
+                            <h3 className="font-medium mb-2">Feet & Inches</h3>
+                            <div className="flex items-center gap-3">
+                                <div className="flex-1">
+                                    <label className="block text-sm text-gray-600 mb-1">Feet</label>
+                                    <input
+                                        type="number"
+                                        min="2"
+                                        max="8"
+                                        className={`w-full border-2 rounded-md px-4 py-2 ${errors.height ? "border-red-400" : "border-gray-300"
+                                            }`}
+                                        value={tempData.heightFeet || ""}
+                                        onChange={(e) =>
+                                            setTempData({ ...tempData, heightFeet: e.target.value })
+                                        }
+                                        placeholder="e.g., 5"
+                                    />
+                                </div>
+                                <div className="flex-1">
+                                    <label className="block text-sm text-gray-600 mb-1">Inches</label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        max="11"
+                                        className={`w-full border-2 rounded-md px-4 py-2 ${errors.height ? "border-red-400" : "border-gray-300"
+                                            }`}
+                                        value={tempData.heightInches || ""}
+                                        onChange={(e) =>
+                                            setTempData({ ...tempData, heightInches: e.target.value })
+                                        }
+                                        placeholder="e.g., 7"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="relative mb-6">
+                            <div className="absolute inset-0 flex items-center">
+                                <div className="w-full border-t border-gray-300"></div>
+                            </div>
+                            <div className="relative flex justify-center text-sm">
+                                <span className="px-2 bg-white text-gray-500">OR</span>
+                            </div>
+                        </div>
+
+                        {/* Centimeters Input */}
+                        <div className="mb-6">
+                            <h3 className="font-medium mb-2">Centimeters</h3>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="number"
+                                    min="50"
+                                    max="250"
+                                    className={`w-full border-2 rounded-md px-4 py-2 ${errors.height ? "border-red-400" : "border-gray-300"
+                                        }`}
+                                    value={tempData.heightCm || ""}
+                                    onChange={(e) =>
+                                        setTempData({ ...tempData, heightCm: e.target.value })
+                                    }
+                                    placeholder="e.g., 170"
+                                />
+                                <span className="text-gray-500 whitespace-nowrap">cm</span>
+                            </div>
+                        </div>
+
+                        {errors.height && (
+                            <p className="text-red-500 text-sm mb-3">{errors.height}</p>
+                        )}
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => {
+                                    setShowHeightModal(false);
+                                    setErrors({});
+                                }}
+                                className="flex-1 border border-gray-300 text-gray-700 py-2 rounded-md hover:bg-gray-50"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={saveHeight}
+                                className="flex-1 bg-green-500 text-white py-2 rounded-md hover:bg-green-600"
+                            >
+                                Save Height
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

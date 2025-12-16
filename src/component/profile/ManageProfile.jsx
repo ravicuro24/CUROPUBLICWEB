@@ -6,6 +6,7 @@ import MyProfile from "./Profile";
 import LabAppointmentList from "../../pages/lab/labhome/LabAppoitmentList";
 import { FiMenu, FiX } from "react-icons/fi";
 import LabReport from "../../pages/lab/labhome/LabReport";
+import FamilyMedicalHIstoryWrapper from "../familyMedical/FamilyMedicalHIstoryWrapper";
 
 function ManageProfile() {
   const [activePage, setActivePage] = useState("profile");
@@ -19,6 +20,7 @@ function ManageProfile() {
     { name: "Manage Profile", key: "profile" },
     { name: "My Orders", key: "orders" },
     { name: "Address Book", key: "address" },
+    { name: "Family History", key: "family" },
     { name: "My Appointments", key: "appointments" },
     { name: "My Reports", key: "reports" },
   ];
@@ -106,6 +108,7 @@ function ManageProfile() {
           {activePage === "address" && <SavedAddress />}
           {activePage === "appointments" && <LabAppointmentList />}
           {activePage === "reports" && <LabReport />}
+          {activePage === "family" && <FamilyMedicalHIstoryWrapper />}
         </div>
       </div>
     </div>

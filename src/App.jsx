@@ -5,6 +5,7 @@ import Footer from './component/Footer'
 import Router from './router/Router'
 import { useAuth } from './Authorization/AuthContext'
 import Login from './component/Login'
+import Header2 from './component/Header2'
 
 function App() {
   const { authModal, setAuthModal } = useAuth()
@@ -17,6 +18,7 @@ function App() {
     // <div className='bg-[#f3f3f2] select-none'>
     <div className='wallpaper '>
       <Header />
+      {/* <Header2/> */}
       <Router />
       <Footer />
 

@@ -147,7 +147,7 @@ const SavedAddress = () => {
 
             {/* LOADING SPINNER */}
             {loading && (
-                <LoadingAnimation/>
+                <LoadingAnimation />
             )}
 
             {/* ADDRESS LIST */}
@@ -155,75 +155,146 @@ const SavedAddress = () => {
                 {!loading && (
                     <>
                         {addresses.length > 0 ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                                {/* Desktop Table */}
+                                <div className="hidden md:block overflow-x-auto">
+                                    <table className="w-full">
+                                        <thead className="bg-gray-50">
+                                            <tr>
+                                                <th className="text-left p-4">
+                                                    <span className="text-sm font-semibold text-gray-700">Type</span>
+                                                </th>
+                                                <th className="text-left p-4">
+                                                    <span className="text-sm font-semibold text-gray-700">Address Details</span>
+                                                </th>
+                                                <th className="text-left p-4">
+                                                    <span className="text-sm font-semibold text-gray-700">Contact</span>
+                                                </th>
+                                                <th className="text-left p-4">
+                                                    <span className="text-sm font-semibold text-gray-700">Actions</span>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-100">
+                                            {addresses.map((address) => (
+                                                <tr key={address.id} className="hover:bg-gray-50 transition-colors">
+                                                    <td className="p-4">
+                                                        <div className="flex items-center gap-3">
+                                                            <div
+                                                                className="h-8 w-8 p-2 rounded-lg flex items-center justify-center"
+                                                                style={{
+                                                                    background: `${getTypeColor(address.addressType)}20`
+                                                                }}
+                                                            >
+                                                                {getTypeIcon(address.addressType)}
+                                                            </div>
+                                                            <span className="font-medium text-gray-800">{address.addressType}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-4">
+                                                        <div className="flex items-start gap-3">
+                                                            <IoLocationSharp size={18} className="text-red-500 mt-1 flex-shrink-0" />
+                                                            <div>
+                                                                <p className="font-medium text-gray-800">
+                                                                    {address.houseNumber}, {address.street}
+                                                                </p>
+                                                                <p className="text-gray-600 text-sm mt-1">
+                                                                    {address.city}, {address.state} - {address.postalCode}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-4">
+                                                        <div className="flex items-center gap-3">
+                                                            <MdPhone size={16} className="text-gray-500" />
+                                                            <span className="text-gray-800">{address.phoneNumber}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-4">
+                                                        <div className="flex gap-2">
+                                                            <button
+                                                                onClick={() => {
+                                                                    setEditAddressData(address);
+                                                                    setAddaddressModal(true);
+                                                                }}
+                                                                className="flex items-center gap-1 text-blue-600 hover:text-blue-800 px-3 py-1.5 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors"
+                                                            >
+                                                                <MdEdit size={14} />
+                                                                <span>Edit</span>
+                                                            </button>
+                                                            <button
+                                                                onClick={() => confirmDeleteAddress(address.id)}
+                                                                className="flex items-center gap-1 text-red-600 hover:text-red-800 px-3 py-1.5 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
+                                                            >
+                                                                <MdDelete size={14} />
+                                                                <span>Delete</span>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
 
-                                {addresses.map((address) => (
-                                    <div key={address.id}
-                                        className="bg-white rounded-lg shadow-md border border-gray-200 p-2 flex flex-col justify-between h-[260px]"
-                                    >
-                                        {/* Card Header */}
-                                        <div className="flex justify-between items-center p-2">
-                                            <div className="flex items-center gap-3">
-                                                <div
-                                                    className="h-10 w-10 p-2 rounded-md flex items-center justify-center"
-                                                    style={{
-                                                        background: `${getTypeColor(address.addressType)}20`
+                                {/* Mobile Cards */}
+                                <div className="md:hidden space-y-4 p-4">
+                                    {addresses.map((address) => (
+                                        <div key={address.id} className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+                                            <div className="flex items-center justify-between mb-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div
+                                                        className="h-12 w-12 p-3 rounded-lg flex items-center justify-center"
+                                                        style={{
+                                                            background: `${getTypeColor(address.addressType)}20`
+                                                        }}
+                                                    >
+                                                        {getTypeIcon(address.addressType)}
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="font-semibold text-gray-800">{address.addressType}</h3>
+                                                        <p className="text-sm text-gray-500 mt-1">{address.city}, {address.state}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-3 mb-4">
+                                                <div className="flex gap-3">
+                                                    <IoLocationSharp size={18} className="text-red-500 mt-0.5" />
+                                                    <div>
+                                                        <p className="font-medium text-gray-800">{address.houseNumber}, {address.street}</p>
+                                                        <p className="text-sm text-gray-500">{address.postalCode}</p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex gap-3 items-center">
+                                                    <MdPhone size={16} className="text-gray-500" />
+                                                    <p className="text-gray-800">{address.phoneNumber}</p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex gap-2 pt-4 border-t">
+                                                <button
+                                                    onClick={() => {
+                                                        setEditAddressData(address);
+                                                        setAddaddressModal(true);
                                                     }}
+                                                    className="flex-1 flex items-center justify-center gap-2 text-blue-600 py-2.5 border border-blue-200 rounded-lg hover:bg-blue-50"
                                                 >
-                                                    {getTypeIcon(address.addressType)}
-                                                </div>
-                                                <h2 className="text-sm font-semibold">
-                                                    {address.addressType}
-                                                </h2>
+                                                    <MdEdit size={16} />
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    onClick={() => confirmDeleteAddress(address.id)}
+                                                    className="flex-1 flex items-center justify-center gap-2 text-red-600 py-2.5 border border-red-200 rounded-lg hover:bg-red-50"
+                                                >
+                                                    <MdDelete size={16} />
+                                                    Delete
+                                                </button>
                                             </div>
                                         </div>
-
-                                        {/* Details */}
-                                        <div className="p-2 space-y-2">
-                                            <div className="flex gap-3">
-                                                <IoLocationSharp size={20} className="text-red-500 mt-1" />
-                                                <div>
-                                                    <p className="font-medium text-gray-800 text-sm">
-                                                        {address.houseNumber}, {address.street}
-                                                    </p>
-                                                    <p className="text-gray-600 text-xs">
-                                                        {address.city}, {address.state} - {address.postalCode}
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex gap-3 items-center">
-                                                <MdPhone size={18} className="text-gray-500" />
-                                                <p className="text-gray-600 text-sm">
-                                                    {address.phoneNumber}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        {/* Actions */}
-                                        <div className="flex justify-between pt-2 border-t mt-auto">
-                                            <button
-                                                onClick={() => {
-                                                    setEditAddressData(address);
-                                                    setAddaddressModal(true);
-                                                }}
-                                                className="flex items-center gap-2 text-blue-600 text-sm"
-                                            >
-                                                <MdEdit size={16} />
-                                                Edit
-                                            </button>
-
-                                            <button
-                                                onClick={() => confirmDeleteAddress(address.id)}
-                                                className="flex items-center gap-2 text-red-600 text-sm"
-                                            >
-                                                <MdDelete size={16} />
-                                                Delete
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-
+                                    ))}
+                                </div>
                             </div>
                         ) : (
                             <div className="flex flex-col items-center mt-20">

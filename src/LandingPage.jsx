@@ -6,6 +6,8 @@ import OurServices from './component/OurServices'
 import UpcommingStaus from './component/UpcommingStaus'
 import HealthRecords from './component/HealthRecords'
 import Testimonial from './component/Testomonial'
+import UserBMI from './component/UserBMI'
+import WeatherReport from './component/WeatherReport'
 
 function LandingPage() {
     return (
@@ -35,6 +37,12 @@ function LandingPage() {
                 {/* Health Records */}
                 <section className="py-2 sm:py-10 ">
                     <HealthRecords />
+                </section>
+                <section className='py-2 sm:py-10'>
+                    <UserBMI />
+                </section>
+                <section className='py-2 sm:py-10 '>
+                    <WeatherReport />
                 </section>
                 {/* <section className="py-2 sm:py-10 ">
                     <Testimonial/>

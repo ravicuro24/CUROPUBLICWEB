@@ -10,6 +10,7 @@ import {
 } from "react-icons/fi";
 import {
   MdLocalPharmacy,
+  MdOutlineBloodtype,
   MdOutlineManageAccounts,
 } from "react-icons/md";
 
@@ -32,6 +33,8 @@ import { useAuth } from "../Authorization/AuthContext";
 import { useLabAuth } from "../Authorization/LabAuthContext";
 import { Sidebar } from 'primereact/sidebar';
 import Map from "./Map";
+import { GiTakeMyMoney } from "react-icons/gi";
+import Header2 from "./Header2";
 
 
 const placeholders = [
@@ -98,6 +101,8 @@ const Header = () => {
     if (path.startsWith("/medicine")) return "Pharmacy";
     if (path.startsWith("/doctor")) return "Doctor";
     if (path.startsWith("/ambulance")) return "Ambulance";
+    if (path.startsWith("/blood")) return "BloodBank";
+    if (path.startsWith("/insurance")) return "Insurance";
     return "Home";
   };
 
@@ -105,10 +110,12 @@ const Header = () => {
 
   const navigationItems = [
     { name: "Home", path: "/", icon: <HiHome size={18} /> },
-    { name: "Pharmacy", path: "/medicine/delivery", icon: <MdLocalPharmacy size={18} /> },
-    { name: "Lab", path: "/lab", icon: <BiTestTube size={18} /> },
-    { name: "Doctor", path: "/doctor", icon: <FaUserMd size={18} /> },
-    { name: "Ambulance", path: "/ambulance", icon: <FaAmbulance size={18} /> },
+    { name: "Pharmacy", path: "/medicine/delivery", icon: <MdLocalPharmacy size={18} className="text-green-500" /> },
+    { name: "Lab", path: "/lab", icon: <BiTestTube size={18} className="text-blue-500" /> },
+    { name: "Doctor", path: "/doctor", icon: <FaUserMd size={18} className='text-teal-500' /> },
+    { name: "Ambulance", path: "/ambulance", icon: <FaAmbulance size={18} className="text-amber-500" /> },
+    { name: "Blood Bank", path: "/blood", icon: <MdOutlineBloodtype  size={18} className="text-red-500" /> },
+    { name: "Insurance", path: "/insurance", icon: <GiTakeMyMoney className='text-cyan-500'   size={18} /> },
   ];
 
   const handleLogout = () => {
@@ -151,9 +158,9 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
+    <header className="bg-white  sticky top-0 z-50">
       <nav className="mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between ">
 
           {/* Logo */}
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="flex items-center flex-shrink-0">
@@ -189,16 +196,16 @@ const Header = () => {
           <div className="flex items-center space-x-3">
 
             {/* Location */}
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={() => setVisible(true)} className="hidden md:flex items-center space-x-2 cursor-pointer">
+            {/* <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={() => setVisible(true)} className="hidden md:flex items-center space-x-2 cursor-pointer">
               <FaMapMarkerAlt className="text-teal-600" size={14} />
               <GetCurrentLocation />
-            </motion.div>
+            </motion.div> */}
 
             {/* Search */}
-            <motion.div ref={searchRef} className="hidden md:flex items-center bg-gray-50 border border-gray-200 px-4 py-2 rounded-lg w-64 transition-all duration-300 focus-within:border-teal-500 focus-within:bg-white focus-within:shadow-sm">
+            {/* <motion.div ref={searchRef} className="hidden md:flex items-center bg-gray-50 border border-gray-200 px-4 py-2 rounded-lg w-64 transition-all duration-300 focus-within:border-teal-500 focus-within:bg-white focus-within:shadow-sm">
               <FiSearch className="text-gray-400 mr-2" size={18} />
               <input type="text" placeholder={placeholders[placeholderIndex]} className="bg-transparent outline-none text-sm w-full border-0 placeholder-gray-400" />
-            </motion.div>
+            </motion.div> */}
 
             {/* Mobile Search Button */}
             <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setSearchOpen(true)} className="md:hidden p-2 text-gray-600 hover:text-teal-600 transition-colors">
@@ -273,6 +280,7 @@ const Header = () => {
             </motion.button>
           </div>
         </div>
+        <Header2/>
       </nav>
 
       {/* Mobile Search Modal */}

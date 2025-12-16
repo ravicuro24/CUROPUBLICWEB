@@ -58,7 +58,7 @@ function SubCategoryMedicineDetails() {
                     <div className="flex gap-4">
                         <div className="flex gap-4">
                             {/* Thumbnail List */}
-                            <div className="flex flex-col gap-3">
+                            {/* <div className="flex flex-col gap-3">
                                 {images.map((img, i) => (
                                     <img
                                         key={i}
@@ -68,15 +68,21 @@ function SubCategoryMedicineDetails() {
                                             }`}
                                     />
                                 ))}
-                            </div>
+                            </div> */}
 
                             {/* Main Image */}
                             <div className="flex-1">
                                 <img
-                                    src={activeImage}
+                                    src={`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBeTXqOJnhL2W_vZewM6uL7UcNmfknP9MvEQ&s`}
                                     className="w-full h-72 object-cover rounded-xl shadow"
                                 />
                             </div>
+                            {/* <div className="flex-1">
+                                <img
+                                    src={activeImage}
+                                    className="w-full h-72 object-cover rounded-xl shadow"
+                                />
+                            </div> */}
                         </div>
                         <div className="mt-6">
                             {/* Title */}

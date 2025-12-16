@@ -64,6 +64,10 @@ const Login = ({ onClose, onLoginSuccess }) => {
         startCountdown()
       } else {
         console.log("Resend OTP", response)
+        if (response.data.message === "Your number is not registered, please signup") {
+          setShowSignUp(true)
+          return;
+        }
       }
     } catch (error) {
       console.error(error)
@@ -104,7 +108,7 @@ const Login = ({ onClose, onLoginSuccess }) => {
 
   const resendOtp = async () => {
     if (countdown > 0 || isResending) return
-    
+
     setIsResending(true)
     try {
       const response = await axiosInstance.post('/auth/endUserSignup', null, {
@@ -417,7 +421,7 @@ const Login = ({ onClose, onLoginSuccess }) => {
         </div>
 
         {/* FOOTER */}
-        <div className="bg-gray-50 px-6 py-4 border-t">
+        <div className="bg-gray-50 px-6 py-4 ">
           <p className="text-center text-sm text-gray-600">
             By continuing, you agree to our{" "}
             <span className="text-teal-600 font-semibold cursor-pointer hover:text-teal-700">

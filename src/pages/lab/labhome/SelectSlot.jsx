@@ -4,8 +4,12 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useLabAuth } from "../../../Authorization/LabAuthContext";
 import axiosInstance from "../../../Authorization/axiosInstance";
+import AddNewFamily from "../../../component/familyMedical/AddNewFamily";
+import AddNewAddress from "../../../component/profile/AddnewAddress";
 
 function SelectSlot({ labCartItems }) {
+    const [addNewPatientModal, setAddNewPatientMdoal] = useState(false)
+    const [addNewAddressModal, setAddNewAddressModal] = useState(false)
     const { userData, getAllLabCartItems } = useLabAuth();
     const userId = userData?.id;
     const navigate = useNavigate();
@@ -34,7 +38,7 @@ function SelectSlot({ labCartItems }) {
 
         slots.forEach(slot => {
             const startHour = parseInt(slot.startAt.split(':')[0]);
-            
+
             // Determine category based on start time
             if (startHour >= 6 && startHour < 12) {
                 categorized.morning.push(slot);
@@ -177,8 +181,8 @@ function SelectSlot({ labCartItems }) {
             labCartItems.forEach((pkg) => {
                 const pkgId = pkg.labPackage.id;
                 // Create a copy of the first selection but with the correct package ID
-                newSelections[pkgId] = { 
-                    ...firstSelection, 
+                newSelections[pkgId] = {
+                    ...firstSelection,
                     selectedPackageId: String(pkgId),
                     // Keep the patient name, slot times, etc. but update package-specific info
                 };
@@ -226,26 +230,26 @@ function SelectSlot({ labCartItems }) {
             selectedAddressId: String(ad.id),
             addressName: ad.city + " - " + (ad.houseNumber || ad.fullAddress)
         });
-        
+
         // If apply to all is enabled, apply this selection to all packages
         if (applyToAllEnabled) {
             const currentSelection = selections[activePackage];
             const newSelections = {};
-            
+
             labCartItems.forEach((pkg) => {
                 const pkgId = pkg.labPackage.id;
-                newSelections[pkgId] = { 
-                    ...currentSelection, 
+                newSelections[pkgId] = {
+                    ...currentSelection,
                     selectedPackageId: String(pkgId),
                     // Update the address for all packages
                     selectedAddressId: String(ad.id),
                     addressName: ad.city + " - " + (ad.houseNumber || ad.fullAddress)
                 };
             });
-            
+
             setSelections(newSelections);
         }
-        
+
         setActivePackage(null);
         setActiveStep(null);
     };
@@ -383,7 +387,7 @@ function SelectSlot({ labCartItems }) {
     // Function to render categorized time slots
     const renderCategorizedSlots = (pkgId) => {
         const categorizedSlots = categorizeSlots(slots);
-        
+
         return (
             <div className="space-y-6">
                 {/* Morning Slots */}
@@ -410,10 +414,10 @@ function SelectSlot({ labCartItems }) {
                                             if (applyToAllEnabled) {
                                                 const currentSelection = selections[pkgId];
                                                 const newSelections = {};
-                                                
+
                                                 labCartItems.forEach((pkg) => {
                                                     const otherPkgId = pkg.labPackage.id;
-                                                    newSelections[otherPkgId] = { 
+                                                    newSelections[otherPkgId] = {
                                                         ...(selections[otherPkgId] || {}),
                                                         selectedPackageId: String(otherPkgId),
                                                         selectedSlotId: String(slot.id),
@@ -422,7 +426,7 @@ function SelectSlot({ labCartItems }) {
                                                         appointmentDate
                                                     };
                                                 });
-                                                
+
                                                 setSelections(newSelections);
                                             }
                                         }}
@@ -478,10 +482,10 @@ function SelectSlot({ labCartItems }) {
                                             if (applyToAllEnabled) {
                                                 const currentSelection = selections[pkgId];
                                                 const newSelections = {};
-                                                
+
                                                 labCartItems.forEach((pkg) => {
                                                     const otherPkgId = pkg.labPackage.id;
-                                                    newSelections[otherPkgId] = { 
+                                                    newSelections[otherPkgId] = {
                                                         ...(selections[otherPkgId] || {}),
                                                         selectedPackageId: String(otherPkgId),
                                                         selectedSlotId: String(slot.id),
@@ -490,7 +494,7 @@ function SelectSlot({ labCartItems }) {
                                                         appointmentDate
                                                     };
                                                 });
-                                                
+
                                                 setSelections(newSelections);
                                             }
                                         }}
@@ -546,10 +550,10 @@ function SelectSlot({ labCartItems }) {
                                             if (applyToAllEnabled) {
                                                 const currentSelection = selections[pkgId];
                                                 const newSelections = {};
-                                                
+
                                                 labCartItems.forEach((pkg) => {
                                                     const otherPkgId = pkg.labPackage.id;
-                                                    newSelections[otherPkgId] = { 
+                                                    newSelections[otherPkgId] = {
                                                         ...(selections[otherPkgId] || {}),
                                                         selectedPackageId: String(otherPkgId),
                                                         selectedSlotId: String(slot.id),
@@ -558,7 +562,7 @@ function SelectSlot({ labCartItems }) {
                                                         appointmentDate
                                                     };
                                                 });
-                                                
+
                                                 setSelections(newSelections);
                                             }
                                         }}
@@ -800,7 +804,7 @@ function SelectSlot({ labCartItems }) {
                                                                     const newSelections = {};
                                                                     labCartItems.forEach((pkg) => {
                                                                         const otherPkgId = pkg.labPackage.id;
-                                                                        newSelections[otherPkgId] = { 
+                                                                        newSelections[otherPkgId] = {
                                                                             ...(selections[otherPkgId] || {}),
                                                                             selectedPackageId: String(otherPkgId),
                                                                             appointmentDate: newDate
@@ -824,7 +828,8 @@ function SelectSlot({ labCartItems }) {
                                                 {/* Family Members Selection */}
                                                 {activeStep === "family" && (
                                                     <div className="bg-white rounded-lg border border-gray-200 p-5">
-                                                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Patient</h3>
+
+                                                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Patient </h3>
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                                                             {familyMembers.length === 0 ? (
                                                                 <div className="col-span-full text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-300">
@@ -835,46 +840,52 @@ function SelectSlot({ labCartItems }) {
                                                                 familyMembers.map((fm) => {
                                                                     const chosen = selections[pkgId]?.patientId === String(fm.id);
                                                                     return (
-                                                                        <button
-                                                                            key={fm.id}
-                                                                            onClick={() => {
-                                                                                onSelectFamily(fm);
-                                                                                // If apply to all is enabled, apply this patient to all packages
-                                                                                if (applyToAllEnabled) {
-                                                                                    const newSelections = {};
-                                                                                    labCartItems.forEach((pkg) => {
-                                                                                        const otherPkgId = pkg.labPackage.id;
-                                                                                        newSelections[otherPkgId] = { 
-                                                                                            ...(selections[otherPkgId] || {}),
-                                                                                            selectedPackageId: String(otherPkgId),
-                                                                                            patientId: String(fm.id),
-                                                                                            patientName: fm.name
-                                                                                        };
-                                                                                    });
-                                                                                    setSelections(newSelections);
-                                                                                }
-                                                                            }}
-                                                                            className={`p-4 rounded-lg border transition-all duration-200 flex flex-col items-center ${chosen
-                                                                                ? "bg-teal-50 border-teal-500 text-teal-700 ring-1 ring-teal-200"
-                                                                                : "bg-white border-gray-300 text-gray-700 hover:bg-teal-50 hover:border-teal-300"
-                                                                                }`}
-                                                                        >
-                                                                            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 text-xl mb-3">
-                                                                                👤
-                                                                            </div>
-                                                                            <span className="font-semibold text-base">{fm.name}</span>
-                                                                            <span className="text-sm text-gray-500 mt-1">
-                                                                                {fm.relationship || "Self"} • {fm.age || "N/A"} yrs
-                                                                            </span>
-                                                                            {chosen && (
-                                                                                <div className="mt-3 w-6 h-6 bg-teal-500 rounded-full flex items-center justify-center">
-                                                                                    <span className="text-white text-xs">✓</span>
+                                                                        <>
+
+                                                                            <button
+                                                                                key={fm.id}
+                                                                                onClick={() => {
+                                                                                    onSelectFamily(fm);
+                                                                                    // If apply to all is enabled, apply this patient to all packages
+                                                                                    if (applyToAllEnabled) {
+                                                                                        const newSelections = {};
+                                                                                        labCartItems.forEach((pkg) => {
+                                                                                            const otherPkgId = pkg.labPackage.id;
+                                                                                            newSelections[otherPkgId] = {
+                                                                                                ...(selections[otherPkgId] || {}),
+                                                                                                selectedPackageId: String(otherPkgId),
+                                                                                                patientId: String(fm.id),
+                                                                                                patientName: fm.name
+                                                                                            };
+                                                                                        });
+                                                                                        setSelections(newSelections);
+                                                                                    }
+                                                                                }}
+                                                                                className={`p-2 rounded-lg border transition-all duration-200 flex flex-col items-center ${chosen
+                                                                                    ? "bg-teal-50 border-teal-500 text-teal-700 ring-1 ring-teal-200"
+                                                                                    : "bg-white border-gray-300 text-gray-700 hover:bg-teal-50 hover:border-teal-300"
+                                                                                    }`}
+                                                                            >
+                                                                                <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 text-xl mb-3">
+                                                                                    👤
                                                                                 </div>
-                                                                            )}
-                                                                        </button>
+                                                                                <span className="font-semibold text-base">{fm.name} ({fm.gender == "Male" ? "M" : "Female" ? "F" : "O"})</span>
+                                                                                <span className="text-sm text-gray-500 mt-1">
+                                                                                    {fm.relationship || "Self"} • {fm.age || "N/A"} yrs
+                                                                                </span>
+                                                                                {chosen && (
+                                                                                    <div className="mt-3 w-6 h-6 bg-teal-500 rounded-full flex items-center justify-center">
+                                                                                        <span className="text-white text-xs">✓</span>
+                                                                                    </div>
+                                                                                )}
+                                                                            </button>
+                                                                        </>
                                                                     );
                                                                 })
                                                             )}
+                                                            <button
+                                                                onClick={() => setAddNewPatientMdoal(true)}
+                                                                className='bg-teal-700 text-white rounded-md py-2 cursor-pointer' >+ Add New </button>
                                                         </div>
                                                     </div>
                                                 )}
@@ -926,6 +937,9 @@ function SelectSlot({ labCartItems }) {
                                                                     );
                                                                 })
                                                             )}
+                                                            <button
+                                                                onClick={() => setAddNewAddressModal(true)}
+                                                                className='bg-teal-700 text-white rounded-md py-2 cursor-pointer'>+ New Address</button>
                                                         </div>
                                                     </div>
                                                 )}
@@ -978,7 +992,39 @@ function SelectSlot({ labCartItems }) {
                     </div>
                 </div>
             </div>
-        </div>
+            {addNewPatientModal &&
+                <div className="fixed inset-0 backdrop-brightness-50 flex justify-center items-center z-50">
+
+                    {/* Modal Box */}
+                    <div className="bg-white w-full max-w-2xl max-h-[90vh] rounded-md shadow-lg relative overflow-y-auto">
+                        {/* Content */}
+                        <div className="p-4">
+                            <AddNewFamily onClose={() => setAddNewPatientMdoal(false)} onSuccess={() => fetchFamilyMembers()} />
+                        </div>
+                    </div>
+                </div>
+            }
+            {addNewAddressModal &&
+                <div className="fixed inset-0 backdrop-brightness-50 flex justify-center items-center z-50">
+
+                    {/* Modal Box */}
+                    <div className="bg-white w-full max-w-2xl max-h-[90vh] rounded-md shadow-lg relative overflow-y-auto">
+                        {/* Content */}
+                        <div className="p-4">
+                            <AddNewAddress
+                                onSucess={() => {
+                                    fetchAddress();
+                                    setAddNewAddressModal(false);
+                                }}
+                                onClose={() => {
+                                    setAddNewAddressModal(false);
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
+            }
+        </div >
     );
 }
 

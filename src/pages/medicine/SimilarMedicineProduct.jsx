@@ -101,8 +101,13 @@ export default function SimilarMedicineProduct({ name }) {
                                         </span>
 
                                         <div className="w-full flex justify-center mt-2">
-                                            <img
+                                            {/* <img
                                                 src={m.imagesUrl?.[0] || "/no-image.png"}
+                                                alt={m.name}
+                                                className="h-24 sm:h-28 md:h-32 object-contain"
+                                            /> */}
+                                            <img
+                                                src={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBeTXqOJnhL2W_vZewM6uL7UcNmfknP9MvEQ&s"}
                                                 alt={m.name}
                                                 className="h-24 sm:h-28 md:h-32 object-contain"
                                             />

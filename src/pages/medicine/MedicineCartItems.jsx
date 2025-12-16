@@ -117,10 +117,10 @@ function MedicineCartItems() {
     const EmptyCart = () => (
         <div className="flex h-screen flex-col items-center justify-center py-20">
             <div className="bg-gray-100 p-6 rounded-full mb-4">
-                <FiShoppingCart />
+                <img src="https://cdn-icons-png.flaticon.com/128/11329/11329060.png" alt="" />
             </div>
             <h2 className="text-2xl font-bold text-gray-700">Your Cart is Empty</h2>
-            <p className="text-gray-500 mb-4">Start adding items to your cart!</p>
+            <p className="text-gray-500 mb-4">Start adding medicines to place your order</p>
             <button
                 onClick={() => navigate("/medicine/delivery")}
                 className="bg-teal-500 text-white px-6 py-2 rounded-md shadow"
@@ -132,7 +132,7 @@ function MedicineCartItems() {
 
     if (loading)
         return (
-            <LoadingAnimation/>
+            <LoadingAnimation />
         );
 
     if (cartData.length === 0) {
@@ -169,7 +169,8 @@ function MedicineCartItems() {
                                         {!medicine.otc && <p className="text-[8px] bg-amber-200 border-amber-500 text-amber-500 px-1 rounded-full">Prescription Required</p>}
                                         <img
                                             src={
-                                                medicine?.imagesUrl?.[0] ||
+                                                // medicine?.imagesUrl?.[0] ||
+                                                `https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBeTXqOJnhL2W_vZewM6uL7UcNmfknP9MvEQ&s` ||
                                                 "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQywcmMUL-iZxqJ_yZYp67MaZefH7aXhMPS5w&s"
                                             }
                                             className="w-20 h-20 object-contain bg-gray-100 rounded"

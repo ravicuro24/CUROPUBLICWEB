@@ -3,8 +3,12 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLabAuth } from "../../../Authorization/LabAuthContext";
 import axiosInstance from "../../../Authorization/axiosInstance";
+import AddNewFamily from "../../../component/familyMedical/AddNewFamily";
+import AddNewAddress from "../../../component/profile/AddnewAddress";
 
 function LabSinglePackageHomeCollection({ labCartItems }) {
+  const [addNewPatientModal, setAddNewPatientMdoal] = useState(false)
+  const [addNewAddressModal,setAddNewAddressModal] = useState(false)
   const { userData, getAllLabCartItems } = useLabAuth();
   const userId = userData?.id;
   const navigate = useNavigate();
@@ -34,7 +38,7 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
     slots.forEach(slot => {
       const startHour = parseInt(slot.startAt.split(':')[0]);
       const endHour = parseInt(slot.endAt.split(':')[0]);
-      
+
       // Determine category based on start time
       if (startHour >= 6 && startHour < 12) {
         categorized.morning.push(slot);
@@ -351,7 +355,7 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
   // Function to render categorized time slots
   const renderCategorizedSlots = () => {
     const categorizedSlots = categorizeSlots(slots);
-    
+
     return (
       <div className="space-y-6">
         {/* Morning Slots */}
@@ -668,7 +672,7 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
                         {/* Family Members */}
                         {activeStep === "family" && (
                           <div className="bg-white rounded-lg border border-gray-200 p-5">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Patient</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Patient </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                               {familyMembers.map((fm) => (
                                 <button
@@ -686,6 +690,9 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
                                   <span className="text-sm text-gray-500 mt-1">Age: {fm.age || "N/A"}</span>
                                 </button>
                               ))}
+                              <button
+                                onClick={() => setAddNewPatientMdoal(true)}
+                                className="bg-teal-700 text-white cursor-pointer rounded-md">Add New Family</button>
                             </div>
                           </div>
                         )}
@@ -722,6 +729,7 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
                                   </div>
                                 </button>
                               ))}
+                              <button onClick={() => setAddNewAddressModal(true)} className="bg-teal-700 text-white rounded-md cursor-pointer">Add New Address</button>
                             </div>
                           </div>
                         )}
@@ -755,6 +763,38 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
           </div>
         </div>
       </div>
+      {addNewPatientModal &&
+        <div className="fixed inset-0 backdrop-brightness-50 flex justify-center items-center z-50">
+
+          {/* Modal Box */}
+          <div className="bg-white w-full max-w-2xl max-h-[90vh] rounded-md shadow-lg relative overflow-y-auto">
+            {/* Content */}
+            <div className="p-4">
+              <AddNewFamily onClose={() => setAddNewPatientMdoal(false)} onSuccess={() => fetchFamilyMembers()} />
+            </div>
+          </div>
+        </div>
+      }
+      {addNewAddressModal &&
+        <div className="fixed inset-0 backdrop-brightness-50 flex justify-center items-center z-50">
+
+          {/* Modal Box */}
+          <div className="bg-white w-full max-w-2xl max-h-[90vh] rounded-md shadow-lg relative overflow-y-auto">
+            {/* Content */}
+            <div className="p-4">
+              <AddNewAddress
+                onSucess={() => {
+                  fetchAddress();
+                  setAddNewAddressModal(false);
+                }}
+                onClose={() => {
+                  setAddNewAddressModal(false);
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      }
     </div>
   );
 }

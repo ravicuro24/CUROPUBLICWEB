@@ -3,8 +3,10 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLabAuth } from "../../../Authorization/LabAuthContext";
 import axiosInstance from "../../../Authorization/axiosInstance";
+import AddNewFamily from "../../../component/familyMedical/AddNewFamily";
 
 function LabSinglePackageSelectSlot({ labCartItems }) {
+  const [addNewPatientModal, setAddNewPatientMdoal] = useState(false)
   console.log("LabSinglePackageSelectSlot labCartItems:", labCartItems);
 
   const { userData, getAllLabCartItems } = useLabAuth();
@@ -32,7 +34,7 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
 
     slots.forEach(slot => {
       const startHour = parseInt(slot.startAt.split(':')[0]);
-      
+
       // Determine category based on start time
       if (startHour >= 6 && startHour < 12) {
         categorized.morning.push(slot);
@@ -319,7 +321,7 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
   // Function to render categorized time slots
   const renderCategorizedSlots = (pkgId) => {
     const categorizedSlots = categorizeSlots(slots);
-    
+
     return (
       <div className="space-y-6">
         {/* Morning Slots */}
@@ -667,7 +669,7 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
                         {/* Family Members Selection */}
                         {activeStep === "family" && (
                           <div className="bg-white rounded-lg border border-gray-200 p-5">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Patient</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Patient </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                               {familyMembers.length === 0 ? (
                                 <div className="col-span-full text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-300">
@@ -702,6 +704,9 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
                                   );
                                 })
                               )}
+                              <button
+                                onClick={() => setAddNewPatientMdoal(true)}
+                                className='bg-teal-700 text-white rounded-md cursor-pointer'>Add New Patient</button>
                             </div>
                           </div>
                         )}
@@ -747,6 +752,18 @@ function LabSinglePackageSelectSlot({ labCartItems }) {
           </div>
         </div>
       </div>
+      {addNewPatientModal &&
+        <div className="fixed inset-0 backdrop-brightness-50 flex justify-center items-center z-50">
+
+          {/* Modal Box */}
+          <div className="bg-white w-full max-w-2xl max-h-[90vh] rounded-md shadow-lg relative overflow-y-auto">
+            {/* Content */}
+            <div className="p-4">
+              <AddNewFamily onClose={() => setAddNewPatientMdoal(false)} onSuccess={() => fetchFamilyMembers()} />
+            </div>
+          </div>
+        </div>
+      }
     </div>
   );
 }

@@ -53,9 +53,14 @@ function MedicineProductBySubCategory({ productList = [], loading }) {
                     className="flex flex-col bg-white border border-gray-100 shadow-sm rounded-xl h-70 cursor-pointer hover:shadow-md transition"
                 >
                     <div className="relative">
-                        <img
+                        {/* <img
                             className="w-full md:h-24 h-16 rounded-t-xl object-contain p-2"
                             src={item?.pharmacyMedicineBatch?.medicine?.imagesUrl?.[0] || defaultImageURL}
+                            alt={item?.pharmacyMedicineBatch?.medicine?.name || "Medicine"}
+                        /> */}
+                        <img
+                            className="w-full md:h-24 h-16 rounded-t-xl object-contain p-2"
+                            src={defaultImageURL}
                             alt={item?.pharmacyMedicineBatch?.medicine?.name || "Medicine"}
                         />
 
