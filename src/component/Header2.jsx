@@ -1,3 +1,4 @@
+// src/component/Header2.jsx
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import GetCurrentLocation from "../Authorization/GetCurrentLocation";
 import { FiSearch, FiX } from "react-icons/fi";

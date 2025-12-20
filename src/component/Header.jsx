@@ -114,8 +114,8 @@ const Header = () => {
     { name: "Lab", path: "/lab", icon: <BiTestTube size={18} className="text-blue-500" /> },
     { name: "Doctor", path: "/doctor", icon: <FaUserMd size={18} className='text-teal-500' /> },
     { name: "Ambulance", path: "/ambulance", icon: <FaAmbulance size={18} className="text-amber-500" /> },
-    { name: "Blood Bank", path: "/blood", icon: <MdOutlineBloodtype  size={18} className="text-red-500" /> },
-    { name: "Insurance", path: "/insurance", icon: <GiTakeMyMoney className='text-cyan-500'   size={18} /> },
+    { name: "Blood Bank", path: "/blood", icon: <MdOutlineBloodtype size={18} className="text-red-500" /> },
+    { name: "Insurance", path: "/insurance", icon: <GiTakeMyMoney className='text-cyan-500' size={18} /> },
   ];
 
   const handleLogout = () => {
@@ -158,8 +158,8 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white  sticky top-0 z-50">
-      <nav className="mx-auto px-4 sm:px-6 lg:px-8">
+    <header className="bg-white  sticky top-0 z-50 py-1">
+      <nav className="mx-auto px-4 sm:px-6 lg:px-8 border-b border-gray-50 pb-1">
         <div className="flex items-center justify-between ">
 
           {/* Logo */}
@@ -213,7 +213,7 @@ const Header = () => {
             </motion.button>
 
             {/* Cart */}
-            {screen == "Doctor" ? <IoIosNotificationsOutline onClick={()=>navigate('/doctor/doctor/notifications')} size={24} className="cursor-pointer" /> : <motion.button
+            {screen == "Doctor" ? <IoIosNotificationsOutline onClick={() => navigate('/doctor/doctor/notifications')} size={24} className="cursor-pointer" /> : <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => activeMenu === "Pharmacy" ? navigate('/medicine/cart') : navigate('/lab/cartitems')}
@@ -255,6 +255,7 @@ const Header = () => {
                         <FaHistory size={16} />
                         <span className="text-sm">My Orders</span>
                       </button>
+                      
 
                       <div className="border-t border-gray-100 mt-1 pt-1">
                         <button onClick={() => { setProfileOpen(false); handleLogout(); }} className="w-full flex items-center space-x-3 px-4 py-3 text-left text-red-600 hover:bg-red-50 transition-colors duration-200">
@@ -280,8 +281,8 @@ const Header = () => {
             </motion.button>
           </div>
         </div>
-        <Header2/>
       </nav>
+      <Header2 />
 
       {/* Mobile Search Modal */}
       <AnimatePresence>

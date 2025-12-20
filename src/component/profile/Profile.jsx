@@ -1,5 +1,4 @@
 // src/component/profile/Profile.jsx
-// src/component/Profile.jsx
 import React, { useEffect, useState } from "react";
 import {
     HiPencilSquare as PencilIcon,
@@ -23,7 +22,7 @@ const MyProfile = () => {
         gender: "",
         age: "",
         weight: "",
-        heightCm: "",
+        heightcm: "",
         heightFeet: "",
         heightInches: "",
     });
@@ -57,6 +56,46 @@ const MyProfile = () => {
         height: "📏",
     };
 
+    // Function to normalize user data from API
+    const normalizeUserData = (userData) => {
+        return {
+            firstName: userData.firstName || "",
+            lastName: userData.lastName || "",
+            email: userData.email || "",
+            mobileNumber: userData.mobileNumber || "",
+            gender: userData.gender || "",
+            age: userData.age || "",
+            weight: userData.weight || "",
+            heightcm: userData.heightcm || userData.heightCm || "",
+        };
+    };
+
+    // Function to convert feet and inches to centimeters and return as integer
+    const convertToCm = (feet, inches) => {
+        const feetNum = parseFloat(feet) || 0;
+        const inchesNum = parseFloat(inches) || 0;
+
+        // Convert feet to inches
+        const totalInches = (feetNum * 12) + inchesNum;
+        // Convert inches to cm (1 inch = 2.54 cm)
+        const cm = totalInches * 2.54;
+
+        // Return as integer (round to nearest whole number)
+        return Math.round(cm);
+    };
+
+    // Function to convert cm to feet and inches
+    const convertCmToFeetInches = (cm) => {
+        if (!cm) return { feet: "", inches: "" };
+        const cmNum = parseFloat(cm);
+        // Convert cm to inches
+        const totalInches = cmNum / 2.54;
+        // Convert to feet and inches
+        const feet = Math.floor(totalInches / 12);
+        const inches = Math.round(totalInches % 12);
+        return { feet: feet.toString(), inches: inches.toString() };
+    };
+
     useEffect(() => {
         if (!id) {
             setAuthModal(true);
@@ -67,20 +106,9 @@ const MyProfile = () => {
 
     useEffect(() => {
         if (userData) {
-            const newProfile = {
-                firstName: userData.firstName || "",
-                lastName: userData.lastName || "",
-                email: userData.email || "",
-                mobileNumber: userData.mobileNumber || "",
-                gender: userData.gender || "",
-                age: userData.age || "",
-                weight: userData.weight || "",
-                heightCm: userData.heightCm || "",
-                heightFeet: userData.heightFeet || "",
-                heightInches: userData.heightInches || "",
-            };
-            setProfileData(newProfile);
-            setOriginalData(newProfile);
+            const normalizedData = normalizeUserData(userData);
+            setProfileData(normalizedData);
+            setOriginalData(normalizedData);
         }
     }, [userData]);
 
@@ -91,7 +119,9 @@ const MyProfile = () => {
             const response = await axiosInstance.get(
                 `/endUserEndPoint/getEndUserProfile?id=${id}`
             );
-            setUserdata(response.data.dto);
+            // Normalize the data before setting
+            const normalizedData = normalizeUserData(response.data.dto);
+            setUserdata({ ...response.data.dto, ...normalizedData });
         } catch (err) {
             console.log("Fetch profile error:", err);
         }
@@ -179,29 +209,33 @@ const MyProfile = () => {
 
     // Function to format height display
     const formatHeightDisplay = () => {
-        const feet = profileData.heightFeet || "";
-        const inches = profileData.heightInches || "";
-        const cm = profileData.heightCm || "";
-        
-        if (feet && inches) {
-            return `${feet} ft ${inches} inch`;
-        } else if (cm) {
-            return `${cm} cm`;
-        }
-        return "No height set";
+        const cm = Number(profileData.heightcm);
+        if (!cm) return "No height set";
+
+        const totalInches = cm / 2.54;
+        const feet = Math.floor(totalInches / 12);
+        const inches = Math.round(totalInches % 12);
+
+        return `${feet}' ${inches}" (${cm} cm)`;
     };
+
+
+
 
     // Function to save height
     const saveHeight = async () => {
         const feet = tempData.heightFeet || "";
         const inches = tempData.heightInches || "";
-        const cm = tempData.heightCm || "";
+        const cm = tempData.heightcm || "";
 
-        // Validate feet and inches
+        let heightcm = "";
+
+        // Check if user entered feet and inches
         if (feet || inches) {
-            const feetNum = Number(feet);
-            const inchesNum = Number(inches);
-            
+            const feetNum = Number(feet) || 0;
+            const inchesNum = Number(inches) || 0;
+
+            // Validate feet and inches
             if (feet && (feetNum < 2 || feetNum > 8)) {
                 setErrors({ height: "Feet should be between 2-8" });
                 return;
@@ -210,25 +244,41 @@ const MyProfile = () => {
                 setErrors({ height: "Inches should be 0-11" });
                 return;
             }
+
+            // Convert feet and inches to cm (as integer)
+            if (feet || inches) {
+                heightcm = convertToCm(feet, inches).toString(); // Convert to string for API
+            }
         }
-        
-        // Validate cm
+
+        // If user entered cm directly, use that value (ensure it's integer)
         if (cm) {
             const cmNum = Number(cm);
             if (cmNum < 50 || cmNum > 250) {
                 setErrors({ height: "Height should be 50-250 cm" });
                 return;
             }
+            // Ensure integer value
+            heightcm = Math.round(cmNum).toString();
         }
 
+        // Validate we have a height value
+        if (!heightcm) {
+            setErrors({ height: "Please enter height in either format" });
+            return;
+        }
+
+        // Prepare updates for all three fields
         const updates = {};
-        if (feet !== profileData.heightFeet) updates.heightFeet = feet;
-        if (inches !== profileData.heightInches) updates.heightInches = inches;
-        if (cm !== profileData.heightCm) updates.heightCm = cm;
+
+        // Always update heightcm with integer value
+        updates.heightcm = heightcm;
+
 
         if (Object.keys(updates).length > 0) {
             await updateProfileFieldAPI(updates);
         }
+
         setShowHeightModal(false);
         setErrors({});
     };
@@ -254,7 +304,7 @@ const MyProfile = () => {
                 </div>
 
                 {/* PROFILE CARD */}
-                <div className=" gap-4 flex flex-col md:flex-row w-full justify-between items-start">
+                <div div className=" gap-4 flex flex-col md:flex-row w-full justify-between items-start">
                     <div className="bg-white w-full md:w-1/2 py-2 rounded-md border border-gray-200 overflow-hidden mb-4">
 
                         {/* NAME FIELD */}
@@ -459,10 +509,13 @@ const MyProfile = () => {
                                 <button
                                     onClick={() => {
                                         setShowHeightModal(true);
+                                        // Initialize with current height in cm and also convert to feet/inches for the modal
+                                        const currentHeight = profileData.heightcm;
+                                        const { feet, inches } = convertCmToFeetInches(currentHeight);
                                         setTempData({
-                                            heightFeet: profileData.heightFeet,
-                                            heightInches: profileData.heightInches,
-                                            heightCm: profileData.heightCm,
+                                            heightcm: currentHeight || "",
+                                            heightFeet: feet,
+                                            heightInches: inches,
                                         });
                                         setErrors({});
                                     }}
@@ -603,72 +656,28 @@ const MyProfile = () => {
                         </button>
 
                         <h2 className="text-lg font-bold mb-3">Update Height</h2>
-                        <p className="text-gray-500 text-sm mb-4">Enter height in either format</p>
 
-                        {/* Feet and Inches Input */}
-                        <div className="mb-6">
-                            <h3 className="font-medium mb-2">Feet & Inches</h3>
-                            <div className="flex items-center gap-3">
-                                <div className="flex-1">
-                                    <label className="block text-sm text-gray-600 mb-1">Feet</label>
-                                    <input
-                                        type="number"
-                                        min="2"
-                                        max="8"
-                                        className={`w-full border-2 rounded-md px-4 py-2 ${errors.height ? "border-red-400" : "border-gray-300"
-                                            }`}
-                                        value={tempData.heightFeet || ""}
-                                        onChange={(e) =>
-                                            setTempData({ ...tempData, heightFeet: e.target.value })
-                                        }
-                                        placeholder="e.g., 5"
-                                    />
-                                </div>
-                                <div className="flex-1">
-                                    <label className="block text-sm text-gray-600 mb-1">Inches</label>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        max="11"
-                                        className={`w-full border-2 rounded-md px-4 py-2 ${errors.height ? "border-red-400" : "border-gray-300"
-                                            }`}
-                                        value={tempData.heightInches || ""}
-                                        onChange={(e) =>
-                                            setTempData({ ...tempData, heightInches: e.target.value })
-                                        }
-                                        placeholder="e.g., 7"
-                                    />
-                                </div>
-                            </div>
-                        </div>
 
-                        <div className="relative mb-6">
-                            <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-gray-300"></div>
-                            </div>
-                            <div className="relative flex justify-center text-sm">
-                                <span className="px-2 bg-white text-gray-500">OR</span>
-                            </div>
-                        </div>
 
                         {/* Centimeters Input */}
                         <div className="mb-6">
-                            <h3 className="font-medium mb-2">Centimeters</h3>
                             <div className="flex items-center gap-2">
                                 <input
                                     type="number"
                                     min="50"
                                     max="250"
+                                    step="1"
                                     className={`w-full border-2 rounded-md px-4 py-2 ${errors.height ? "border-red-400" : "border-gray-300"
                                         }`}
-                                    value={tempData.heightCm || ""}
+                                    value={tempData.heightcm || ""}
                                     onChange={(e) =>
-                                        setTempData({ ...tempData, heightCm: e.target.value })
+                                        setTempData({ ...tempData, heightcm: e.target.value })
                                     }
                                     placeholder="e.g., 170"
                                 />
                                 <span className="text-gray-500 whitespace-nowrap">cm</span>
                             </div>
+                            <p className="text-xs text-gray-500 mt-1">(Whole numbers only, e.g., 170)</p>
                         </div>
 
                         {errors.height && (

@@ -4,7 +4,7 @@ import axios from 'axios'
 // ✅ Create Axios instance
 const axiosInstance = axios.create({
   baseURL: 'https://test.curo24.com/', // 🔹 Replace with your actual API endpoint
-  // baseURL: 'http://192.168.1.25:8080/', // 🔹 Replace with your actual API endpoint
+  // baseURL: 'http://192.168.1.5:8080/', // 🔹 Replace with your actual API endpoint
   timeout: 10000, // optional
   headers: {
     'Content-Type': 'application/json',

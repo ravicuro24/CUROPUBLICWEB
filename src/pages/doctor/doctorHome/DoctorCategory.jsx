@@ -2,7 +2,6 @@
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
-    // Medical Icons
     FaUserMd,
     FaHeartbeat,
     FaBaby,
@@ -17,14 +16,11 @@ import {
     FaBrain as FaNeuro,
     FaJoint,
     FaEye,
-    FaSkull,
     FaViruses,
     FaCut,
     FaUserInjured,
     FaPills,
     FaTooth,
-
-    // General Icons
     FaArrowRight,
     FaStar
 } from 'react-icons/fa';
@@ -39,7 +35,7 @@ function DoctorCategory() {
     useEffect(() => {
         window.scrollTo({
             top: 0,
-            behavior: 'sm'
+            behavior: 'smooth'
         })
     }, [])
     const specialties = [
@@ -163,7 +159,7 @@ function DoctorCategory() {
                                 </div>
 
                                 {/* View Button */}
-                                <Link to='/doctor-allDoctor' className="w-full cursor-pointer flex items-center justify-center gap-2 py-2 text-sm font-semibold text-blue-600 hover:text-blue-700 group-hover:bg-blue-50 rounded-lg transition-colors">
+                                <Link to='/doctor/allDoctor' className="w-full cursor-pointer flex items-center justify-center gap-2 py-2 text-sm font-semibold text-blue-600 hover:text-blue-700 group-hover:bg-blue-50 rounded-lg transition-colors">
                                     View Doctors
                                     <FaArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                                 </Link>

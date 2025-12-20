@@ -1,8 +1,11 @@
 // src/pages/medicine/MedicineCheckout.jsx
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import RazorpayPayment from '../../component/payments/RazorpayPayments';
+import { useAuth } from '../../Authorization/AuthContext';
 
 function MedicineCheckout() {
+    const{userData} = useAuth
     const location = useLocation();
     const { cartData, totalAmount } = location.state || {};
     console.log(cartData)
@@ -89,6 +92,8 @@ function MedicineCheckout() {
                     <p className='text-gray-500 text-lg'>No cart data found!</p>
                 </div>
             )}
+
+            
         </div>
     );
 }

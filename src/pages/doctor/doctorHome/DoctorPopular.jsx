@@ -56,7 +56,8 @@ function DoctorPopular() {
     };
 
     return (
-        <div className="w-full py-8 px-4 sm:px-6 md:px-8 container md:mx-auto mx-2">
+        <div className="w-full py-8 container md:mx-auto ">
+            <h1 className='my-2 text-base md:text-md font-semibold md:font-bold text-gray-800'>Popular Doctor</h1>
             <div className="mx-auto">
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">

@@ -14,6 +14,7 @@ import PendingConsultDoctor from '../pages/doctor/doctorHome/quickConsult/Pendin
 import CompleteConsult from '../pages/doctor/doctorHome/quickConsult/CompleteConsult'
 import QuickViewDoctorDetails from '../pages/doctor/doctorHome/quickConsult/QuickViewDoctorDetails'
 import DoctorNotification from '../pages/doctor/DoctorNotification'
+import SearchedDoctor from '../pages/doctor/doctorHome/doctors/SearchedDoctor'
 
 function DoctorRouting() {
     return (
@@ -22,7 +23,7 @@ function DoctorRouting() {
                 {/* <Route path='/doctor' element={<DoctorHome />} /> */}
                 <Route path='/doctor' element={<DoctorHero />} />
                 <Route path='/doctor-category' element={<DoctorCategory />} />
-                <Route path='/doctor-allDoctor' element={<DoctorList />} />
+                <Route path='/doctor/allDoctor' element={<DoctorList />} />
                 <Route path='/doctor/doctor-details' element={<ViewDoctorDetails />} />
                 <Route path='/doctor/quick/doctor-details' element={<QuickViewDoctorDetails />} />
                 <Route path='/doctor-book-appoitment' element={<BookAppoitment />} />
@@ -32,6 +33,7 @@ function DoctorRouting() {
                 <Route path='/doctor/pendingConsultDoctor' element={<PendingConsultDoctor />} />
                 <Route path='/doctor/complete/consult' element={<CompleteConsult />} />
                 <Route path='/doctor/doctor/notifications' element={<DoctorNotification />} />
+                <Route path='/doctor/doctor/search' element={<SearchedDoctor />} />
             </Routes>
         </div>
     )

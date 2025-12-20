@@ -1,5 +1,5 @@
 // src/pages/insurance/InsuranceHome.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Shield,
   Home,
@@ -14,369 +14,352 @@ import {
   Calculator,
   FileText,
   Calendar,
-  ArrowRight
+  ArrowRight,
+  Clock,
+  Bell,
+  Rocket,
+  Target,
+  Zap
 } from 'lucide-react';
 import { LuIndianRupee } from "react-icons/lu";
 
+function InsuranceHome() {
+  const [email, setEmail] = useState('');
+  const [subscribers, setSubscribers] = useState(12543);
+  const [daysLeft, setDaysLeft] = useState(45);
+  const [progress, setProgress] = useState(75);
 
-function InsuranceLandingPage() {
-  const [insuranceType, setInsuranceType] = useState('');
-  const [zipCode, setZipCode] = useState('');
+  // Animation for counter
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSubscribers(prev => prev + Math.floor(Math.random() * 10));
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
-  // Insurance types
+  // Insurance types with coming soon badges
   const insuranceTypes = [
     {
       id: 1,
       name: 'Health Insurance',
-      icon: <Heart className="h-8 w-8" />,
+      icon: <Heart className="h-10 w-10" />,
       color: 'bg-red-50 border-red-200',
-      iconColor: 'text-red-600'
-    },
-    {
-      id: 2,
-      name: 'Auto Insurance',
-      icon: <Car className="h-8 w-8" />,
-      color: 'bg-blue-50 border-blue-200',
-      iconColor: 'text-blue-600'
-    },
-    {
-      id: 3,
-      name: 'Home Insurance',
-      icon: <Home className="h-8 w-8" />,
-      color: 'bg-green-50 border-green-200',
-      iconColor: 'text-green-600'
-    },
+      iconColor: 'text-red-600',
+      status: 'Coming Soon',
+      launchDate: 'Q1 2024'
+    },   
+   
     {
       id: 4,
       name: 'Life Insurance',
-      icon: <Users className="h-8 w-8" />,
+      icon: <Users className="h-10 w-10" />,
       color: 'bg-purple-50 border-purple-200',
-      iconColor: 'text-purple-600'
+      iconColor: 'text-purple-600',
+      status: 'Planning',
+      launchDate: 'Q3 2024'
     },
   ];
 
-  // Coverage options
-  const coverageOptions = [
-    { name: 'Comprehensive Coverage', desc: 'Full protection for all scenarios' },
-    { name: 'Liability Protection', desc: 'Legal and damage coverage' },
-    { name: 'Medical Payments', desc: 'Healthcare expense coverage' },
-    { name: 'Property Damage', desc: 'Asset protection and repair' },
-    { name: 'Personal Injury', desc: 'Accident and injury coverage' },
-    { name: 'Natural Disasters', desc: 'Weather-related incident protection' },
-  ];
-
-  // Testimonials
-  const testimonials = [
+  // Features we're building
+  const features = [
     {
-      name: 'Sarah Johnson',
-      role: 'Small Business Owner',
-      text: 'SecureShield saved me thousands when my home was damaged in a storm. Their claims process was incredibly smooth.',
-      rating: 5,
-      image: 'SJ'
+      title: 'AI-Powered Risk Assessment',
+      description: 'Smart algorithms for personalized coverage',
+      icon: <Zap className="h-6 w-6" />,
+      progress: 85
     },
     {
-      name: 'Michael Chen',
-      role: 'Family Man',
-      text: 'The family health insurance plan is comprehensive and affordable. Great customer service!',
-      rating: 5,
-      image: 'MC'
+      title: 'Instant Claim Processing',
+      description: 'Get claims approved in minutes, not weeks',
+      icon: <Clock className="h-6 w-6" />,
+      progress: 70
     },
     {
-      name: 'Emma Rodriguez',
-      role: 'Car Owner',
-      text: 'After my accident, they handled everything. I was back on the road in no time.',
-      rating: 4,
-      image: 'ER'
+      title: 'Mobile-First Experience',
+      description: 'Manage everything from your smartphone',
+      icon: <Rocket className="h-6 w-6" />,
+      progress: 90
+    },
+    {
+      title: 'Smart Policy Management',
+      description: 'One dashboard for all your policies',
+      icon: <Target className="h-6 w-6" />,
+      progress: 65
     },
   ];
 
-  // Partners
-  const partners = [
-    { name: 'Global Health', logo: '🏥' },
-    { name: 'AutoSecure', logo: '🚗' },
-    { name: 'HomeGuard', logo: '🏠' },
-    { name: 'LifePlus', logo: '💼' },
-    { name: 'TravelSafe', logo: '✈️' },
+  // Launch timeline
+  const timeline = [
+    { phase: 'Research & Planning', date: 'Completed', status: 'done' },
+    { phase: 'UI/UX Design', date: 'Completed', status: 'done' },
+    { phase: 'Development Phase', date: 'In Progress', status: 'current' },
+    { phase: 'Beta Testing', date: 'Q4 2023', status: 'pending' },
+    { phase: 'Public Launch', date: 'Q1 2024', status: 'pending' },
   ];
+
+  const handleNotifyMe = (e) => {
+    e.preventDefault();
+    if (email) {
+      alert(`Thank you! We'll notify you at ${email} when we launch.`);
+      setEmail('');
+      setSubscribers(prev => prev + 1);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      {/* SVG Background Pattern */}
-      <div className="absolute inset-0 overflow-hidden opacity-10">
-        <svg className="absolute w-full h-full" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#3b82f6" strokeWidth="0.5" />
-            </pattern>
-            <pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse">
-              <circle cx="2" cy="2" r="1" fill="#3b82f6" opacity="0.3" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-          <rect width="100%" height="100%" fill="url(#dots)" />
-        </svg>
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 overflow-hidden opacity-5">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle at 25px 25px, #3b82f6 2px, transparent 2px)`,
+          backgroundSize: '50px 50px'
+        }} />
       </div>
 
-      {/* Navigation */}
+      {/* Main Content */}
+      <div className="relative z-10 container mx-auto px-4 py-12 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="text-center mb-16">
+         
+          
+          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+          
+            <span className="block text-blue-600 mt-2">Coming Soon .....</span>
+          </h1>
+          
+          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+            We're building a next-generation insurance platform that makes protection
+            smart, simple, and accessible for everyone.
+          </p>
+          
+          {/* Countdown Stats */}
+          
+        </div>
 
-
-      {/* Hero Section */}
-      <div className="relative z-10">
-        <div className="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-              Protect What Matters Most
-              <span className="block text-blue-600">With Confidence</span>
-            </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Get personalized insurance coverage that fits your life and budget.
-              Trusted by over 2 million customers worldwide.
-            </p>
-
-            {/* Quote Calculator */}
-            <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl p-8">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Get Your Free Quote</h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Insurance Type
-                  </label>
-                  <select
-                    className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    value={insuranceType}
-                    onChange={(e) => setInsuranceType(e.target.value)}
-                  >
-                    <option value="">Select Coverage Type</option>
-                    <option value="health">Health Insurance</option>
-                    <option value="auto">Auto Insurance</option>
-                    <option value="home">Home Insurance</option>
-                    <option value="life">Life Insurance</option>
-                    <option value="business">Business Insurance</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Zip Code
-                  </label>
-                  <div className="relative">
-                    <MapPin className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
-                    <input
-                      type="text"
-                      className="w-full pl-12 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Enter zip code"
-                      value={zipCode}
-                      onChange={(e) => setZipCode(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <div className="flex items-end">
-                  <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg transition duration-300 flex items-center justify-center text-lg">
-                    Calculate Premium
-                    <Calculator className="ml-2 h-5 w-5" />
-                  </button>
-                </div>
-              </div>
-
-              <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">95%</div>
-                  <div className="text-sm text-gray-600">Claim Satisfaction</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">24/7</div>
-                  <div className="text-sm text-gray-600">Support Available</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">₹2.5+</div>
-                  <div className="text-sm text-gray-600">Claims Paid</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">A+</div>
-                  <div className="text-sm text-gray-600">Rating</div>
-                </div>
-              </div>
+        {/* Progress Section */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 mb-16">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Development Progress</h2>
+            <span className="text-sm font-medium text-blue-600">{progress}% Complete</span>
+          </div>
+          
+          <div className="mb-8">
+            <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-1000"
+                style={{ width: `${progress}%` }}
+              />
             </div>
           </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {features.map((feature, index) => (
+              <div key={index} className="border border-gray-200 rounded-xl p-4">
+                <div className="flex items-center mb-3">
+                  <div className="p-2 bg-blue-50 rounded-lg mr-3">
+                    <div className="text-blue-600">
+                      {feature.icon}
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">{feature.title}</h3>
+                    <p className="text-sm text-gray-600">{feature.description}</p>
+                  </div>
+                </div>
+                <div className="flex items-center">
+                  <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden mr-3">
+                    <div 
+                      className="h-full bg-blue-500 rounded-full"
+                      style={{ width: `${feature.progress}%` }}
+                    />
+                  </div>
+                  <span className="text-sm font-medium text-blue-600">
+                    {feature.progress}%
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Insurance Types */}
-      <div className="relative z-10 bg-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-            Comprehensive Coverage Options
+        {/* Insurance Products Preview */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-start text-gray-900 mb-12">
+            Insurance Products We're Building
           </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          
+          <div className="flex flex-row justify-start items-center gap-2">
             {insuranceTypes.map((type) => (
               <div
                 key={type.id}
-                className={`${type.color} border-2 rounded-xl p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer`}
+                className={`${type.color} border rounded-xl p-6 relative overflow-hidden group hover:shadow-lg transition-all duration-300 w-70 h-60`}
               >
+                {/* Coming Soon Badge */}
+                <div className="absolute top-4 right-4">
+                  <span className="px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-full">
+                    {type.status}
+                  </span>
+                </div>
+                
                 <div className={`${type.iconColor} mb-4`}>
                   {type.icon}
                 </div>
+                
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{type.name}</h3>
-                <p className="text-gray-600 mb-4">
-                  Comprehensive protection tailored to your specific needs and lifestyle.
+                <p className="text-gray-600 text-sm mb-4">
+                  Launching {type.launchDate}
                 </p>
-                <button className="flex items-center text-blue-600 hover:text-blue-700 font-medium">
-                  Learn More
+                
+                <div className="flex items-center text-sm text-gray-500">
+                  <Clock className="h-4 w-4 mr-1" />
+                  <span>Coming Soon</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Timeline */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-8 text-white mb-16">
+          <h2 className="text-2xl font-bold mb-8 text-center">Launch Timeline</h2>
+          
+          <div className="relative">
+            {/* Timeline Line */}
+            <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-white/30" />
+            
+            {timeline.map((item, index) => (
+              <div key={index} className="relative flex items-start mb-8 last:mb-0">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-4 z-10 ${
+                  item.status === 'done' ? 'bg-green-400' :
+                  item.status === 'current' ? 'bg-yellow-400 animate-pulse' :
+                  'bg-white/30'
+                }`}>
+                  {item.status === 'done' ? (
+                    <CheckCircle className="h-5 w-5 text-white" />
+                  ) : (
+                    <div className="w-3 h-3 rounded-full bg-white" />
+                  )}
+                </div>
+                
+                <div className="flex-1">
+                  <div className="flex justify-between items-center mb-1">
+                    <h3 className="font-bold text-lg">{item.phase}</h3>
+                    <span className="text-blue-100">{item.date}</span>
+                  </div>
+                  <div className={`h-2 rounded-full ${
+                    item.status === 'done' ? 'bg-green-400' :
+                    item.status === 'current' ? 'bg-yellow-400' :
+                    'bg-white/20'
+                  }`} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Notification Signup */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 mb-16">
+          <div className="text-center max-w-2xl mx-auto">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-6">
+              <Bell className="h-8 w-8 text-blue-600" />
+            </div>
+            
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Get Notified When We Launch
+            </h2>
+            
+            <p className="text-gray-600 mb-8">
+              Be the first to experience our revolutionary insurance platform.
+              Early subscribers get exclusive benefits and priority access.
+            </p>
+            
+            <form onSubmit={handleNotifyMe} className="max-w-md mx-auto">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <input
+                  type="email"
+                  placeholder="Enter your email address"
+                  className="flex-1 px-6 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <button
+                  type="submit"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg transition duration-300 flex items-center justify-center"
+                >
+                  Notify Me
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </button>
               </div>
-            ))}
+              <p className="text-sm text-gray-500 mt-3">
+                Join {subscribers.toLocaleString()}+ others waiting for launch
+              </p>
+            </form>
           </div>
         </div>
-      </div>
 
-      {/* Features */}
-      <div className="relative z-10 bg-gradient-to-r from-blue-50 to-cyan-50 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Why Choose SecureShield?
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              We're committed to providing exceptional service and comprehensive protection
+        {/* Features Preview */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-4">
+              <Shield className="h-6 w-6 text-blue-600" />
+            </div>
+            <h3 className="font-bold text-gray-900 mb-2">AI-Powered Protection</h3>
+            <p className="text-gray-600 text-sm">
+              Smart algorithms that understand your unique needs
             </p>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-xl p-6 shadow-lg">
-              <div className="flex items-center mb-4">
-                <Award className="h-10 w-10 text-blue-600 mr-4" />
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900">A-Rated Insurance</h3>
-                  <p className="text-sm text-gray-600">Top financial strength rating</p>
-                </div>
-              </div>
-              <p className="text-gray-600">
-                Our A+ rating from AM Best ensures we have the financial strength to protect you.
-              </p>
+          
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-4">
+              <LuIndianRupee className="h-6 w-6 text-green-600" />
             </div>
-
-            <div className="bg-white rounded-xl p-6 shadow-lg">
-              <div className="flex items-center mb-4">
-                <Globe className="h-10 w-10 text-green-600 mr-4" />
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900">24/7 Global Support</h3>
-                  <p className="text-sm text-gray-600">Always here to help</p>
-                </div>
-              </div>
-              <p className="text-gray-600">
-                Access claims assistance and customer support anytime, anywhere in the world.
-              </p>
+            <h3 className="font-bold text-gray-900 mb-2">Transparent Pricing</h3>
+            <p className="text-gray-600 text-sm">
+              No hidden fees, just honest pricing you can trust
+            </p>
+          </div>
+          
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-12 h-12 bg-purple-100 rounded-full mb-4">
+              <Globe className="h-6 w-6 text-purple-600" />
             </div>
-
-            <div className="bg-white rounded-xl p-6 shadow-lg">
-              <div className="flex items-center mb-4">
-                <LuIndianRupee className="h-10 w-10 text-purple-600 mr-4" />
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900">Best Price Guarantee</h3>
-                  <p className="text-sm text-gray-600">Competitive rates</p>
-                </div>
-              </div>
-              <p className="text-gray-600">
-                We'll match any competitor's price for equivalent coverage.
-              </p>
-            </div>
+            <h3 className="font-bold text-gray-900 mb-2">24/7 Digital Support</h3>
+            <p className="text-gray-600 text-sm">
+              Get help anytime, anywhere through our app
+            </p>
           </div>
         </div>
+
+        {/* Footer */}
+        
       </div>
 
-      {/* Coverage Details */}
-      <div className="relative z-10 bg-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                Complete Protection for Every Aspect of Your Life
-              </h2>
-              <p className="text-gray-600 mb-8">
-                Our comprehensive coverage options ensure you're protected against life's uncertainties.
-                From health emergencies to property damage, we've got you covered.
-              </p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {coverageOptions.map((option, index) => (
-                  <div key={index} className="flex items-start">
-                    <CheckCircle className="h-6 w-6 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-medium text-gray-900">{option.name}</h4>
-                      <p className="text-sm text-gray-600">{option.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-blue-600 to-cyan-600 rounded-2xl p-8 text-white">
-              <h3 className="text-2xl font-bold mb-6">Get Protected Today</h3>
-              <div className="space-y-4">
-                <div className="flex items-center">
-                  <div className="bg-white/20 rounded-lg p-3 mr-4">
-                    <FileText className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <p className="font-bold">Easy Application</p>
-                    <p className="text-blue-100">Complete online in 10 minutes</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center">
-                  <div className="bg-white/20 rounded-lg p-3 mr-4">
-                    <Calendar className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <p className="font-bold">Instant Coverage</p>
-                    <p className="text-blue-100">Active immediately after approval</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center">
-                  <div className="bg-white/20 rounded-lg p-3 mr-4">
-                    <Shield className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <p className="font-bold">Peace of Mind</p>
-                    <p className="text-blue-100">24/7 protection guaranteed</p>
-                  </div>
-                </div>
-              </div>
-
-              <button className="w-full mt-8 bg-white text-blue-600 hover:bg-blue-50 font-bold py-4 px-6 rounded-lg transition duration-300">
-                Start Your Application
-              </button>
-            </div>
-          </div>
+      {/* Animated Elements */}
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+        }
+        .floating {
+          animation: float 3s ease-in-out infinite;
+        }
+      `}</style>
+      
+      {/* Floating Elements */}
+      <div className="hidden md:block">
+        <div className="absolute top-20 left-10 floating">
+          <div className="w-8 h-8 bg-blue-200/30 rounded-full" />
+        </div>
+        <div className="absolute bottom-40 right-10 floating" style={{ animationDelay: '1s' }}>
+          <div className="w-6 h-6 bg-blue-300/30 rounded-full" />
+        </div>
+        <div className="absolute top-1/3 right-20 floating" style={{ animationDelay: '2s' }}>
+          <div className="w-4 h-4 bg-blue-400/30 rounded-full" />
         </div>
       </div>
-
-
-      {/* Partners */}
-      <div className="relative z-10 bg-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h3 className="text-lg font-medium text-center text-gray-600 mb-8">
-            Trusted by leading organizations worldwide
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
-            {partners.map((partner, index) => (
-              <div key={index} className="text-center">
-                <div className="text-3xl mb-2">{partner.logo}</div>
-                <div className="font-medium text-gray-700">{partner.name}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-
     </div>
   );
 }
 
-export default InsuranceLandingPage;
+export default InsuranceHome;

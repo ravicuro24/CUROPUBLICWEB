@@ -5,6 +5,8 @@ import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import DoctorPopular from './DoctorPopular';
 import { useLabAuth } from '../../../Authorization/LabAuthContext';
+import DoctorAllCategory from './DoctorAllCategory'
+import DoctorAllSymtoms from './DoctorAllSymtoms'
 
 // Doctor-related images
 const doctorImages = [
@@ -26,10 +28,10 @@ function DoctorHero() {
         const checkMobile = () => {
             setIsMobile(window.innerWidth < 768);
         };
-        
+
         checkMobile();
         window.addEventListener('resize', checkMobile);
-        
+
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
@@ -49,7 +51,7 @@ function DoctorHero() {
     }, [doctorImages.length]);
 
     return (
-        <div className='bg-gradient-to-br from-blue-50 to-cyan-50'>
+        <div className='bg-gradient-to-br from-blue-50 to-cyan-50 '>
             {/* Mobile-only floating action button */}
             {isMobile && (
                 <motion.div
@@ -72,7 +74,7 @@ function DoctorHero() {
 
             <div className="min-h-screen flex items-center justify-center px-4 md:px-8 lg:px-16 pt-20 md:pt-0">
                 <div className="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start lg:items-center">
-                    
+
                     {/* Left Side: Text Content */}
                     <motion.div
                         initial={{ opacity: 0, x: isMobile ? 0 : -50 }}
@@ -137,7 +139,7 @@ function DoctorHero() {
                                     </svg>
                                 </Link>
                             </motion.button>
-                            
+
                             <motion.button
                                 onClick={() => navigate('/doctor/quick-consult')}
                                 whileHover={{ scale: isMobile ? 1 : 1.05 }}
@@ -309,7 +311,7 @@ function DoctorHero() {
                     </motion.div>
                 </div>
             </div>
-            
+
             {/* Stats Section - Responsive grid */}
             {/* <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -332,7 +334,10 @@ function DoctorHero() {
                     </div>
                 </div>
             </motion.div> */}
-            
+            <DoctorAllSymtoms />
+            <div className='my-2'>
+                <DoctorAllCategory />
+            </div>
             <DoctorPopular />
         </div>
     );

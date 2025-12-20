@@ -195,7 +195,7 @@ function LabCartItems() {
                                                             <div className="flex flex-col items-end gap-3">
                                                                 <div className="text-right">
                                                                     <p className="text-md md:text-2xl font-bold text-teal-600">
-                                                                        ₹{item.unitPrice?.toLocaleString()}
+                                                                        ₹{item.totalPrice?.toLocaleString()}
                                                                     </p>
 
                                                                 </div>

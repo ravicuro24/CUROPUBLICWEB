@@ -254,7 +254,14 @@ function SelectSlot({ labCartItems }) {
         setActiveStep(null);
     };
 
+    const calculateTotalPrice = (items = []) => {
+        return items.reduce((sum, item) => sum + (item.totalPrice || 0), 0);
+    };
+
+
     const handleCheckout = async () => {
+        const totalAmount = calculateTotalPrice(labCartItems);
+        console.log("Total Amount:", totalAmount);
         setLoading(true);
         // Only include selections that have all required IDs
         const order = Object.values(selections)

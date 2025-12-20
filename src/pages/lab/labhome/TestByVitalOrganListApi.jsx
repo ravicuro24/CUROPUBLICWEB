@@ -3,7 +3,7 @@ import React, { useEffect, useState, useCallback } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom';
 import axiosInstance from '../../../Authorization/axiosInstance';
 import { useLabAuth } from '../../../Authorization/LabAuthContext';
-import { FaShoppingCart, FaHeart, FaMapMarkerAlt,FaSearch } from 'react-icons/fa';
+import { FaShoppingCart, FaHeart, FaMapMarkerAlt, FaSearch } from 'react-icons/fa';
 import { MdLocalHospital } from 'react-icons/md';
 import { useAuth } from '../../../Authorization/AuthContext';
 import LoadingAnimation from '../../../LoaderSpinner';
@@ -28,9 +28,9 @@ function TestByVitalOrganListApi() {
     const [searchTimeout, setSearchTimeout] = useState(null)
 
     // Filter states
-    const [filters, setFilters] = useState({       
+    const [filters, setFilters] = useState({
         sortBy: 'distance', // distance, price_low, price_high, name
-     
+
     });
 
     useEffect(() => {
@@ -80,7 +80,7 @@ function TestByVitalOrganListApi() {
                 lat: latitude,
                 lng: longitude,
                 distance: distance
-            });        
+            });
 
             const response = await axiosInstance.get(
                 `/endUserEndPoint/searchTestByTestName?${params.toString()}`
@@ -223,13 +223,13 @@ function TestByVitalOrganListApi() {
                                 placeholder="Search for tests, packages, or organs..."
                                 className="block w-full pl-10 pr-12 py-3 sm:py-4 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm sm:text-base transition-all duration-200"
                             />
-                            
+
                         </div>
 
                         <div className="w-full md:w-[25%]">
                             {/* Distance Filter */}
                             <div>
-                               
+
                                 <select
                                     value={distance}
                                     onChange={(e) => handleDistanceChange(Number(e.target.value))}
@@ -311,6 +311,7 @@ function TestByVitalOrganListApi() {
 
                                 return (
                                     <div
+                                        onClick={() => navigate('/lab/labPackage_details', { state: item })}
                                         key={`${packageData?.id}-${index}`}
                                         className="bg-white rounded-xl sm:rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-200 overflow-hidden group"
                                     >

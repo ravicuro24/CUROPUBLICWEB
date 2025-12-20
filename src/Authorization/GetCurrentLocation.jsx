@@ -80,9 +80,9 @@ function GetCurrentLocation() {
   };
 
   return (
-    <div className="p-4">
+    <div className="px-2">
       {address ? (
-        <p className="text-gray-600 text-sm mt-2">{address}</p>
+        <p className="text-gray-600 text-sm ">{address}</p>
       ) : (
         <p className="text-gray-400 text-sm mt-2">Fetching your location...</p>
       )}

@@ -1,6 +1,7 @@
 // src/component/PrivacyPolicy.jsx
 // src/Screens/PrivacyCenter/PrivacyCenter.js
 import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 const PrivacyCenter = () => {
     const handleContactSupport = () => {
@@ -194,6 +195,12 @@ const PrivacyCenter = () => {
             title: '14. Disclaimer & Consent',
             icon: '✅',
             content: `By using Curo24's services (app, website, or helpline), you consent to the collection, processing, storage, transfer, and use of your information in accordance with this Privacy Policy.`
+        },
+        {
+            id: 'disclaimer-consent',
+            title: '15. How Delete Acccount',
+            icon: '✅',
+            content: `By requesting account deletion, you acknowledge and consent that your Curo24 account and associated personal data will be permanently deleted in accordance with our Privacy Policy  and applicable laws. Certain information may be retained for legal, regulatory, or audit purposes as required by law. Once deleted, your account cannot be restored.`
         }
     ];
 
@@ -240,29 +247,51 @@ const PrivacyCenter = () => {
 
                     <div className="p-8">
                         <div className="space-y-8">
-                            {privacySections.map((section, index) => (
-                                <div
-                                    key={section.id}
-                                    className={`pb-8 ${index !== privacySections.length - 1 ? 'border-b border-gray-100' : ''}`}
-                                >
-                                    <div className="flex items-start mb-4">
-                                        <div className="flex items-center justify-center h-6 w-6 md:w-12 md:h-12 bg-teal-100 rounded-lg mr-4 flex-shrink-0">
-                                            <span className=" text-xs md:text-xl">{section.icon}</span>
-                                        </div>
-                                        <h3 className=" text-md md:text-md  font-semibold text-gray-900 md:mt-2">
-                                            {section.title}
-                                        </h3>
-                                    </div>
+                            {privacySections.map((section, index) => {
+                                const isLast = index === privacySections.length - 1;
 
-                                    <div className="md:ml-16">
-                                        <p className="text-gray-700 leading-7 whitespace-pre-line text-xs md:text-[14px]">
-                                            {section.content}
-                                        </p>
+                                return (
+                                    <div
+                                        key={section.id}
+                                        className={`pb-8 ${!isLast ? "border-b border-gray-100" : ""
+                                            }`}
+                                    >
+                                        <div className="flex items-start mb-4">
+                                            <div className="flex items-center justify-center h-6 w-6 md:w-12 md:h-12 bg-teal-100 rounded-lg mr-4 flex-shrink-0">
+                                                <span className="text-xs md:text-xl">{section.icon}</span>
+                                            </div>
+
+                                            <h3 className="text-md md:text-md font-semibold text-gray-900 md:mt-2">
+                                                {section.title}
+                                            </h3>
+                                        </div>
+
+                                        <div className="md:ml-16">
+                                            <p className="text-gray-700 leading-7 whitespace-pre-line text-xs md:text-[14px]">
+                                                {section.content}
+
+                                                {/* ✅ Show link only for last section */}
+                                                {isLast && (
+                                                    <>
+                                                        {" "}
+                                                        <Link
+                                                            to='/account/delete'
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-red-500 underline font-medium hover:text-red-700"
+                                                        >
+                                                            Click here
+                                                        </Link>
+                                                    </>
+                                                )}
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
+
                 </div>
 
                 {/* Consent Footer */}

@@ -59,88 +59,89 @@ function LabPackageDetails() {
         <div className="min-h-screen bg-gray-50">
             <div className="container mx-auto px-4 py-4 lg:py-6">
                 {/* Package Header Card */}
-                <div className="bg-white rounded-xl lg:rounded-2xl shadow-sm lg:shadow-xl overflow-hidden mb-6 lg:mb-8 ">
-                    <div className="flex flex-col md:flex-row">
-                        {/* Image Section */}
-                        <div className="w-full relative">
+                <div className="border border-gray-200 rounded-2xl overflow-hidden mb-6 lg:mb-10 bg-white shadow-sm hover:shadow-md transition-shadow duration-300">
+                    <div className="flex flex-col lg:flex-row">
+
+                        {/* IMAGE SECTION */}
+                        <div className="relative w-full lg:w-2/5 bg-gray-100">
                             <img
-                                src={labPackage?.tests[0]?.imagesUrl[0]}
+                                src={labPackage?.tests?.[0]?.imagesUrl?.[0]}
                                 alt={labPackage?.packageName}
-                                className="w-full h-40 md:h-full object-cover"
+                                className="w-full h-40 lg:h-full object-cover"
                             />
+
                             {labPackage?.popular && (
-                                <div className="absolute top-4 right-4 lg:left-20 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-2 rounded-full shadow-lg flex items-center space-x-1">
-                                    <Star size={16} fill="currentColor" />
-                                    <span className="font-semibold text-sm">Popular</span>
+                                <div className="absolute top-4 left-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1.5 rounded-full shadow-md flex items-center gap-1 text-xs font-semibold">
+                                    <Star size={14} fill="currentColor" />
+                                    Popular
                                 </div>
                             )}
                         </div>
 
-                        {/* Content Section */}
-                        <div className="w-full p-4 lg:p-8">
-                            {/* Header with Meta Info */}
-                            <div className="mb-4 lg:mb-6">
-                                <div className="flex-1">
-                                    <h1 className="text-xl md:text-3xl font-bold text-gray-900 mb-2 lg:mb-3 leading-tight">
-                                        {labPackage?.packageName}
-                                    </h1>
-                                    <div className="flex items-center space-x-2 text-sm text-gray-600">
-                                        <div className="flex items-center space-x-2 bg-gray-100 px-2 lg:px-3 py-1 lg:py-1.5 rounded-lg">
-                                            <Calendar size={14} className="text-blue-600" />
-                                            <span className="font-medium text-xs lg:text-sm">
-                                                Created: {new Date(labPackage?.createdAt).toLocaleDateString("en-IN")}
-                                            </span>
-                                        </div>
-                                    </div>
+                        {/* CONTENT SECTION */}
+                        <div className="w-full lg:w-3/5 p-5 lg:p-8 flex flex-col justify-between">
+
+                            {/* HEADER */}
+                            <div>
+                                <h1 className="text-lg lg:text-2xl font-semibold text-gray-900 leading-tight mb-2">
+                                    {labPackage?.packageName}
+                                </h1>
+
+                                <div className="flex items-center gap-2 text-xs lg:text-sm text-gray-500 mb-4">
+                                    <Calendar size={14} className="text-blue-600" />
+                                    Created on{" "}
+                                    {new Date(labPackage?.createdAt).toLocaleDateString("en-IN")}
                                 </div>
+
+                                {/* DESCRIPTION */}
+                                <p className="text-gray-600 text-sm lg:text-base leading-relaxed border-l-4 border-blue-500 pl-4 bg-blue-50 rounded-md py-2">
+                                    {labPackage?.description}
+                                </p>
                             </div>
 
-                            {/* Description */}
-                            <p className="text-gray-700 text-sm lg:text-lg mb-4 lg:mb-8 leading-relaxed border-l-4 border-blue-500 pl-3 lg:pl-4 bg-blue-50 py-2 lg:py-3 rounded-r-lg">
-                                {labPackage?.description}
-                            </p>
-
-                            {/* Price Section */}
-                            <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl lg:rounded-2xl p-4 lg:p-6 border border-gray-200">
-                                <div className="flex flex-col space-y-3 lg:space-y-0 lg:flex-row lg:items-center lg:justify-between">
-                                    <div className="flex items-baseline space-x-3">
-                                        <div className="flex flex-col">
-                                            <span className="text-md md:text-2xl font-bold text-green-600">
+                            {/* PRICE SECTION */}
+                            <div className="mt-6 bg-gray-50 rounded-xl p-4 border border-gray-200">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <span className="text-xs uppercase tracking-wide text-gray-500">
+                                            Price
+                                        </span>
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-xl lg:text-2xl font-bold text-green-600">
                                                 ₹{labPackage?.price}
                                             </span>
+
+                                            {labPackage?.discount > 0 && (
+                                                <span className="text-sm line-through text-gray-400">
+                                                    ₹{labPackage?.price + labPackage?.discount}
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
+
+                                    {labPackage?.discount > 0 && (
+                                        <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">
+                                            Save ₹{labPackage?.discount}
+                                        </span>
+                                    )}
                                 </div>
-
-                                {labPackage?.discount > 0 && (
-                                    <div className="mt-3 lg:mt-4 pt-3 lg:pt-4 border-t border-gray-200 border-dashed">
-                                        <div className="flex items-center justify-between text-sm text-gray-600">
-                                            <span>Original Price</span>
-                                            <span className="font-medium">₹{labPackage?.price}</span>
-                                        </div>
-
-                                        <div className="flex items-center justify-between text-base lg:text-lg font-bold text-gray-900 mt-2 pt-2 border-t border-gray-300">
-                                            <span>Final Price</span>
-                                            <span className="text-green-600">₹{labPackage?.price}</span>
-                                        </div>
-                                    </div>
-                                )}
                             </div>
 
-                            {/* Quick Stats */}
-                            <div className="flex flex-wrap gap-3 lg:gap-6 mt-4 lg:mt-6 pt-4 lg:pt-6 border-t border-gray-200">
-                                <div className="flex items-center space-x-2 text-gray-600">
-                                    <div className="w-2 h-2 lg:w-3 lg:h-3 bg-green-500 rounded-full"></div>
-                                    <span className="text-xs lg:text-sm font-medium">Home Collection</span>
+                            {/* QUICK FEATURES */}
+                            <div className="flex flex-wrap gap-4 mt-6 pt-4 border-t border-gray-200">
+                                <div className="flex items-center gap-2 text-gray-600 text-sm">
+                                    <span className="w-2.5 h-2.5 bg-green-500 rounded-full"></span>
+                                    Home Collection
                                 </div>
-                                <div className="flex items-center space-x-2 text-gray-600">
-                                    <div className="w-2 h-2 lg:w-3 lg:h-3 bg-blue-500 rounded-full"></div>
-                                    <span className="text-xs lg:text-sm font-medium">Fast Reports</span>
+                                <div className="flex items-center gap-2 text-gray-600 text-sm">
+                                    <span className="w-2.5 h-2.5 bg-blue-500 rounded-full"></span>
+                                    Fast Reports
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
                     {/* Left Column - Lab Info & Tests */}
@@ -186,7 +187,7 @@ function LabPackageDetails() {
                                     </div>
                                 </div>
 
-                                <div className="border-t pt-3 lg:pt-4">
+                                <div className="border-t border-gray-200 pt-3 lg:pt-4">
                                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
                                         <div className="flex items-center space-x-2">
                                             <Shield size={16} className="text-gray-600" />

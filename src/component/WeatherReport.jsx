@@ -1,3 +1,4 @@
+// src/component/WeatherReport.jsx
 import axios from "axios"
 import React, { useEffect, useRef, useState } from "react"
 import { useAuth } from "../Authorization/AuthContext"
@@ -122,7 +123,7 @@ function WeatherReport() {
     const aqiInfo = getAqiInfo(aqiData.main.aqi)
 
     return (
-        <div className="w-full min-h-screen bg-gray-100 p-6">
+        <div className="w-full min-h-screen bg-gray-100 container mx-auto">
             <h1 className="text-2xl font-bold mb-6">Air Quality Dashboard</h1>
 
             {/* DATE FILTER */}
@@ -149,7 +150,7 @@ function WeatherReport() {
 
                 <button
                     onClick={getAQIHistory}
-                    className="self-end bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700"
+                    className="self-end bg-teal-600 text-white px-5 py-2 rounded hover:bg-teal-700 cursor-pointer"
                 >
                     {historyLoading ? <span className="loading loading-spinner loading-sm"></span> : "Apply Filter"}
                 </button>

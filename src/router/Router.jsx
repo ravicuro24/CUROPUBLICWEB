@@ -28,6 +28,7 @@ import ReturnRefundPolicy from '../component/ReturnRefundPolicy'
 import ContactUs from '../component/ContactUs'
 import BloodBankRouting from './BloodBankRouting'
 import InsuranceRouting from './InsuranceRouting'
+import DeleteAccount from '../component/DeleteAccount'
 
 function Router() {
   return (
@@ -57,6 +58,7 @@ function Router() {
           <Route path='/terms_of_service' element={<TermsAndConditions />} />
           <Route path='/return_refund_policies' element={<ReturnRefundPolicy />} />
           <Route path='/conactUs' element={<ContactUs />} />
+          <Route path='/account/delete' element={<DeleteAccount />} />
 
         </Routes>
         <LabRouting />

@@ -152,9 +152,18 @@ const MedicalInformation = () => {
         },
     ];
 
+    const handleDeleteAccount = async (id) => {
+        try {
+            const response = await axiosInstance.delete(`/endUserEndPoint/updateEndUserProfile?fieldName=heightCM&value=168&userId=${id}`)
+            console.log("account deleted", response)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     return (
         <div className="">
-        
+
 
             <div className="bg-white rounded-md border border-gray-200 overflow-hidden">
                 {fields.map((field, index) => (
@@ -203,8 +212,8 @@ const MedicalInformation = () => {
                                                 onClick={() => saveEdit(field.key)}
                                                 disabled={!hasChanges(field.key) || isLoading || errors[field.key]}
                                                 className={`px-4 py-2 bg-green-500 rounded-md text-white flex items-center justify-center ${!hasChanges(field.key) || isLoading || errors[field.key]
-                                                        ? "opacity-50"
-                                                        : ""
+                                                    ? "opacity-50"
+                                                    : ""
                                                     }`}
                                             >
                                                 <FaCheck size={18} />
@@ -226,6 +235,13 @@ const MedicalInformation = () => {
                         </div>
                     </div>
                 ))}
+
+
+            </div>
+            <div className="mt-2 flex justify-end">
+                <button
+                    onClick={() => handleDeleteAccount(userData?.id)}
+                    className="bg-red-500 text-white px-4 py-2 cursor-pointer rounded-md hover:bg-red-600">Delete Account</button>
             </div>
 
             {/* Blood Type Modal */}
@@ -248,11 +264,11 @@ const MedicalInformation = () => {
                                 <button
                                     key={type}
                                     className={`w-12 h-12 rounded-md flex items-center justify-center font-bold border-2 ${medicalData.bloodType === type
-                                            ? "bg-red-500 border-red-600 text-white"
-                                            : "bg-gray-100 border-gray-200 text-gray-700"
+                                        ? "bg-red-500 border-red-600 text-white"
+                                        : "bg-gray-100 border-gray-200 text-gray-700"
                                         }`}
                                     onClick={() => handleBloodTypeSelect(type)}
-                                 >
+                                >
                                     {type}
                                 </button>
                             ))}

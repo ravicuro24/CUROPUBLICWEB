@@ -7,6 +7,7 @@ import { FaRegTrashAlt } from "react-icons/fa";
 import { FiShoppingCart } from "react-icons/fi";
 import SimilaMedicineProduct from '../medicine/SimilarMedicineProduct'
 import LoadingAnimation from "../../LoaderSpinner";
+import RazorpayPayment from "../../component/payments/RazorpayPayments";
 
 
 
@@ -282,8 +283,9 @@ function MedicineCartItems() {
                         </button>
                     </div>
                 </div>
-            </div>
 
+            </div>
+            
             <SimilaMedicineProduct name={"Fever"} />
         </div>
 

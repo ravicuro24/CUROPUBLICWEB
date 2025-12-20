@@ -1,3 +1,4 @@
+// src/pages/ambulance/ambulanceHome/AmbulanceLandingPage.jsx
 import React, { useEffect, useState } from 'react';
 import {
   Search,
@@ -64,8 +65,6 @@ function AmbulanceLandingPage() {
   const emergencyContacts = [
     { name: 'Police', number: '100', color: 'bg-blue-600' },
     { name: 'Fire', number: '101', color: 'bg-red-600' },
-    { name: 'Poison Control', number: '1-800-222-1222', color: 'bg-green-600' },
-    { name: 'Suicide Prevention', number: '1-800-273-8255', color: 'bg-purple-600' },
   ];
 
   // Testimonials
@@ -196,58 +195,7 @@ function AmbulanceLandingPage() {
         </div>
       </div>
 
-      {/* Stats Section */}
-      <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8 -mt-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <Clock className="h-8 w-8 text-blue-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm text-gray-600">Average Response Time</p>
-                <p className="text-2xl font-bold text-gray-900">8.2 min</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <Ambulance className="h-8 w-8 text-green-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm text-gray-600">Active Ambulances</p>
-                <p className="text-2xl font-bold text-gray-900">47</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center">
-              <div className="p-3 bg-purple-100 rounded-lg">
-                <Users className="h-8 w-8 text-purple-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm text-gray-600">Certified Paramedics</p>
-                <p className="text-2xl font-bold text-gray-900">156</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center">
-              <div className="p-3 bg-red-100 rounded-lg">
-                <Heart className="h-8 w-8 text-red-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm text-gray-600">Lives Saved</p>
-                <p className="text-2xl font-bold text-gray-900">12,847+</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
@@ -394,83 +342,7 @@ function AmbulanceLandingPage() {
       </div>
 
       {/* Footer */}
-      <div className="bg-gray-900 text-white mt-12">
-        <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center mb-4">
-                <Ambulance className="h-8 w-8 text-red-500 mr-2" />
-                <span className="text-xl font-bold">MediRescue</span>
-              </div>
-              <p className="text-gray-400">
-                Providing emergency medical services with compassion and expertise since 2005.
-              </p>
-              <div className="mt-4 flex space-x-4">
-                <div className="bg-blue-800 rounded-lg p-3 text-center">
-                  <div className="text-2xl font-bold">24/7</div>
-                  <div className="text-sm">Service</div>
-                </div>
-                <div className="bg-green-800 rounded-lg p-3 text-center">
-                  <div className="text-2xl font-bold">8min</div>
-                  <div className="text-sm">Avg Response</div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="font-bold mb-4 text-lg">Quick Links</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Emergency Services</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Non-Emergency Transport</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Ambulance Types</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">First Aid Tips</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-bold mb-4 text-lg">Resources</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Emergency Procedures</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">CPR Guide</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Hospital Network</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Insurance Partners</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-bold mb-4 text-lg">Contact Info</h4>
-              <ul className="space-y-3 text-gray-400">
-                <li className="flex items-start">
-                  <Phone className="h-5 w-5 mr-2 mt-0.5 text-red-500" />
-                  <div>
-                    <p className="font-medium">Emergency</p>
-                    <a href="tel:911" className="hover:text-white">911 or 1-800-AMBULANCE</a>
-                  </div>
-                </li>
-                <li className="flex items-start">
-                  <Phone className="h-5 w-5 mr-2 mt-0.5 text-blue-500" />
-                  <div>
-                    <p className="font-medium">Non-Emergency</p>
-                    <a href="tel:1-800-222-1234" className="hover:text-white">1-800-222-1234</a>
-                  </div>
-                </li>
-                <li className="flex items-start">
-                  <Clock className="h-5 w-5 mr-2 mt-0.5 text-green-500" />
-                  <div>
-                    <p className="font-medium">24/7 Operation</p>
-                    <p>Always Available</p>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>© 2023 MediRescue Ambulance Service. All rights reserved. In case of emergency, call 911 immediately.</p>
-            <p className="mt-2 text-sm">This is for demonstration purposes only. In real emergencies, always call your local emergency number.</p>
-          </div>
-        </div>
-      </div>
+     
     </div>
   );
 }
