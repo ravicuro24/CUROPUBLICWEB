@@ -273,8 +273,6 @@ const Header = () => {
                 <span className="text-sm font-semibold">Login</span>
               </motion.button>
             )}
-
-
             {/* Mobile Menu Button */}
             <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setMenuOpen(!menuOpen)} className="lg:hidden p-2 text-gray-600 hover:text-teal-600 transition-colors">
               <FiMenu size={22} />

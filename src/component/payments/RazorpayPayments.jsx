@@ -62,7 +62,7 @@ const RazorpayPayment = ({
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        amount: Number(amount).toFixed(2),
+                        amount: amount,
                         currency: "INR",
                         email,
                         planId,

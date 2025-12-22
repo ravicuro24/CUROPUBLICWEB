@@ -2,14 +2,12 @@
 // src/component/Profile/MedicalInformation.jsx
 import React, { useEffect, useState } from "react";
 import { HiPencilSquare } from "react-icons/hi2";
-
 import { FaCheck } from "react-icons/fa";
-
-
-
 import { useAuth } from "../../Authorization/AuthContext";
 import axiosInstance from "../../Authorization/axiosInstance";
 import { IoMdCloseCircle } from "react-icons/io";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const MedicalInformation = () => {
     const { userData } = useAuth();
@@ -24,6 +22,7 @@ const MedicalInformation = () => {
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [showBloodModal, setShowBloodModal] = useState(false);
+    const navigate = useNavigate();
 
     const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
@@ -153,13 +152,69 @@ const MedicalInformation = () => {
     ];
 
     const handleDeleteAccount = async (id) => {
+        const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "Your account will be permanently deleted!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "Cancel",
+        });
+
+        if (!result.isConfirmed) return;
+
+        // 🔄 Show loading popup
+        Swal.fire({
+            title: "Please wait...",
+            text: "Deleting your account",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => {
+                Swal.showLoading();
+            },
+        });
+
         try {
-            const response = await axiosInstance.delete(`/endUserEndPoint/updateEndUserProfile?fieldName=heightCM&value=168&userId=${id}`)
-            console.log("account deleted", response)
+            const response = await axiosInstance.delete(
+                `/endUserEndPoint/updateEndUserProfile?fieldName=heightCM&value=168&userId=${id}`
+            );
+
+            // ✅ Close loading
+            Swal.close();
+
+            Swal.fire({
+                title: "Deleted!",
+                text: "Your account has been deleted successfully.",
+                icon: "success",
+                timer: 2000,
+                showConfirmButton: false,
+            });
+
+            console.log("account deleted", response);
+
+            localStorage.removeItem("token");
+            localStorage.removeItem("userData");
+
+            setTimeout(() => {
+                navigate("/");
+            }, 2000);
+
         } catch (error) {
-            console.log(error)
+            console.log(error);
+
+            // ❌ Close loading if error
+            Swal.close();
+
+            Swal.fire({
+                title: "Error!",
+                text: "Something went wrong. Please try again.",
+                icon: "error",
+            });
         }
-    }
+    };
+
 
     return (
         <div className="">

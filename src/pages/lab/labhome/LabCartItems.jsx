@@ -67,11 +67,7 @@ function LabCartItems() {
         }
     }
 
-    const handleProceedToCheckout = async () => {
-        if (paymentMethod !== "Pay at Lab") {
-            setPaymentMessage("Only 'Pay at Lab' is allowed at this time.");
-            return;
-        }
+    const handleProceedToCheckout = async () => {       
         setIsLoading(true);
         try {
             // Simulate API call delay
@@ -257,40 +253,7 @@ function LabCartItems() {
                                     </div>
                                 </div>
 
-                                {/* Custom Payment Method Dropdown */}
-                                <div className="mb-6 relative">
-                                    <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
-                                        <CreditCard className="w-4 h-4" /> Payment Method
-                                    </label>
-                                    <div
-                                        className="border border-gray-300 rounded-xl py-3 px-4 text-sm bg-gray-50 cursor-pointer flex justify-between items-center"
-                                        onClick={() => setDropdownOpen(!dropdownOpen)}
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            {paymentOptions.find(opt => opt.label === paymentMethod)?.icon}
-                                            <span>{paymentMethod}</span>
-                                        </div>
-                                        <span className="text-gray-500">▼</span>
-                                    </div>
-                                    {dropdownOpen && (
-                                        <div className="absolute left-0 right-0 mt-1 bg-white border rounded-xl shadow-lg z-10">
-                                            {paymentOptions.map(opt => (
-                                                <div key={opt.label}
-                                                    className="px-4 py-3 hover:bg-teal-50 cursor-pointer flex items-center gap-2"
-                                                    onClick={() => handlePaymentChange(opt.label)}
-                                                >
-                                                    {opt.icon}
-                                                    <span>{opt.label}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                    {paymentMessage && (
-                                        <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-red-500 text-sm mt-2 flex items-center gap-1">
-                                            ⚠️ {paymentMessage}
-                                        </motion.p>
-                                    )}
-                                </div>
+                               
 
                                 {/* Checkout Button */}
                                 <motion.button

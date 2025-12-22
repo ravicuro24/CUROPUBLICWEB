@@ -29,6 +29,7 @@ import ContactUs from '../component/ContactUs'
 import BloodBankRouting from './BloodBankRouting'
 import InsuranceRouting from './InsuranceRouting'
 import DeleteAccount from '../component/DeleteAccount'
+import InvestorRelations from '../component/InvestorRelations'
 
 function Router() {
   return (
@@ -57,8 +58,9 @@ function Router() {
           <Route path='/privacy_policy' element={<PrivacyCenter />} />
           <Route path='/terms_of_service' element={<TermsAndConditions />} />
           <Route path='/return_refund_policies' element={<ReturnRefundPolicy />} />
-          <Route path='/conactUs' element={<ContactUs />} />
+          <Route path='/contactUs' element={<ContactUs />} />
           <Route path='/account/delete' element={<DeleteAccount />} />
+          <Route path='/investor-relations' element={<InvestorRelations />} />
 
         </Routes>
         <LabRouting />

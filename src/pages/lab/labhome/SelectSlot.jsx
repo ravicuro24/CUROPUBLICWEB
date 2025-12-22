@@ -6,8 +6,9 @@ import { useLabAuth } from "../../../Authorization/LabAuthContext";
 import axiosInstance from "../../../Authorization/axiosInstance";
 import AddNewFamily from "../../../component/familyMedical/AddNewFamily";
 import AddNewAddress from "../../../component/profile/AddnewAddress";
+import RazorpayPayment from "../../../component/payments/RazorpayPayments";
 
-function SelectSlot({ labCartItems }) {
+function SelectSlot({ labCartItems, page = "HomeCollection" }) {
     const [addNewPatientModal, setAddNewPatientMdoal] = useState(false)
     const [addNewAddressModal, setAddNewAddressModal] = useState(false)
     const { userData, getAllLabCartItems } = useLabAuth();
@@ -27,6 +28,14 @@ function SelectSlot({ labCartItems }) {
     const [selections, setSelections] = useState({});
     const [applyToAllEnabled, setApplyToAllEnabled] = useState(false);
     const [loading, setLoading] = useState(false);
+
+    // New state for payment
+    const [showPayment, setShowPayment] = useState(false);
+    const [paymentAmount, setPaymentAmount] = useState(0);
+    const [paymentData, setPaymentData] = useState(null);
+
+    // Check if it's VisitLab mode
+    const isVisitLab = page === "VisitLab";
 
     // Function to categorize time slots
     const categorizeSlots = (slots) => {
@@ -110,6 +119,7 @@ function SelectSlot({ labCartItems }) {
             const res = await axiosInstance.get(
                 `/endUserEndPoint/getFamilyMembersByEndUserId?endUserId=${userData?.id}`
             );
+            console.log("Family Members:", res.data);
             setFamilyMembers(res.data?.dtoList || []);
         } catch (err) {
             console.error("fetchFamilyMembers:", err);
@@ -131,8 +141,10 @@ function SelectSlot({ labCartItems }) {
 
     useEffect(() => {
         fetchFamilyMembers();
-        fetchAddress();
-    }, []);
+        if (!isVisitLab) { // Only fetch addresses for Home Collection
+            fetchAddress();
+        }
+    }, [isVisitLab]);
 
     useEffect(() => {
         if (activePackage) {
@@ -164,6 +176,7 @@ function SelectSlot({ labCartItems }) {
                 ...obj,
                 appointmentDate,
                 selectedPackageId: String(activePackage),
+                ...(isVisitLab && { selectedAddressId: null }), // For VisitLab, set addressId to null
             },
         }));
     };
@@ -184,7 +197,8 @@ function SelectSlot({ labCartItems }) {
                 newSelections[pkgId] = {
                     ...firstSelection,
                     selectedPackageId: String(pkgId),
-                    // Keep the patient name, slot times, etc. but update package-specific info
+                    // For VisitLab, ensure addressId is null
+                    ...(isVisitLab && { selectedAddressId: null }),
                 };
             });
 
@@ -222,7 +236,33 @@ function SelectSlot({ labCartItems }) {
             patientId: String(fm.id),
             patientName: fm.name
         });
-        setActiveStep("address");
+
+        if (isVisitLab) {
+            // For VisitLab, skip address selection
+            // If apply to all is enabled, apply this selection to all packages
+            if (applyToAllEnabled) {
+                const currentSelection = selections[activePackage];
+                const newSelections = {};
+
+                labCartItems.forEach((pkg) => {
+                    const pkgId = pkg.labPackage.id;
+                    newSelections[pkgId] = {
+                        ...currentSelection,
+                        selectedPackageId: String(pkgId),
+                        patientId: String(fm.id),
+                        patientName: fm.name,
+                        selectedAddressId: null // Explicitly set to null for VisitLab
+                    };
+                });
+
+                setSelections(newSelections);
+            }
+
+            setActivePackage(null);
+            setActiveStep(null);
+        } else {
+            setActiveStep("address");
+        }
     };
 
     const onSelectAddress = (ad) => {
@@ -258,58 +298,151 @@ function SelectSlot({ labCartItems }) {
         return items.reduce((sum, item) => sum + (item.totalPrice || 0), 0);
     };
 
+    // Format amount without decimal points
+    const formatAmountForRazorpay = (amount) => {
+        // Convert to number, round to nearest integer, and remove decimal points
+        return Math.round(Number(amount)).toString();
+    };
 
-    const handleCheckout = async () => {
+    // Prepare order data for checkout
+    const prepareOrderData = () => {
         const totalAmount = calculateTotalPrice(labCartItems);
-        console.log("Total Amount:", totalAmount);
-        setLoading(true);
-        // Only include selections that have all required IDs
+        const formattedAmount = formatAmountForRazorpay(totalAmount);
+
+        // Filter selections based on mode
         const order = Object.values(selections)
-            .filter(
-                s =>
-                    s &&
-                    s.appointmentDate &&
-                    s.selectedSlotId &&
-                    s.selectedAddressId &&
-                    s.selectedPackageId &&
-                    s.patientId
-            )
+            .filter(s => {
+                // Basic validation for all modes
+                if (!s || !s.appointmentDate || !s.selectedSlotId ||
+                    !s.selectedPackageId || !s.patientId) {
+                    return false;
+                }
+
+                // For Home Collection: address is required
+                if (!isVisitLab && !s.selectedAddressId) {
+                    return false;
+                }
+
+                // For Visit Lab: address should be null (or not present)
+                if (isVisitLab) {
+                    // Ensure addressId is explicitly null
+                    s.selectedAddressId = null;
+                }
+
+                return true;
+            })
             .map(s => ({
                 appointmentDate: s.appointmentDate,
                 selectedSlotId: s.selectedSlotId,
-                selectedAddressId: s.selectedAddressId,
+                selectedAddressId: isVisitLab ? null : s.selectedAddressId,
                 selectedPackageId: s.selectedPackageId,
                 patientId: s.patientId
             }));
 
-        const payload = { order };
-        console.log("FINAL PAYLOAD:", payload);
+        return { order, totalAmount, formattedAmount };
+    };
+
+    // Handle checkout button click - start payment process
+    const handleCheckoutClick = () => {
+        const orderData = prepareOrderData();
+
+        if (orderData.order.length === 0) {
+            alert("Please complete all package selections before checkout");
+            return;
+        }
+
+        // Set payment data and amount
+        setPaymentData(orderData);
+        setPaymentAmount(orderData.formattedAmount); // Use formatted amount without decimals
+        setShowPayment(true);
+    };
+
+    // This function will be called after successful payment
+    const handleCheckoutAfterPayment = async (paymentResponse) => {
+        setLoading(true);
+        console.log("Payment successful, proceeding with checkout...");
+        console.log("Payment response:", paymentResponse);
 
         try {
+            // Convert paymentAmount to number for backend
+            const amountPaid = Number(paymentAmount);
+
+            // Add payment details to the payload
+            const payload = {
+                order: paymentData.order,
+                paymentId: paymentResponse.razorpay_payment_id,
+                orderId: paymentResponse.razorpay_order_id,
+                signature: paymentResponse.razorpay_signature,
+                paymentMethod: 'Razorpay',
+                amountPaid: amountPaid
+            };
+
+            console.log("FINAL PAYLOAD WITH PAYMENT:", JSON.stringify(payload, null, 2));
+
             const response = await axiosInstance.post(
                 `/endUserEndPoint/createMultipleAppointmentForTestPackage?endUserId=${userId}`,
                 payload
             );
+
             console.log("Order response:", response.data);
-            await getAllLabCartItems()
-            navigate('/lab/appointment/confirm', { state: { orderResponse: response.data } });
+            await getAllLabCartItems();
+
+            // Navigate to confirmation page with both order and payment details
+            navigate('/lab/appointment/confirm', {
+                state: {
+                    orderResponse: response.data,
+                    paymentResponse: paymentResponse,
+                    amountPaid: amountPaid
+                }
+            });
+
         } catch (error) {
             console.error("Order error:", error.response?.data || error.message);
+            alert("Error creating appointment after payment: " + (error.response?.data?.message || error.message));
+
+            // You might want to handle refund or show retry option here
+            // For now, just show an error and keep payment visible for retry
+            setShowPayment(true);
         } finally {
             setLoading(false);
         }
     };
 
+    // Payment success callback
+    const handlePaymentSuccess = (paymentResponse) => {
+        console.log("Payment Success:", paymentResponse);
+        setShowPayment(false);
+        handleCheckoutAfterPayment(paymentResponse);
+    };
+
+    // Payment failure callback
+    const handlePaymentFailure = (error) => {
+        console.log("Payment Failed:", error);
+        alert("Payment failed. Please try again.");
+        setShowPayment(false);
+        setLoading(false);
+    };
+
     const isPackageCompleted = (pkgId) => {
         const s = selections[pkgId];
-        return (
-            s &&
-            s.appointmentDate &&
-            s.selectedSlotId &&
-            s.selectedAddressId &&
-            s.selectedPackageId &&
+        if (!s) return false;
+
+        const requiredFields = [
+            s.appointmentDate,
+            s.selectedSlotId,
+            s.selectedPackageId,
             s.patientId
-        );
+        ];
+
+        // For Home Collection, also check address
+        if (!isVisitLab) {
+            requiredFields.push(s.selectedAddressId);
+        } else {
+            // For VisitLab, ensure addressId is null (or not present)
+            s.selectedAddressId = null;
+        }
+
+        return requiredFields.every(field => field != null && field !== '');
     };
 
     const renderSelectedSummary = (pkgId) => {
@@ -317,7 +450,7 @@ function SelectSlot({ labCartItems }) {
         if (!s) return null;
         const slotName = s.slotStartAt && s.slotEndAt ? `${convertTo12Hour(s.slotStartAt)} - ${convertTo12Hour(s.slotEndAt)}` : "N/A";
         const patientName = s.patientName || "N/A";
-        const addressName = s.addressName || "N/A";
+        const addressName = isVisitLab ? "Visit Lab" : (s.addressName || "N/A");
 
         return (
             <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
@@ -344,8 +477,12 @@ function SelectSlot({ labCartItems }) {
                         <span className="text-sm font-semibold text-gray-900">{patientName}</span>
                     </div>
                     <div className="flex flex-col">
-                        <span className="text-xs font-medium text-gray-500 mb-1">Address</span>
-                        <span className="text-sm font-semibold text-gray-900 truncate" title={addressName}>{addressName}</span>
+                        <span className="text-xs font-medium text-gray-500 mb-1">
+                            {isVisitLab ? "Collection Type" : "Address"}
+                        </span>
+                        <span className="text-sm font-semibold text-gray-900 truncate" title={addressName}>
+                            {addressName}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -353,11 +490,17 @@ function SelectSlot({ labCartItems }) {
     };
 
     const renderStepIndicator = () => {
-        const steps = [
-            { key: "slots", label: "Select Slot", icon: "🕒" },
-            { key: "family", label: "Select Patient", icon: "👨‍👩‍👧‍👦" },
-            { key: "address", label: "Select Address", icon: "📍" }
-        ];
+        const steps = isVisitLab
+            ? [
+                { key: "slots", label: "Select Slot", icon: "🕒" },
+                { key: "family", label: "Select Patient", icon: "👨‍👩‍👧‍👦" }
+                // No address step for VisitLab
+            ]
+            : [
+                { key: "slots", label: "Select Slot", icon: "🕒" },
+                { key: "family", label: "Select Patient", icon: "👨‍👩‍👧‍👦" },
+                { key: "address", label: "Select Address", icon: "📍" }
+            ];
 
         const currentIndex = steps.findIndex(step => step.key === activeStep);
 
@@ -625,13 +768,14 @@ function SelectSlot({ labCartItems }) {
                 {/* Header */}
                 <div className="mb-8 flex flex-col items-start">
                     <h1 className="text-md md:text-3xl font-bold text-gray-900 mb-1">
-                        Schedule Lab Tests
+                        Schedule Lab Tests - {isVisitLab ? "Visit Lab" : "Home Collection"}
                     </h1>
                     <p className="text-gray-600 text-[12px] md:text-sm">
-                        Select time slots and details for your lab packages
+                        {isVisitLab
+                            ? "Select time slots for your lab visit"
+                            : "Select time slots and details for your home collection"}
                     </p>
                 </div>
-
 
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Left Sidebar - Progress Summary */}
@@ -663,9 +807,24 @@ function SelectSlot({ labCartItems }) {
                                 </div>
                             </div>
 
+                            {/* Collection Type Info */}
+                            <div className="border-t border-gray-200 pt-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-sm font-medium text-gray-700">Collection Type:</span>
+                                    <span className={`text-sm font-semibold ${isVisitLab ? 'text-blue-600' : 'text-teal-600'}`}>
+                                        {isVisitLab ? 'Visit Lab' : 'Home Collection'}
+                                    </span>
+                                </div>
+                                <p className="text-xs text-gray-500">
+                                    {isVisitLab
+                                        ? 'You will visit the lab at the selected time'
+                                        : 'Sample collection will be done at your selected address'}
+                                </p>
+                            </div>
+
                             {/* Apply to All Toggle - FIXED */}
                             {Object.keys(selections).length > 0 && (
-                                <div className="border-t border-gray-200 pt-4">
+                                <div className="border-t border-gray-200 pt-4 mt-4">
                                     <label className="flex items-center justify-between cursor-pointer">
                                         <div className="flex flex-col">
                                             <span className="text-sm font-medium text-gray-700">
@@ -753,6 +912,12 @@ function SelectSlot({ labCartItems }) {
                                                                     <span className="font-medium text-gray-700">Lab:</span>
                                                                     <span className="text-gray-900">{pkg.labPackage.lab?.labName || pkg.labPackage.lab?.firstName || "N/A"}</span>
                                                                 </div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="font-medium text-gray-700">Type:</span>
+                                                                    <span className={`font-semibold ${isVisitLab ? 'text-blue-600' : 'text-teal-600'}`}>
+                                                                        {isVisitLab ? 'Visit Lab' : 'Home Collection'}
+                                                                    </span>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -835,7 +1000,6 @@ function SelectSlot({ labCartItems }) {
                                                 {/* Family Members Selection */}
                                                 {activeStep === "family" && (
                                                     <div className="bg-white rounded-lg border border-gray-200 p-5">
-
                                                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Patient </h3>
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                                                             {familyMembers.length === 0 ? (
@@ -847,46 +1011,29 @@ function SelectSlot({ labCartItems }) {
                                                                 familyMembers.map((fm) => {
                                                                     const chosen = selections[pkgId]?.patientId === String(fm.id);
                                                                     return (
-                                                                        <>
-
-                                                                            <button
-                                                                                key={fm.id}
-                                                                                onClick={() => {
-                                                                                    onSelectFamily(fm);
-                                                                                    // If apply to all is enabled, apply this patient to all packages
-                                                                                    if (applyToAllEnabled) {
-                                                                                        const newSelections = {};
-                                                                                        labCartItems.forEach((pkg) => {
-                                                                                            const otherPkgId = pkg.labPackage.id;
-                                                                                            newSelections[otherPkgId] = {
-                                                                                                ...(selections[otherPkgId] || {}),
-                                                                                                selectedPackageId: String(otherPkgId),
-                                                                                                patientId: String(fm.id),
-                                                                                                patientName: fm.name
-                                                                                            };
-                                                                                        });
-                                                                                        setSelections(newSelections);
-                                                                                    }
-                                                                                }}
-                                                                                className={`p-2 rounded-lg border transition-all duration-200 flex flex-col items-center ${chosen
-                                                                                    ? "bg-teal-50 border-teal-500 text-teal-700 ring-1 ring-teal-200"
-                                                                                    : "bg-white border-gray-300 text-gray-700 hover:bg-teal-50 hover:border-teal-300"
-                                                                                    }`}
-                                                                            >
-                                                                                <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 text-xl mb-3">
-                                                                                    👤
+                                                                        <button
+                                                                            key={fm.id}
+                                                                            onClick={() => {
+                                                                                onSelectFamily(fm);
+                                                                            }}
+                                                                            className={`p-2 rounded-lg border transition-all duration-200 flex flex-col items-center ${chosen
+                                                                                ? "bg-teal-50 border-teal-500 text-teal-700 ring-1 ring-teal-200"
+                                                                                : "bg-white border-gray-300 text-gray-700 hover:bg-teal-50 hover:border-teal-300"
+                                                                                }`}
+                                                                        >
+                                                                            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 text-xl mb-3">
+                                                                                👤
+                                                                            </div>
+                                                                            <span className="font-semibold text-base">{fm.name} ({fm.gender == "Male" ? "M" : "Female" ? "F" : "O"})</span>
+                                                                            <span className="text-sm text-gray-500 mt-1">
+                                                                                {fm.relationship || "Self"} • {fm.age || "N/A"} yrs
+                                                                            </span>
+                                                                            {chosen && (
+                                                                                <div className="mt-3 w-6 h-6 bg-teal-500 rounded-full flex items-center justify-center">
+                                                                                    <span className="text-white text-xs">✓</span>
                                                                                 </div>
-                                                                                <span className="font-semibold text-base">{fm.name} ({fm.gender == "Male" ? "M" : "Female" ? "F" : "O"})</span>
-                                                                                <span className="text-sm text-gray-500 mt-1">
-                                                                                    {fm.relationship || "Self"} • {fm.age || "N/A"} yrs
-                                                                                </span>
-                                                                                {chosen && (
-                                                                                    <div className="mt-3 w-6 h-6 bg-teal-500 rounded-full flex items-center justify-center">
-                                                                                        <span className="text-white text-xs">✓</span>
-                                                                                    </div>
-                                                                                )}
-                                                                            </button>
-                                                                        </>
+                                                                            )}
+                                                                        </button>
                                                                     );
                                                                 })
                                                             )}
@@ -897,8 +1044,8 @@ function SelectSlot({ labCartItems }) {
                                                     </div>
                                                 )}
 
-                                                {/* Address Selection */}
-                                                {activeStep === "address" && (
+                                                {/* Address Selection - Only for Home Collection */}
+                                                {activeStep === "address" && !isVisitLab && (
                                                     <div className="bg-white rounded-lg border border-gray-200 p-5">
                                                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Address</h3>
                                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -968,6 +1115,14 @@ function SelectSlot({ labCartItems }) {
                                         <div className="text-sm text-gray-600">
                                             All {labCartItems.length} packages are scheduled and confirmed
                                         </div>
+                                        <div className="text-sm text-gray-600 mt-1">
+                                            Collection Type: <span className={`font-semibold ${isVisitLab ? 'text-blue-600' : 'text-teal-600'}`}>
+                                                {isVisitLab ? 'Visit Lab' : 'Home Collection'}
+                                            </span>
+                                        </div>
+                                        <div className="text-lg font-bold text-teal-700 mt-2">
+                                            Total Amount: ₹{calculateTotalPrice(labCartItems)}
+                                        </div>
                                         {applyToAllEnabled && (
                                             <div className="flex items-center gap-2 mt-2">
                                                 <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
@@ -977,9 +1132,9 @@ function SelectSlot({ labCartItems }) {
                                         )}
                                     </div>
                                     <button
-                                        onClick={handleCheckout}
-                                        disabled={loading}
-                                        className={`px-8 py-3 rounded-lg font-semibold text-white transition-all duration-300 ${loading
+                                        onClick={handleCheckoutClick}
+                                        disabled={loading || showPayment}
+                                        className={`px-8 py-3 rounded-lg font-semibold text-white transition-all duration-300 ${loading || showPayment
                                             ? "bg-gray-400 cursor-not-allowed"
                                             : "bg-teal-600 hover:bg-teal-700 hover:shadow-lg transform hover:-translate-y-0.5"
                                             }`}
@@ -989,8 +1144,10 @@ function SelectSlot({ labCartItems }) {
                                                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                                                 Processing...
                                             </div>
+                                        ) : showPayment ? (
+                                            "Processing Payment..."
                                         ) : (
-                                            `Book All Tests`
+                                            `Proceed to Payment`
                                         )}
                                     </button>
                                 </div>
@@ -999,24 +1156,78 @@ function SelectSlot({ labCartItems }) {
                     </div>
                 </div>
             </div>
-            {addNewPatientModal &&
-                <div className="fixed inset-0 backdrop-brightness-50 flex justify-center items-center z-50">
 
-                    {/* Modal Box */}
+            {/* Razorpay Payment Component - Hidden until needed */}
+            {showPayment && paymentData && (
+                <div className="fixed inset-0 backdrop-brightness-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-lg font-semibold text-gray-900">Complete Payment</h3>
+                            <button
+                                onClick={() => setShowPayment(false)}
+                                className="text-gray-400 hover:text-gray-600"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        <div className="mb-6">
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                                <div className="flex justify-between mb-2">
+                                    <span className="text-gray-600">Total Amount:</span>
+                                    <span className="font-bold text-lg">₹{paymentAmount}</span>
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                    {labCartItems.length} package(s) • {isVisitLab ? 'Visit Lab' : 'Home Collection'}
+                                </div>
+                            </div>
+                        </div>
+
+                        <RazorpayPayment
+                            amount={paymentAmount} // Already formatted without decimals
+                            email={userData?.email || ""}
+                            planId="1"
+                            contact={userData?.mobileNumber || ""}
+                            checkoutFrom="lab-booking"
+                            type="Lab Test Booking"
+                            userId={userData?.id}
+                            orderFrom="lab"
+                            description={`Lab tests booking for ${labCartItems.length} package(s)`}
+                            selectedPaymentMethod={{
+                                selectedPayment: true,
+                                method: "Razorpay"
+                            }}
+                            onSuccess={handlePaymentSuccess}
+                            onfailure={handlePaymentFailure}
+                        />
+
+                        <div className="mt-4 text-center">
+                            <button
+                                onClick={() => setShowPayment(false)}
+                                className="text-sm text-gray-500 hover:text-gray-700"
+                            >
+                                Cancel Payment
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Add New Patient Modal */}
+            {addNewPatientModal && (
+                <div className="fixed inset-0 backdrop-brightness-50 flex justify-center items-center z-50">
                     <div className="bg-white w-full max-w-2xl max-h-[90vh] rounded-md shadow-lg relative overflow-y-auto">
-                        {/* Content */}
                         <div className="p-4">
                             <AddNewFamily onClose={() => setAddNewPatientMdoal(false)} onSuccess={() => fetchFamilyMembers()} />
                         </div>
                     </div>
                 </div>
-            }
-            {addNewAddressModal &&
-                <div className="fixed inset-0 backdrop-brightness-50 flex justify-center items-center z-50">
+            )}
 
-                    {/* Modal Box */}
+            {/* Add New Address Modal (Only for Home Collection) */}
+            {!isVisitLab && addNewAddressModal && (
+                <div className="fixed inset-0 backdrop-brightness-50 flex justify-center items-center z-50">
                     <div className="bg-white w-full max-w-2xl max-h-[90vh] rounded-md shadow-lg relative overflow-y-auto">
-                        {/* Content */}
                         <div className="p-4">
                             <AddNewAddress
                                 onSucess={() => {
@@ -1030,8 +1241,8 @@ function SelectSlot({ labCartItems }) {
                         </div>
                     </div>
                 </div>
-            }
-        </div >
+            )}
+        </div>
     );
 }
 
