@@ -18,283 +18,274 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { RiStethoscopeFill } from "react-icons/ri";
 import { CiSearch } from "react-icons/ci";
+import DoctorAllSymptoms from '../DoctorAllSymtoms';
+import DoctorAllCategory from '../DoctorAllCategory';
+import { useAuth } from '../../../../Authorization/AuthContext';
+import axiosInstance from '../../../../Authorization/axiosInstance';
 
+function FilterDoctorList() {
+  // Destructure values from your auth context
+  const { symptomsId = [], specializationId = [] } = useAuth();
 
+  // Initialize state with the values from context
+  const [selectedCategories, setSelectedCategories] = useState([]); // Changed to array for multiple
+  const [selectedCategoryNames, setSelectedCategoryNames] = useState([]); // Changed to array
+  const [selectedSymptoms, setSelectedSymptoms] = useState([]);
+  const [selectedSymptomNames, setSelectedSymptomNames] = useState([]);
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSearchInput, setShowSearchInput] = useState(false);
+  const [showFilterPanel, setShowFilterPanel] = useState(false);
+  const navigate = useNavigate();
 
-function FilterDoctorList({ categories = [], symptoms = [] }) {
   useEffect(() => {
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
-    })
-  }, [])
+    });
 
-  // Updated categories to match the screenshot
-  const categoriesList = [
-    {
-      category: 'Cardiology',
-      image: 'https://cdn-icons-png.flaticon.com/128/10154/10154414.png',
-      description: 'Heart and cardiovascular system',
-      color: 'red'
-    },
-    {
-      category: 'Neurology',
-      image: 'https://cdn-icons-png.flaticon.com/128/9133/9133531.png',
-      description: 'Brain and nervous system',
-      color: 'purple'
-    },
-    {
-      category: 'Orthopedics',
-      image: 'https://cdn-icons-png.flaticon.com/128/7350/7350861.png',
-      description: 'Bones and musculoskeletal system',
-      color: 'blue'
-    },
-    {
-      category: 'Pediatrics',
-      image: 'https://cdn-icons-png.flaticon.com/128/10154/10154319.png',
-      description: 'Children\'s health and development',
-      color: 'pink'
-    },
-    {
-      category: 'Dermatology',
-      image: 'https://cdn-icons-png.flaticon.com/128/7305/7305189.png',
-      description: 'Skin, hair, and nails',
-      color: 'orange'
-    },
-    {
-      category: 'Ophthalmology',
-      image: 'https://cdn-icons-png.flaticon.com/128/4702/4702277.png',
-      description: 'Eyes and vision',
-      color: 'teal'
-    },
-    {
-      category: 'ENT',
-      image: 'https://cdn-icons-png.flaticon.com/128/2721/2721021.png',
-      description: 'Ear, Nose, and Throat',
-      color: 'green'
-    },
-    {
-      category: 'Oncology',
-      image: 'https://cdn-icons-png.flaticon.com/128/18196/18196941.png',
-      description: 'Cancer treatment and research',
-      color: 'yellow'
-    },
-    {
-      category: 'Gastroenterology',
-      image: 'https://cdn-icons-png.flaticon.com/128/8549/8549885.png',
-      description: 'Digestive system',
-      color: 'brown'
-    },
-    {
-      category: 'Dentistry',
-      image: 'https://cdn-icons-png.flaticon.com/128/15595/15595467.png',
-      description: 'Teeth and oral health',
-      color: 'cyan'
-    },
-    {
-      category: 'Physiotherapy',
-      image: 'https://cdn-icons-png.flaticon.com/128/2277/2277789.png',
-      description: 'Physical rehabilitation',
-      color: 'indigo'
-    },
-    {
-      category: 'General Medicine',
-      image: 'https://cdn-icons-png.flaticon.com/128/17281/17281958.png',
-      description: 'Primary healthcare services',
-      color: 'gray'
+    // Initialize filters from context
+    initializeFiltersFromContext();
+  }, []);
+
+  useEffect(() => {
+    // Update filters when context changes
+    initializeFiltersFromContext();
+  }, [specializationId, symptomsId]);
+
+  // Helper function to extract specializations from context
+  const extractSpecializationsFromContext = () => {
+    const categories = [];
+    const categoryNames = [];
+
+    if (!specializationId || !Array.isArray(specializationId)) {
+      return { categories, categoryNames };
     }
-  ];
 
-  // Updated symptoms to match the screenshot
-  const symptomsList = [
-    { symptom: 'Fever', icon: '🌡️', category: 'General' },
-    { symptom: 'Headache', icon: '🤕', category: 'Neurological' },
-    { symptom: 'Cough', icon: '😷', category: 'Respiratory' },
-    { symptom: 'Sore Throat', icon: '🗣️', category: 'ENT' },
-    { symptom: 'Fatigue', icon: '😴', category: 'General' },
-    { symptom: 'Muscle Pain', icon: '💪', category: 'Musculoskeletal' },
-    { symptom: 'Diarrhea', icon: '💦', category: 'Gastrointestinal' },
-    { symptom: 'Rash', icon: '🔴', category: 'Dermatological' },
-    { symptom: 'Chest Pain', icon: '❤️', category: 'Cardiac' },
-    { symptom: 'Back Pain', icon: '🧍', category: 'Musculoskeletal' },
-    { symptom: 'Abdominal Pain', icon: '🤰', category: 'Gastrointestinal' }
-  ];
-  // const categoriesList = categories.length > 0 ? categories : defaultCategories;
-  // const symptomsList = symptoms.length > 0 ? symptoms : defaultSymptoms;
+    console.log("Processing specializationId:", specializationId);
 
-  // Updated doctors data to match the screenshot
-  const dummyDoctors = [
-    {
-      id: 1,
-      image: 'https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg',
-      name: 'Dr. Anya Sharma',
-      specialization: 'Cardiology',
-      experience: 12,
-      rating: 4.8,
-      isVerified: true,
-      imageColor: 'bg-red-100',
-      languages: ['English', 'Hindi'],
-      availability: 'Available Today',
-      nextSlot: '10:30 AM',
-      consultationFee: 1500,
-      symptoms: ['Chest Pain', 'Fatigue']
-    },
-    {
-      id: 2,
-      image: 'https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg',
-      name: 'Dr. Ben Carter',
-      specialization: 'Dermatology',
-      experience: 8,
-      rating: 4.7,
-      isVerified: true,
-      imageColor: 'bg-purple-100',
-      languages: ['English'],
-      availability: 'Available Tomorrow',
-      nextSlot: '11:00 AM',
-      consultationFee: 800,
-      symptoms: ['Rash', 'Skin Allergy']
-    },
-    {
-      id: 3,
-      image: 'https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg',
-      name: 'Dr. Clara Rodriguez',
-      specialization: 'Pediatrics',
-      experience: 15,
-      rating: 4.9,
-      isVerified: true,
-      imageColor: 'bg-teal-100',
-      languages: ['English', 'Spanish'],
-      availability: 'Available Today',
-      nextSlot: '2:00 PM',
-      consultationFee: 600,
-      symptoms: ['Fever', 'Cough']
-    },
-    {
-      id: 4,
-      image: 'https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg',
-      name: 'Dr. David Lee',
-      specialization: 'Neurology',
-      experience: 10,
-      rating: 4.6,
-      isVerified: true,
-      imageColor: 'bg-indigo-100',
-      languages: ['English'],
-      availability: 'Available Today',
-      nextSlot: '3:30 PM',
-      consultationFee: 1200,
-      symptoms: ['Headache', 'Migraine']
-    },
-    {
-      id: 5,
-      image: 'https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg',
-      name: 'Dr. Emily White',
-      specialization: 'Orthopedics',
-      experience: 18,
-      rating: 4.5,
-      isVerified: true,
-      imageColor: 'bg-yellow-100',
-      languages: ['English'],
-      availability: 'Available Tomorrow',
-      nextSlot: '9:00 AM',
-      consultationFee: 900,
-      symptoms: ['Back Pain', 'Muscle Pain']
-    },
-    {
-      id: 6,
-      image: 'https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg',
-      name: 'Dr. Alex Green',
-      specialization: 'Gastroenterology',
-      experience: 7,
-      rating: 4.4,
-      isVerified: true,
-      imageColor: 'bg-orange-100',
-      languages: ['English'],
-      availability: 'Available Today',
-      nextSlot: '4:00 PM',
-      consultationFee: 1100,
-      symptoms: ['Abdominal Pain', 'Diarrhea']
-    },
-    {
-      id: 7,
-      image: 'https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg',
-      name: 'Dr. Olivia Wilson',
-      specialization: 'Pulmonology',
-      experience: 11,
-      rating: 4.7,
-      isVerified: true,
-      imageColor: 'bg-cyan-100',
-      languages: ['English'],
-      availability: 'Available Tomorrow',
-      nextSlot: '1:00 PM',
-      consultationFee: 1000,
-      symptoms: ['Cough', 'Chest Pain']
-    },
-    {
-      id: 8,
-      image: 'https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg',
-      name: 'Dr. Robert Brown',
-      specialization: 'Endocrinology',
-      experience: 14,
-      rating: 4.8,
-      isVerified: true,
-      imageColor: 'bg-pink-100',
-      languages: ['English'],
-      availability: 'Available Today',
-      nextSlot: '11:30 AM',
-      consultationFee: 1300,
-      symptoms: ['Fatigue', 'Weight Issues']
+    // Process each item in the specializationId array
+    specializationId.forEach(item => {
+      if (item === null || item === undefined) return;
+
+      // If item is an object with name property
+      if (typeof item === 'object') {
+        if (item.name) {
+          // Use id if available, otherwise use name as id
+          const id = item.id || item.name;
+          categories.push(id);
+          categoryNames.push(item.name);
+        }
+        // If there's a nested array, process it recursively
+        else if (Array.isArray(item)) {
+          const nested = extractSpecializationsFromArray(item);
+          categories.push(...nested.categories);
+          categoryNames.push(...nested.categoryNames);
+        }
+      }
+      // If item is an array (nested structure)
+      else if (Array.isArray(item)) {
+        const nested = extractSpecializationsFromArray(item);
+        categories.push(...nested.categories);
+        categoryNames.push(...nested.categoryNames);
+      }
+      // If item is a string (ID)
+      else if (typeof item === 'string' && item.trim() !== '') {
+        categories.push(item);
+        // Try to extract name from object in the array
+        const nameObj = specializationId.find(x =>
+          typeof x === 'object' && x !== null && (x.id === item || x.name === item)
+        );
+        categoryNames.push(nameObj?.name || item);
+      }
+    });
+
+    return { categories, categoryNames };
+  };
+
+  // Helper to extract from nested arrays
+  const extractSpecializationsFromArray = (arr) => {
+    const categories = [];
+    const categoryNames = [];
+
+    arr.forEach(item => {
+      if (item === null || item === undefined) return;
+
+      if (typeof item === 'object' && item.name) {
+        const id = item.id || item.name;
+        categories.push(id);
+        categoryNames.push(item.name);
+      } else if (typeof item === 'string' && item.trim() !== '') {
+        categories.push(item);
+        const nameObj = arr.find(x =>
+          typeof x === 'object' && x !== null && (x.id === item || x.name === item)
+        );
+        categoryNames.push(nameObj?.name || item);
+      }
+    });
+
+    return { categories, categoryNames };
+  };
+
+  const initializeFiltersFromContext = () => {
+    console.log("Initializing filters from context...");
+    console.log("Raw specializationId:", specializationId);
+
+    // Handle specializations
+    const { categories, categoryNames } = extractSpecializationsFromContext();
+
+    if (categories.length > 0) {
+      console.log("Setting categories:", categories);
+      console.log("Setting category names:", categoryNames);
+      setSelectedCategories(categories);
+      setSelectedCategoryNames(categoryNames);
+    } else {
+      setSelectedCategories([]);
+      setSelectedCategoryNames([]);
     }
-  ];
 
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [selectedSymptoms, setSelectedSymptoms] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showSearchInput, setShowSearchInput] = useState(false);
-  const [showFilterPanel, setShowFilterPanel] = useState(false);
-  const [activeMobileTab, setActiveMobileTab] = useState('search');
-  const navigate = useNavigate();
+    // Handle symptoms
+    if (symptomsId && symptomsId.length > 0) {
+      const symptomIds = [];
+      const symptomNames = [];
+
+      symptomsId.forEach(symptom => {
+        if (typeof symptom === 'object' && symptom !== null) {
+          if (symptom.id && symptom.name) {
+            symptomIds.push(symptom.id);
+            symptomNames.push(symptom.name);
+          } else if (symptom.name) {
+            symptomIds.push(symptom.name);
+            symptomNames.push(symptom.name);
+          }
+        } else if (typeof symptom === 'string' || typeof symptom === 'number') {
+          symptomIds.push(symptom);
+          symptomNames.push(getSymptomNameById(symptom));
+        }
+      });
+
+      console.log("Setting symptoms:", { symptomIds, symptomNames });
+      setSelectedSymptoms(symptomIds);
+      setSelectedSymptomNames(symptomNames);
+    } else {
+      setSelectedSymptoms([]);
+      setSelectedSymptomNames([]);
+    }
+
+    // Fetch doctors if we have filters
+    if (specializationId.length > 0 || symptomsId.length > 0) {
+      getFilteredDoctors();
+    }
+  };
+
+  // Helper function to get symptom name by ID
+  const getSymptomNameById = (id) => {
+    return id.toString();
+  };
+
+  // Update filtered doctors when filters change
+  useEffect(() => {
+    // Debounce API calls when filters change
+    const timeoutId = setTimeout(() => {
+      if (selectedCategories.length > 0 || selectedSymptoms.length > 0) {
+        getFilteredDoctors();
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [selectedCategories, selectedSymptoms]);
 
   const handleBookAppointment = (doctor) => {
     navigate('/doctor/quick-consult/payment', { state: { doctor } });
   };
 
-  const filteredDoctors = dummyDoctors.filter(doctor => {
-    if (selectedCategory !== 'All' && doctor.specialization !== selectedCategory) {
-      return false;
+  const getFilteredDoctors = async () => {
+    setLoading(true);
+    try {
+      // Build payload with multiple specializations
+      const payload = {
+        // Send array of specialization IDs
+        specializationId: selectedCategories.length > 0 ? selectedCategories : [],
+
+        // Convert symptom IDs
+        symptomIds: selectedSymptoms.map(id => {
+          if (typeof id === 'number') return id;
+          const parsedId = parseInt(id);
+          return isNaN(parsedId) ? id : parsedId;
+        })
+      };
+
+      console.log("Fetching doctors with payload:", JSON.stringify(payload, null, 2));
+
+      const response = await axiosInstance.post("/doctor/filter", payload);
+      console.log("Fetched doctors:", response.data);
+
+      // Update the state with real data from the API
+      setDoctors(response.data?.data || []);
+    } catch (error) {
+      console.error("Error fetching filtered doctors:", error);
+      if (error.response) {
+        console.error("Response error:", error.response.data);
+        console.error("Response status:", error.response.status);
+      }
+      setDoctors([]);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    if (selectedSymptoms.length > 0) {
-      const hasMatchingSymptom = selectedSymptoms.some(symptom =>
-        doctor.symptoms.includes(symptom)
-      );
-      if (!hasMatchingSymptom) return false;
-    }
+  const toggleSymptom = (symptomId, symptomName) => {
+    setSelectedSymptoms(prev => {
+      if (prev.includes(symptomId)) {
+        const newSymptoms = prev.filter(s => s !== symptomId);
+        setSelectedSymptomNames(prevNames =>
+          prevNames.filter(name => name !== symptomName)
+        );
+        return newSymptoms;
+      } else {
+        const newSymptoms = [...prev, symptomId];
+        setSelectedSymptomNames(prevNames => [...prevNames, symptomName]);
+        return newSymptoms;
+      }
+    });
+  };
 
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      return (
-        doctor.name.toLowerCase().includes(query) ||
-        doctor.specialization.toLowerCase().includes(query)
-      );
-    }
+  const toggleCategory = (categoryId, categoryName = '') => {
+    console.log("Toggling category:", categoryId, categoryName);
+    setSelectedCategories(prev => {
+      if (prev.includes(categoryId)) {
+        // Remove category
+        const newCategories = prev.filter(c => c !== categoryId);
+        // Remove corresponding name
+        setSelectedCategoryNames(prevNames =>
+          prevNames.filter((name, index) => prev[index] !== categoryId)
+        );
+        return newCategories;
+      } else {
+        // Add category
+        const newCategories = [...prev, categoryId];
+        // Add corresponding name
+        setSelectedCategoryNames(prevNames => [...prevNames, categoryName || categoryId]);
+        return newCategories;
+      }
+    });
+  };
 
-    return true;
-  });
-
-  const toggleSymptom = (symptom) => {
-    setSelectedSymptoms(prev =>
-      prev.includes(symptom)
-        ? prev.filter(s => s !== symptom)
-        : [...prev, symptom]
-    );
+  const handleCategorySelect = (categoryId, categoryName = '') => {
+    console.log("Category selected:", categoryId, categoryName);
+    toggleCategory(categoryId, categoryName);
   };
 
   const clearFilters = () => {
-    setSelectedCategory('All');
+    setSelectedCategories([]);
+    setSelectedCategoryNames([]);
     setSelectedSymptoms([]);
+    setSelectedSymptomNames([]);
     setSearchQuery('');
     setShowSearchInput(false);
   };
+
   const placeholders = [
     "Search doctors...",
     "Search clinics...",
@@ -308,108 +299,152 @@ function FilterDoctorList({ categories = [], symptoms = [] }) {
   useEffect(() => {
     const interval = setInterval(() => {
       setIndex(prev => (prev + 1) % placeholders.length);
-    }, 1000); // change every second
-
+    }, 30000);
     return () => clearInterval(interval);
   }, []);
+
+  // Filter doctors based on search query
+  const filteredDoctors = doctors.filter(doctor => {
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      return (
+        (doctor.name && doctor.name.toLowerCase().includes(query)) ||
+        (doctor.firstName && `${doctor.firstName} ${doctor.lastName || ''}`.toLowerCase().includes(query)) ||
+        (doctor.specialization && doctor.specialization.toLowerCase().includes(query)) ||
+        (doctor.qualification && doctor.qualification.toLowerCase().includes(query))
+      );
+    }
+    return true;
+  });
+
+  // Update DoctorAllSymptoms usage to pass symptom names
+  const handleSymptomSelectFromComponent = (symptomId, symptomName) => {
+    toggleSymptom(symptomId, symptomName);
+  };
 
   return (
     <div className="min-h-screen mt-4">
       {/* Hero Section */}
       <div className="">
         <div className="container mx-auto px-4">
-          <h1 className="text-sm md:text-lg   mb-2">
+          <h1 className="text-sm md:text-lg mb-2">
             Find the right specialist for your needs and consult instantly.
           </h1>
           {/* Main Search Bar */}
           <div className="w-full">
             <label className="input border w-full flex items-center gap-2">
               <CiSearch className="text-gray-500 text-lg" />
-
               <input
                 type="search"
                 className="w-full"
                 placeholder={placeholders[index]}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    getFilteredDoctors();
+                  }
+                }}
               />
             </label>
           </div>
-
         </div>
       </div>
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         {/* Common Symptoms Section */}
-        <div className="my-2">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">Common Symptoms</h2>
-          <div className="flex flex-wrap gap-3">
-            {symptomsList.map((item) => (
-              <button
-                key={item.symptom}
-                onClick={() => toggleSymptom(item.symptom)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border shadow-lg flex items-center gap-2 ${selectedSymptoms.includes(item.symptom)
-                  ? 'bg-teal-100 text-teal-700 border-teal-300 shadow-teal-100'
-                  : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
-                  }`}
-              >
-                <span className="text-lg">{item.icon}</span>
-                <span>{item.symptom}</span>
-                {selectedSymptoms.includes(item.symptom) && (
-                  <span className="ml-1 inline-flex items-center justify-center w-5 h-5 bg-teal-500 text-white text-xs rounded-full">
-                    ✓
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
+        <DoctorAllSymptoms
+          page={"quickConsult"}
+          selectedSymptoms={selectedSymptoms}
+          onSymptomSelect={handleSymptomSelectFromComponent}
+        />
 
         {/* Medical Specialties */}
         <div className="mt-10">
           <h2 className="text-lg font-semibold text-gray-800 mb-4">Explore Medical Specialties</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {categoriesList.map((item) => (
-              <button
-                key={item.category}
-                onClick={() => setSelectedCategory(item.category)}
-                className={`flex flex-col items-center p-4 rounded-xl border transition-all duration-200 shadow-lg hover:shadow-xl ${selectedCategory === item.category
-                  ? 'bg-teal-50 border-teal-300 ring-2 ring-teal-200'
-                  : 'border-gray-200 hover:border-teal-300 hover:bg-teal-50'
-                  }`}
-              >
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 p-2 ${item.category === 'Cardiology' ? 'bg-red-100' :
-                  item.category === 'Neurology' ? 'bg-indigo-100' :
-                    item.category === 'Orthopedics' ? 'bg-yellow-100' :
-                      item.category === 'Pediatrics' ? 'bg-teal-100' :
-                        item.category === 'Dermatology' ? 'bg-purple-100' :
-                          item.category === 'Ophthalmology' ? 'bg-blue-100' :
-                            item.category === 'ENT' ? 'bg-green-100' :
-                              item.category === 'Oncology' ? 'bg-amber-100' :
-                                item.category === 'Gastroenterology' ? 'bg-orange-100' :
-                                  item.category === 'Dentistry' ? 'bg-cyan-100' :
-                                    item.category === 'Physiotherapy' ? 'bg-violet-100' :
-                                      'bg-gray-100'
-                  }`}>
-                  <img
-                    src={item.image}
-                    alt={item.category}
-                    className="w-6 h-6 object-contain"
-                  />
-                </div>
-                <span className="text-sm font-medium text-gray-700 mt-1">{item.category}</span>
-              </button>
-            ))}
+          <DoctorAllCategory
+            page={"quickConsult"}
+            selectedCategory={selectedCategories} // Pass array instead of single value
+            onCategorySelect={handleCategorySelect}
+            isMultiSelect={true} // Add this prop if DoctorAllCategory supports it
+          />
+        </div>
+
+        {/* Filter Status */}
+        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+          <div className="flex flex-wrap items-center justify-between">
+            <div>
+              <h3 className="font-medium text-gray-700">Active Filters:</h3>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {selectedCategoryNames.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {selectedCategoryNames.map((categoryName, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-teal-100 text-teal-800"
+                      >
+                        {categoryName}
+                        <button
+                          onClick={() => {
+                            // Remove this specific category
+                            const categoryId = selectedCategories[index];
+                            toggleCategory(categoryId, categoryName);
+                          }}
+                          className="ml-2 text-teal-600 hover:text-teal-800"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+                {selectedSymptomNames.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {selectedSymptomNames.map((symptomName, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
+                      >
+                        {symptomName}
+                        <button
+                          onClick={() => {
+                            const symptomId = selectedSymptoms[index];
+                            toggleSymptom(symptomId, symptomName);
+                          }}
+                          className="ml-2 text-blue-600 hover:text-blue-800"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            <button
+              onClick={clearFilters}
+              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-lg transition duration-200"
+            >
+              Clear all filters
+            </button>
           </div>
         </div>
 
         {/* Available Doctors */}
         <div className="m-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm md:text-xl font-bold text-gray-900">Currently Available Doctors</h2>
-            <div className="flex items-center space-x-2">
+            <h2 className="text-sm md:text-xl font-bold text-gray-900">
+              Currently Available Doctors
+              {loading && <span className="ml-2 text-sm text-teal-600">(Loading...)</span>}
+            </h2>
+            {/* <div className="flex items-center space-x-2">
               <button
-                onClick={() => setSelectedCategory('All')}
-                className={`px-3 py-1 text-sm rounded-full ${selectedCategory === 'All'
+                onClick={() => {
+                  setSelectedCategories([]);
+                  setSelectedCategoryNames([]);
+                }}
+                className={`px-3 py-1 text-sm rounded-full ${selectedCategories.length === 0
                   ? 'bg-teal-100 text-teal-700'
                   : 'text-gray-600 hover:bg-gray-100'
                   }`}
@@ -422,33 +457,46 @@ function FilterDoctorList({ categories = [], symptoms = [] }) {
               >
                 Clear filters
               </button>
-            </div>
+            </div> */}
           </div>
 
-          {filteredDoctors.length > 0 ? (
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
+            </div>
+          ) : filteredDoctors.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredDoctors.map((doctor) => (
                 <div
-                  onClick={() => navigate('/doctor/quick/doctor-details', { state: { doctor }, })}
-                  key={doctor.id}
-                  className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-200"
+                  onClick={() => navigate('/doctor/quick/doctor-details', { state: { doctor } })}
+                  key={doctor.id || doctor.doctorId}
+                  className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-200 cursor-pointer"
                 >
-                  <div className="p-5">                    {/* Doctor Header */}
+                  <div className="p-5">
+                    {/* Doctor Header */}
                     <div className="flex flex-col items-center justify-center mb-4">
-                      <div className="flex flex-col items-center space-x-3">  {/* row center */}
-
+                      <div className="flex flex-col items-center space-x-3">
                         {/* Profile Image */}
                         <div className="w-14 h-14 rounded-full flex items-center justify-center">
-                          <img src={doctor.image} alt="" className="rounded-full h-10 w-10" />
+                          <img
+                            src={doctor.profilePicture || doctor.bannerImage || doctor.image || "https://via.placeholder.com/150"}
+                            alt={`${doctor.firstName || ''} ${doctor.lastName || ''}`}
+                            className="rounded-full h-10 w-10 object-cover"
+                            onError={(e) => {
+                              e.target.src = "https://via.placeholder.com/150";
+                            }}
+                          />
                         </div>
 
                         {/* Name + Speciality */}
                         <div className="text-center">
-                          <h3 className="font-bold text-gray-900">{doctor.name}</h3>
+                          <h3 className="font-bold text-gray-900">
+                            {doctor.name || `Dr. ${doctor.firstName || ''} ${doctor.lastName || ''}`.trim()}
+                          </h3>
 
                           <div className="flex items-center justify-center mt-1">
                             <p className="text-teal-600 text-xs font-medium">
-                              {doctor.specialization}
+                              {doctor.specialization || doctor.specialty || "General Practitioner"}
                             </p>
 
                             {doctor.isVerified && (
@@ -459,34 +507,33 @@ function FilterDoctorList({ categories = [], symptoms = [] }) {
                       </div>
                     </div>
 
-
                     {/* Experience and Rating */}
-                    <div className="flex items-center justify-center gap-2 mb-4 ">
+                    <div className="flex items-center justify-center gap-2 mb-4">
                       <div className="flex items-center">
-                        <span className="text-gray-600 text-sm">{doctor.experience} years experience</span>
+                        <span className="text-gray-600 text-sm">
+                          {doctor.yearsOfExperience || doctor.experience || "5"} years experience
+                        </span>
                       </div>
                       <div className="flex items-center px-2 py-1 rounded">
                         <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                        <span className="ml-1 font-medium">{doctor.rating}</span>
+                        <span className="ml-1 font-medium">{doctor.rating || doctor.avgRating || "4.5"}</span>
                       </div>
                     </div>
-
-
-
 
                     {/* Languages */}
                     <div className="mb-4 flex justify-center">
-                      <div className="   bg-blue-50 text-blue-600 text-center text-[10px] px-2 py-1 rounded-full ">
-                        {doctor.availability}
+                      <div className="bg-blue-50 text-blue-600 text-center text-[10px] px-2 py-1 rounded-full">
+                        {doctor.availability || "Available Today"}
                       </div>
                     </div>
-
-
 
                     {/* Action Buttons */}
                     <div className="flex space-x-2">
                       <button
-                        onClick={() => handleBookAppointment(doctor)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleBookAppointment(doctor);
+                        }}
                         className="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-2 cursor-pointer rounded-lg font-medium transition duration-200 flex items-center justify-center"
                       >
                         Contact Now
@@ -503,7 +550,9 @@ function FilterDoctorList({ categories = [], symptoms = [] }) {
                 No doctors found
               </h3>
               <p className="text-gray-500 mb-6">
-                Try adjusting your filters or search criteria
+                {doctors.length === 0
+                  ? "Try adjusting your filters or search criteria"
+                  : "No doctors match your search query"}
               </p>
               <button
                 onClick={clearFilters}
@@ -518,7 +567,10 @@ function FilterDoctorList({ categories = [], symptoms = [] }) {
         {/* Load More */}
         {filteredDoctors.length > 0 && (
           <div className="text-center">
-            <button className="px-8 py-3 border-2 border-teal-600 text-teal-600 rounded-lg hover:bg-teal-50 transition duration-200 font-medium">
+            <button
+              onClick={getFilteredDoctors}
+              className="px-8 py-3 border-2 border-teal-600 text-teal-600 rounded-lg hover:bg-teal-50 transition duration-200 font-medium"
+            >
               Load More Doctors
             </button>
           </div>
@@ -528,7 +580,7 @@ function FilterDoctorList({ categories = [], symptoms = [] }) {
       {/* Mobile Filter Panel */}
       {showFilterPanel && (
         <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-50">
-          <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl p-6 max-h-[80vh] overflow-y-auto">
+          <div className="absolute bottom-0 left-0 right-0  rounded-t-2xl p-6 max-h-[80vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-bold text-gray-900">Filters</h3>
               <button
@@ -539,67 +591,22 @@ function FilterDoctorList({ categories = [], symptoms = [] }) {
               </button>
             </div>
 
-            <div className="space-y-6">
-              <div>
-                <h4 className="font-medium text-gray-700 mb-3">Categories</h4>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() => setSelectedCategory('All')}
-                    className={`p-3 rounded-lg border text-sm ${selectedCategory === 'All'
-                      ? 'border-teal-500 bg-teal-50 text-teal-700'
-                      : 'border-gray-200 text-gray-700'
-                      }`}
-                  >
-                    All
-                  </button>
-                  {categoriesList.slice(0, 6).map((category) => (
-                    <button
-                      key={category}
-                      onClick={() => setSelectedCategory(category)}
-                      className={`p-3 rounded-lg border text-sm ${selectedCategory === category
-                        ? 'border-teal-500 bg-teal-50 text-teal-700'
-                        : 'border-gray-200 text-gray-700'
-                        }`}
-                    >
-                      {category}
-                    </button>
-                  ))}
+            <div className="mb-6">
+              <h4 className="font-medium text-gray-700 mb-3">Active Filters</h4>
+              <div className="space-y-2">
+                <div className="text-sm">
+                  <p><strong>Specializations:</strong> {selectedCategoryNames.length > 0 ? selectedCategoryNames.join(', ') : 'All'}</p>
+                  <p><strong>Symptoms:</strong> {selectedSymptomNames.join(', ') || 'None'}</p>
                 </div>
-              </div>
-
-              <div>
-                <h4 className="font-medium text-gray-700 mb-3">Symptoms</h4>
-                <div className="flex flex-wrap gap-2">
-                  {symptomsList.map((symptom) => (
-                    <button
-                      key={symptom}
-                      onClick={() => toggleSymptom(symptom)}
-                      className={`px-3 py-2 rounded-full text-sm ${selectedSymptoms.includes(symptom)
-                        ? 'bg-teal-100 text-teal-700'
-                        : 'bg-gray-100 text-gray-700'
-                        }`}
-                    >
-                      {symptom}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex space-x-3 pt-4">
-                <button
-                  onClick={clearFilters}
-                  className="flex-1 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium"
-                >
-                  Clear All
-                </button>
-                <button
-                  onClick={() => setShowFilterPanel(false)}
-                  className="flex-1 py-3 bg-teal-600 text-white rounded-lg font-medium"
-                >
-                  Apply Filters
-                </button>
               </div>
             </div>
+
+            <button
+              onClick={clearFilters}
+              className="w-full py-3 bg-red-50 text-red-600 rounded-lg font-medium"
+            >
+              Clear All Filters
+            </button>
           </div>
         </div>
       )}
@@ -616,13 +623,13 @@ function FilterDoctorList({ categories = [], symptoms = [] }) {
           </button>
           <button
             onClick={() => setShowFilterPanel(true)}
-            className="flex-1 flex flex-col items-center text-gray-600"
+            className="flex-1 flex flex-col items-center text-gray-600 relative"
           >
             <Filter className="w-5 h-5 mb-1" />
             <span className="text-xs">Filter</span>
-            {(selectedCategory !== 'All' || selectedSymptoms.length > 0) && (
+            {(selectedCategories.length > 0 || selectedSymptoms.length > 0) && (
               <span className="absolute top-2 right-1/4 bg-teal-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                {(selectedCategory !== 'All' ? 1 : 0) + selectedSymptoms.length}
+                {selectedCategories.length + selectedSymptoms.length}
               </span>
             )}
           </button>
@@ -648,19 +655,46 @@ function FilterDoctorList({ categories = [], symptoms = [] }) {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg"
                 autoFocus
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    getFilteredDoctors();
+                    setShowSearchInput(false);
+                  }
+                }}
               />
             </div>
           </div>
           <div className="space-y-4">
             <h3 className="font-medium text-gray-700">Recent Searches</h3>
             <div className="flex flex-wrap gap-2">
-              <button className="px-3 py-2 bg-gray-100 text-gray-700 rounded-full text-sm">
+              <button
+                onClick={() => {
+                  setSearchQuery('Cardiologist');
+                  getFilteredDoctors();
+                  setShowSearchInput(false);
+                }}
+                className="px-3 py-2 bg-gray-100 text-gray-700 rounded-full text-sm"
+              >
                 Cardiologist
               </button>
-              <button className="px-3 py-2 bg-gray-100 text-gray-700 rounded-full text-sm">
+              <button
+                onClick={() => {
+                  setSearchQuery('Fever');
+                  getFilteredDoctors();
+                  setShowSearchInput(false);
+                }}
+                className="px-3 py-2 bg-gray-100 text-gray-700 rounded-full text-sm"
+              >
                 Fever
               </button>
-              <button className="px-3 py-2 bg-gray-100 text-gray-700 rounded-full text-sm">
+              <button
+                onClick={() => {
+                  setSearchQuery('Dermatology');
+                  getFilteredDoctors();
+                  setShowSearchInput(false);
+                }}
+                className="px-3 py-2 bg-gray-100 text-gray-700 rounded-full text-sm"
+              >
                 Dermatology
               </button>
             </div>

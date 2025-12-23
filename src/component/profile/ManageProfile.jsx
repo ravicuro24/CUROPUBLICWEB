@@ -7,9 +7,15 @@ import LabAppointmentList from "../../pages/lab/labhome/LabAppoitmentList";
 import { FiMenu, FiX } from "react-icons/fi";
 import LabReport from "../../pages/lab/labhome/LabReport";
 import FamilyMedicalHIstoryWrapper from "../familyMedical/FamilyMedicalHIstoryWrapper";
+import { useLocation } from "react-router-dom";
 
 function ManageProfile() {
-  const [activePage, setActivePage] = useState("profile");
+  const location = useLocation();
+  const from = location.state?.from;
+
+  const [activePage, setActivePage] = useState(
+    from === "confirmOrder" ? "appointments" : "profile"
+  );
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -27,7 +33,7 @@ function ManageProfile() {
 
   const handleMenuClick = (key) => {
     setActivePage(key);
-    setSidebarOpen(false); // Close sidebar on mobile
+    setSidebarOpen(false);
   };
 
   return (
@@ -43,7 +49,7 @@ function ManageProfile() {
 
       <div className="flex flex-col md:flex-row gap-4">
 
-        {/* SIDEBAR FOR DESKTOP */}
+        {/* SIDEBAR DESKTOP */}
         <div className="hidden md:block w-full md:w-1/4">
           {menu.map((item, index) => {
             const isActive = activePage === item.key;
@@ -51,8 +57,8 @@ function ManageProfile() {
               <div
                 key={index}
                 onClick={() => handleMenuClick(item.key)}
-                className={`flex items-center px-5 py-3 shadow shadow-gray-300 my-2 rounded-lg cursor-pointer transition-all
-                ${isActive ? "bg-teal-600 text-white font-semibold" : "hover:bg-gray-100 text-gray-700"}
+                className={`flex items-center px-5 py-3 shadow shadow-gray-300 my-2 rounded-lg cursor-pointer bg-teal-50
+                ${isActive ? "bg-teal-600 text-white font-semibold" : "hover:bg-teal-700/20 text-teal-700 duration-300 ease-in-out"}
                 `}
               >
                 {item.name}
@@ -61,20 +67,20 @@ function ManageProfile() {
           })}
         </div>
 
-        {/* MOBILE SLIDE-IN SIDEBAR OVERLAY */}
+        {/* MOBILE OVERLAY */}
         {sidebarOpen && (
-          <div className="fixed inset-0 backdrop-brightness-50 z-40 md:hidden"
+          <div
+            className="fixed inset-0 backdrop-brightness-50 z-40 md:hidden"
             onClick={() => setSidebarOpen(false)}
-          ></div>
+          />
         )}
 
-        {/* MOBILE SIDEBAR PANEL */}
+        {/* MOBILE SIDEBAR */}
         <div
           className={`fixed top-0 left-0 h-full w-64 bg-white shadow-xl z-50 transform transition-transform duration-300 md:hidden
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
           `}
-        >
-          {/* Header */}
+         >
           <div className="flex items-center justify-between p-4 border-b">
             <h3 className="text-lg font-semibold">Menu</h3>
             <button onClick={() => setSidebarOpen(false)}>
@@ -82,7 +88,6 @@ function ManageProfile() {
             </button>
           </div>
 
-          {/* Menu Items */}
           <div className="p-4">
             {menu.map((item, index) => {
               const isActive = activePage === item.key;
@@ -90,8 +95,8 @@ function ManageProfile() {
                 <div
                   key={index}
                   onClick={() => handleMenuClick(item.key)}
-                  className={`px-4 py-3 my-2 rounded-lg cursor-pointer
-                  ${isActive ? "bg-teal-600 text-white font-semibold" : "hover:bg-gray-200 text-gray-700"}
+                  className={`px-4 py-3 my-2 rounded-lg cursor-pointer bg-teal-100
+                  ${isActive ? "bg-teal-600 text-teal-600 font-semibold" : "hover:bg-gray-200 text-gray-700"}
                   `}
                 >
                   {item.name}

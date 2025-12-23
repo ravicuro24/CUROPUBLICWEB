@@ -122,13 +122,13 @@ function DeleteAccount() {
 
                     {/* Steps Section */}
                     <ol class="overflow-hidden space-y-8">
-                        <li class="relative flex-1 after:content-[''] after:w-0.5 after:h-full after:bg-indigo-600 after:inline-block after:absolute after:-bottom-10.5 after:left-4 lg:after:left-5">
+                        <li class="relative flex-1 after:content-[''] after:w-0.5 after:h-full after:bg-teal-600 after:inline-block after:absolute after:-bottom-10.5 after:left-4 lg:after:left-5">
                             <a href="#" class="flex items-center font-medium w-full">
-                                <span class="w-8 h-8 border-2 border-indigo-600 rounded-full flex justify-center items-center mr-3 text-sm text-indigo-600 lg:w-10 lg:h-10">
+                                <span class="w-8 h-8 border-2 border-teal-600 rounded-full flex justify-center items-center mr-3 text-sm text-teal-600 lg:w-10 lg:h-10">
                                     1
                                 </span>
                                 <div class="block">
-                                    <h4 class="text-lg text-indigo-600">Step 1</h4>
+                                    <h4 class="text-lg text-teal-600">Step 1</h4>
                                     <span class="text-sm">
                                         Click on the profile icon shown at the top-right corner.
                                     </span>
@@ -137,13 +137,13 @@ function DeleteAccount() {
                         </li>
 
 
-                        <li class="relative flex-1 after:content-[''] after:w-0.5 after:h-full after:bg-indigo-600 after:inline-block after:absolute after:-bottom-10.5 after:left-4 lg:after:left-5">
+                        <li class="relative flex-1 after:content-[''] after:w-0.5 after:h-full after:bg-teal-600 after:inline-block after:absolute after:-bottom-10.5 after:left-4 lg:after:left-5">
                             <a href="#" class="flex items-center font-medium w-full">
-                                <span class="w-8 h-8 border-2 border-indigo-600 rounded-full flex justify-center items-center mr-3 text-sm text-indigo-600 lg:w-10 lg:h-10">
+                                <span class="w-8 h-8 border-2 border-teal-600 rounded-full flex justify-center items-center mr-3 text-sm text-teal-600 lg:w-10 lg:h-10">
                                     2
                                 </span>
                                 <div class="block">
-                                    <h4 class="text-lg text-indigo-600">Step 2</h4>
+                                    <h4 class="text-lg text-teal-600">Step 2</h4>
                                     <span class="text-sm">
                                         Click on the <strong>Manage Profile</strong> option.
                                     </span>
@@ -153,11 +153,11 @@ function DeleteAccount() {
 
                         <li class="relative flex-1 after:content-[''] after:w-0.5 after:h-full after:bg-gray-200 after:inline-block after:absolute after:-bottom-13 after:left-4 lg:after:left-5">
                             <a class="flex items-center font-medium w-full">
-                                <span class="w-8 h-8 border-2 border-indigo-600 rounded-full flex justify-center items-center mr-3 text-sm lg:w-10 lg:h-10 text-indigo-600">
+                                <span class="w-8 h-8 border-2 border-teal-600 rounded-full flex justify-center items-center mr-3 text-sm lg:w-10 lg:h-10 text-teal-600">
                                     3
                                 </span>
                                 <div class="block">
-                                    <h4 class="text-lg text-indigo-600">Step 3</h4>
+                                    <h4 class="text-lg text-teal-600">Step 3</h4>
                                     <span class="text-sm">
                                         Click the <strong>Delete Account</strong> button. A confirmation popup will appear—confirm to permanently delete your account.
                                     </span>

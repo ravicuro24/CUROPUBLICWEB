@@ -10,6 +10,8 @@ export const AuthProvider = ({ children }) => {
   const [userData, setUserdata] = useState(null);
   const [authModal, setAuthModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [symptomsId, setSymptomsId] = useState([]);
+  const [specializationId, setSpecializationId] = useState([]);
 
 
   // const [latitude, setLatitude] = useState(25.33297); //25.33297
@@ -92,6 +94,12 @@ export const AuthProvider = ({ children }) => {
     setAllMedicineInCart,
 
     getAllMedicineCartItems,
+
+    symptomsId,
+    setSymptomsId,
+
+    specializationId,
+    setSpecializationId
   };
 
   return (

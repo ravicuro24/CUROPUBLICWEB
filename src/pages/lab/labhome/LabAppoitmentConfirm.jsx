@@ -1,3 +1,4 @@
+// src/pages/lab/labhome/LabAppoitmentConfirm.jsx
 // src/pages/lab/labhome/LabAppointmentConfirm.jsx
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -34,6 +35,10 @@ function LabAppointmentConfirm() {
 
     return () => clearTimeout(confettiTimer);
   }, [orderResponse]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   // Confetti animation components
   const Confetti = () => {
@@ -103,7 +108,7 @@ function LabAppointmentConfirm() {
     }
   };
 
-  
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-100 py-8 px-4">
@@ -156,13 +161,13 @@ function LabAppointmentConfirm() {
           <motion.div
             variants={itemVariants}
             className="lg:col-span-2"
-           >
+          >
             <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
               {/* Success Header */}
               <motion.div
                 variants={itemVariants}
                 className="bg-gradient-to-r from-green-500 via-teal-500 to-teal-700 p-8 text-white relative overflow-hidden"
-               >
+              >
                 <div className="absolute inset-0 bg-white opacity-10"></div>
                 <div className="relative z-10 text-center">
                   <motion.h2
@@ -170,7 +175,7 @@ function LabAppointmentConfirm() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5 }}
-                   >
+                  >
                     Booking Confirmed! 🎉
                   </motion.h2>
                   <p className="text-lg opacity-95">We're looking forward to seeing you!</p>
@@ -288,6 +293,18 @@ function LabAppointmentConfirm() {
                     </li>
                   </ul>
                 </motion.div>
+
+                <button
+                  onClick={() =>
+                    navigate('/manage_profile', {
+                      state: { from: 'confirmOrder' }
+                    })
+                  }
+                  className="mt-4 bg-teal-600 text-white py-2 px-4 rounded-md"
+                >
+                  Go to Appointments
+                </button>
+
               </div>
             </div>
           </motion.div>
@@ -306,7 +323,7 @@ function LabAppointmentConfirm() {
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
           className="text-center mt-8 text-gray-500 text-sm"
-         >
+        >
           <p>You will receive a reminder 24 hours before your appointment</p>
         </motion.div>
       </div>

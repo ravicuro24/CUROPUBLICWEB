@@ -5,14 +5,12 @@ import { useLocation } from 'react-router-dom';
 import { MdHome } from "react-icons/md";
 import { BiBuildingHouse } from "react-icons/bi";
 import LabSinglePackageHomeCollection from './LabSinglePackageHomeCollection';
-import LabSinglePackageSelectSlot from './LabSinglePackageSelectSlot';
-
 
 function LabCollectionTypeSinglePackage() {
     const [collectionType, setCollectionType] = useState('home');
     const location = useLocation();
     const labCartItems = location.state || [];
-    console.log("all Data",labCartItems)
+    console.log("all Data", labCartItems)
 
     useEffect(() => {
         window.scrollTo({
@@ -52,16 +50,11 @@ function LabCollectionTypeSinglePackage() {
                 </button>
             </div>
 
-            {/* Conditional Rendering */}
-            {collectionType === 'home' ? (
-                <div>
-                    <LabSinglePackageHomeCollection labCartItems={[labCartItems]} />
-                </div>
-            ) : (
-                <div>
-                    <LabSinglePackageSelectSlot labCartItems={[labCartItems]} />
-                </div>
-            )}
+            {/* Use single component with page prop */}
+            <LabSinglePackageHomeCollection
+                labCartItems={[labCartItems]}
+                page={collectionType === 'home' ? "HomeCollection" : "VisitLab"}
+            />
 
         </div>
     );

@@ -27,34 +27,38 @@ export default function ViewDoctorDetails() {
     }, []);
 
     const { state } = useLocation();
-    const doctor = state?.doctor || {
-        name: "Dr. Evelyn Reed",
-        specialty: "Pediatric Cardiologist",
-        rating: 4.9,
-        reviews: 875,
-        experience: 15,
+    const doctor = state?.doctor;
+
+    // Fallback doctor data if state is not available (for development)
+    const fallbackDoctor = {
+        firstName: "Dr. Evelyn",
+        lastName: "Reed",
+        specialization: "Pediatric Cardiologist",
+        ratingsReceived: [],
+        yearsOfExperience: 15,
         consultationFee: 150,
-        education: "MD, Harvard Medical School",
+        qualification: [{ degreeName: "MD, Harvard Medical School" }],
         languages: ["English", "Spanish", "French"],
-        recentConsultations: 120,
-        image: "/doctor-image.jpg"
+        bannerImage: "https://via.placeholder.com/150",
+        profilePicture: "https://via.placeholder.com/150"
     };
 
-    console.log("view dotro", doctor)
+    const displayDoctor = doctor || fallbackDoctor;
 
     const navigate = useNavigate();
 
     const handleVideoSelect = () => {
         setConsultTypeVideo(true);
         setConsultTypeClinic(false);
-        setSelectedFee(doctor?.fee || doctor?.fees);
+        setSelectedFee(getConsultationFee());
         setShowDateModal(true);
     };
 
     const handleClinicSelect = () => {
         setConsultTypeVideo(false);
         setConsultTypeClinic(true);
-        setSelectedFee((doctor?.fee || doctor?.fees || 0) + 150);
+        const baseFee = getConsultationFee();
+        setSelectedFee(baseFee + 150);
         setShowDateModal(true);
     };
 
@@ -70,7 +74,7 @@ export default function ViewDoctorDetails() {
         }
 
         const consultationData = {
-            doctor,
+            doctor: displayDoctor,
             consultationType: consultTypeVideo ? "Video Consultation" : "In-Person Visit",
             fee: selectedFee,
             appointmentDate: selectedDate,
@@ -119,6 +123,63 @@ export default function ViewDoctorDetails() {
         handleProceedToPay();
     };
 
+    // Helper function to render qualifications
+    const renderQualifications = () => {
+        const qual = displayDoctor?.qualification;
+        
+        if (qual && Array.isArray(qual)) {
+            return qual.map((q, index) => (
+                <li key={index} className="flex items-start">
+                    <FaCheckCircle className="w-4 h-4 text-teal-500 mt-1 mr-2 flex-shrink-0" />
+                    <span className='uppercase'>{q.degreeName || 'Not specified'}</span>
+                </li>
+            ));
+        }
+        
+        return (
+            <li className="flex items-start">
+                <FaCheckCircle className="w-4 h-4 text-teal-500 mt-1 mr-2 flex-shrink-0" />
+                <span>No qualification information available</span>
+            </li>
+        );
+    };
+
+    // Helper function to get consultation fee safely
+    const getConsultationFee = () => {
+        return displayDoctor?.consultationFee || 0;
+    };
+
+    // Helper function to get rating and reviews
+    const getRatingData = () => {
+        const ratings = displayDoctor?.ratingsReceived || [];
+        if (ratings.length === 0) {
+            return { averageRating: 4.9, reviewCount: 875 };
+        }
+        
+        const totalRating = ratings.reduce((sum, rating) => sum + rating.rating, 0);
+        const averageRating = totalRating / ratings.length;
+        
+        return {
+            averageRating: averageRating.toFixed(1),
+            reviewCount: ratings.length
+        };
+    };
+
+    const ratingData = getRatingData();
+
+    // Helper function to get hospital name
+    const getHospitalName = () => {
+        const hospital = displayDoctor?.hospitalAffiliation?.[0];
+        return hospital?.hospitalName || "Not specified";
+    };
+
+    // Helper function to get languages
+    const getLanguages = () => {
+        // Assuming languages might be stored differently
+        // You can update this based on your actual data structure
+        return displayDoctor?.languages || ["English", "Hindi"];
+    };
+
     return (
         <div className="min-h-screen">
             <div className="container mx-auto px-4 sm:px-6 py-6">
@@ -128,26 +189,33 @@ export default function ViewDoctorDetails() {
                         <div className="flex items-start space-x-4">
                             <div className="">
                                 <img
-                                    src={doctor.image}
+                                    src={displayDoctor?.profilePicture || displayDoctor?.bannerImage}
                                     className='w-20 h-20 rounded-full object-cover'
-                                    alt={doctor.name}
+                                    alt={`${displayDoctor?.firstName} ${displayDoctor?.lastName}`}
+                                    onError={(e) => {
+                                        e.target.src = 'https://via.placeholder.com/150';
+                                    }}
                                 />
                             </div>
 
                             <div>
-                                <h1 className="text-2xl md:text-3xl font-bold text-teal-700">{doctor?.name}</h1>
-                                <p className="text-lg text-teal-600 font-medium mt-1">{doctor?.specialty}</p>
+                                <h1 className="text-2xl md:text-3xl font-bold text-teal-700">
+                                    Dr. {displayDoctor?.firstName} {displayDoctor?.lastName}
+                                </h1>
+                                <p className="text-lg text-teal-600 font-medium mt-1">
+                                    {displayDoctor?.specialization}
+                                </p>
 
                                 <div className="flex items-center mt-3 space-x-4">
                                     <div className="flex items-center">
                                         <FaStar className="text-yellow-400 w-5 h-5" />
-                                        <span className="ml-1 text-lg font-bold text-gray-900">{doctor?.rating}</span>
-                                        <span className="ml-1 text-gray-500">({doctor?.reviews} Reviews)</span>
+                                        <span className="ml-1 text-lg font-bold text-gray-900">{ratingData.averageRating}</span>
+                                        <span className="ml-1 text-gray-500">({ratingData.reviewCount} Reviews)</span>
                                     </div>
 
                                     <div className="flex items-center text-gray-600">
                                         <FaHospitalAlt className="w-4 h-4 mr-1" />
-                                        <span>{doctor?.recentConsultations} recent consultations</span>
+                                        <span>Consultation Fee: ₹{getConsultationFee()}</span>
                                     </div>
                                 </div>
                             </div>
@@ -172,21 +240,42 @@ export default function ViewDoctorDetails() {
                                     Qualifications:
                                 </h3>
                                 <ul className="space-y-2 pl-7">
-                                    <li className="flex items-start">
-                                        <FaCheckCircle className="w-4 h-4 text-teal-500 mt-1 mr-2 flex-shrink-0" />
-                                        <span className='uppercase'>{doctor?.qualification || doctor?.education}</span>
-                                    </li>
+                                    {renderQualifications()}
                                 </ul>
                             </div>
 
-                            {/* Year of Experience & Fee */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-1">
-                                <div className="flex gap-2 rounded-xl mb-1 md:mb-4">
+                            {/* Year of Experience & Hospital */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div className="flex gap-2 rounded-xl">
                                     <div className="flex items-center">
                                         <MdWork className="w-5 h-5 text-teal-600 mr-2" />
-                                        <span className="font-semibold text-gray-700">Year of Experience:</span>
+                                        <span className="font-semibold text-gray-700">Years of Experience:</span>
                                     </div>
-                                    <p className="text-lg font-bold text-gray-900">{doctor?.experience} years</p>
+                                    <p className="text-lg font-bold text-gray-900">{displayDoctor?.yearsOfExperience || 0} years</p>
+                                </div>
+                                
+                                <div className="flex gap-2 rounded-xl">
+                                    <div className="flex items-center">
+                                        <FaHospitalAlt className="w-5 h-5 text-teal-600 mr-2" />
+                                        <span className="font-semibold text-gray-700">Hospital:</span>
+                                    </div>
+                                    <p className="text-lg font-bold text-gray-900">{getHospitalName()}</p>
+                                </div>
+                            </div>
+
+                            {/* Contact Information */}
+                            <div className="mb-6">
+                                <h3 className="text-lg font-semibold text-gray-800 mb-3">Contact Information</h3>
+                                <div className="space-y-2">
+                                    <p className="text-gray-700">
+                                        <span className="font-semibold">Email:</span> {displayDoctor?.email || "Not provided"}
+                                    </p>
+                                    <p className="text-gray-700">
+                                        <span className="font-semibold">Phone:</span> {displayDoctor?.contactNumber || "Not provided"}
+                                    </p>
+                                    <p className="text-gray-700">
+                                        <span className="font-semibold">Available Hours:</span> {displayDoctor?.availableHours || "09:00 AM - 05:00 PM"}
+                                    </p>
                                 </div>
                             </div>
 
@@ -194,11 +283,11 @@ export default function ViewDoctorDetails() {
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
                                     <MdOutlineLanguage className="w-5 h-5 mr-2 text-teal-600" />
-                                    Language:
+                                    Languages:
                                 </h3>
                                 <div className="overflow-x-auto">
                                     <div className="flex space-x-3">
-                                        {doctor.languages?.map((language, index) => (
+                                        {getLanguages().map((language, index) => (
                                             <span
                                                 key={index}
                                                 className="px-3 py-1 border border-teal-200 text-teal-400 bg-teal-50 rounded-md text-sm"
@@ -222,75 +311,68 @@ export default function ViewDoctorDetails() {
 
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center">
-                                    <div className="text-4xl font-bold text-gray-900">{doctor?.rating}</div>
+                                    <div className="text-4xl font-bold text-gray-900">{ratingData.averageRating}</div>
                                     <div className="ml-4">
                                         <div className="flex">
                                             {[1, 2, 3, 4, 5].map((star) => (
                                                 <FaStar
                                                     key={star}
-                                                    className={`w-5 h-5 ${star <= Math.floor(doctor?.rating) ? 'text-yellow-400' : 'text-gray-300'}`}
+                                                    className={`w-5 h-5 ${star <= Math.floor(ratingData.averageRating) ? 'text-yellow-400' : 'text-gray-300'}`}
                                                 />
                                             ))}
                                         </div>
-                                        <p className="text-gray-600 mt-1">({doctor?.reviews} Reviews)</p>
+                                        <p className="text-gray-600 mt-1">({ratingData.reviewCount} Reviews)</p>
                                     </div>
                                 </div>
 
                                 <div className="text-right">
-                                    <div className="text-3xl font-bold text-teal-600">{doctor?.recentConsultations}</div>
-                                    <p className="text-gray-600">recent consultations</p>
+                                    <div className="text-3xl font-bold text-teal-600">
+                                        {displayDoctor?.yearsOfExperience || 0}+
+                                    </div>
+                                    <p className="text-gray-600">years of experience</p>
                                 </div>
                             </div>
 
-                            {/* Recent Reviews Section */}
-                            <div className="mt-8">
-                                <h3 className="font-semibold text-gray-800 mb-4">Recent Reviews</h3>
-                                <div className="space-y-4">
-                                    <div className="flex items-start space-x-3">
-                                        <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                                            <IoPersonCircleOutline className="w-6 h-6 text-gray-400" />
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="flex items-center justify-between">
-                                                <span className="font-medium">Sarah Johnson</span>
-                                                <div className="flex items-center text-yellow-400">
-                                                    <FaStar className="w-4 h-4" />
-                                                    <FaStar className="w-4 h-4" />
-                                                    <FaStar className="w-4 h-4" />
-                                                    <FaStar className="w-4 h-4" />
-                                                    <FaStar className="w-4 h-4" />
+                            {/* Recent Reviews Section - Show actual reviews if available */}
+                            {displayDoctor?.ratingsReceived && displayDoctor.ratingsReceived.length > 0 ? (
+                                <div className="mt-8">
+                                    <h3 className="font-semibold text-gray-800 mb-4">Recent Reviews</h3>
+                                    <div className="space-y-4">
+                                        {displayDoctor.ratingsReceived.slice(0, 3).map((review, index) => (
+                                            <div key={index} className="flex items-start space-x-3">
+                                                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                                    <IoPersonCircleOutline className="w-6 h-6 text-gray-400" />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="font-medium">
+                                                            {review.patientName || "Anonymous"}
+                                                        </span>
+                                                        <div className="flex items-center text-yellow-400">
+                                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                                <FaStar
+                                                                    key={star}
+                                                                    className={`w-4 h-4 ${star <= review.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                    <p className="text-gray-600 text-sm mt-1">
+                                                        {review.comment || "No comment provided"}
+                                                    </p>
+                                                    <span className="text-gray-400 text-xs mt-1 block">
+                                                        {review.createdAt ? new Date(review.createdAt).toLocaleDateString() : "Recently"}
+                                                    </span>
                                                 </div>
                                             </div>
-                                            <p className="text-gray-600 text-sm mt-1">
-                                                Dr. Reed was incredibly patient and thorough with my daughter. She explained everything in detail.
-                                            </p>
-                                            <span className="text-gray-400 text-xs mt-1 block">2 days ago</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-start space-x-3">
-                                        <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                                            <IoPersonCircleOutline className="w-6 h-6 text-gray-400" />
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="flex items-center justify-between">
-                                                <span className="font-medium">Michael Chen</span>
-                                                <div className="flex items-center text-yellow-400">
-                                                    <FaStar className="w-4 h-4" />
-                                                    <FaStar className="w-4 h-4" />
-                                                    <FaStar className="w-4 h-4" />
-                                                    <FaStar className="w-4 h-4" />
-                                                    <FaStar className="w-4 h-4" />
-                                                </div>
-                                            </div>
-                                            <p className="text-gray-600 text-sm mt-1">
-                                                Excellent doctor! Very knowledgeable and caring approach. My son feels much better now.
-                                            </p>
-                                            <span className="text-gray-400 text-xs mt-1 block">1 week ago</span>
-                                        </div>
+                                        ))}
                                     </div>
                                 </div>
-                            </div>
+                            ) : (
+                                <div className="mt-8 text-center py-8 text-gray-500">
+                                    <p>No reviews yet. Be the first to review!</p>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -325,7 +407,7 @@ export default function ViewDoctorDetails() {
                                 >
                                     <div className="flex justify-between items-center mb-2">
                                         <span className="font-medium text-gray-700">Video Consultation</span>
-                                        <span className="text-lg font-bold text-teal-600">₹ {doctor?.consultationFee || doctor?.fees || doctor?.fee}</span>
+                                        <span className="text-lg font-bold text-teal-600">₹ {getConsultationFee()}</span>
                                     </div>
                                     <p className="text-sm text-gray-500">30-45 minutes • Available today</p>
                                 </div>
@@ -339,7 +421,7 @@ export default function ViewDoctorDetails() {
                                 >
                                     <div className="flex justify-between items-center mb-2">
                                         <span className="font-medium text-gray-700">In-Person Visit</span>
-                                        <span className="text-lg font-bold text-teal-600">₹ {doctor?.consultationFee + 150 || doctor?.fees + 150 || doctor?.fee + 150}</span>
+                                        <span className="text-lg font-bold text-teal-600">₹ {getConsultationFee() + 150}</span>
                                     </div>
                                     <p className="text-sm text-gray-500">60 minutes • By appointment</p>
                                 </div>
@@ -362,23 +444,25 @@ export default function ViewDoctorDetails() {
                             </div>
 
                             <div className="mt-6 pt-6 border-t border-gray-200">
-                                <h4 className="font-semibold text-gray-700 mb-3">Why choose Dr. {doctor?.name?.split(' ')[1] || doctor?.name}?</h4>
+                                <h4 className="font-semibold text-gray-700 mb-3">
+                                    Why choose Dr. {displayDoctor?.lastName || displayDoctor?.firstName}?
+                                </h4>
                                 <ul className="space-y-2 text-sm text-gray-600">
                                     <li className="flex items-start">
                                         <FaCheckCircle className="w-4 h-4 text-teal-500 mt-0.5 mr-2 flex-shrink-0" />
-                                        <span>Board certified specialist</span>
+                                        <span>{displayDoctor?.isPremium ? "Premium verified doctor" : "Board certified specialist"}</span>
                                     </li>
                                     <li className="flex items-start">
                                         <FaCheckCircle className="w-4 h-4 text-teal-500 mt-0.5 mr-2 flex-shrink-0" />
-                                        <span>15+ years of experience</span>
+                                        <span>{displayDoctor?.yearsOfExperience || 0}+ years of experience</span>
                                     </li>
                                     <li className="flex items-start">
                                         <FaCheckCircle className="w-4 h-4 text-teal-500 mt-0.5 mr-2 flex-shrink-0" />
-                                        <span>Multilingual consultation</span>
+                                        <span>Available: {displayDoctor?.availableHours || "09:00 AM - 05:00 PM"}</span>
                                     </li>
                                     <li className="flex items-start">
                                         <FaCheckCircle className="w-4 h-4 text-teal-500 mt-0.5 mr-2 flex-shrink-0" />
-                                        <span>Same-day appointments available</span>
+                                        <span>{displayDoctor?.verified ? "Verified doctor" : "Same-day appointments available"}</span>
                                     </li>
                                 </ul>
                             </div>

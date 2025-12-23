@@ -5,13 +5,19 @@ import { useLabAuth } from "../../../Authorization/LabAuthContext";
 import axiosInstance from "../../../Authorization/axiosInstance";
 import AddNewFamily from "../../../component/familyMedical/AddNewFamily";
 import AddNewAddress from "../../../component/profile/AddnewAddress";
+import RazorpayPayment from "../../../component/payments/RazorpayPayments";
 
-function LabSinglePackageHomeCollection({ labCartItems }) {
-  const [addNewPatientModal, setAddNewPatientMdoal] = useState(false)
-  const [addNewAddressModal,setAddNewAddressModal] = useState(false)
+function LabSinglePackageHomeCollection({ labCartItems, page = "HomeCollection" }) {
+  const [addNewPatientModal, setAddNewPatientModal] = useState(false);
+  const [addNewAddressModal, setAddNewAddressModal] = useState(false);
   const { userData, getAllLabCartItems } = useLabAuth();
   const userId = userData?.id;
   const navigate = useNavigate();
+
+  // Determine if it's home collection or visit lab from page prop
+  const isHomeCollection = page === "HomeCollection";
+  const isVisitLab = page === "VisitLab";
+
   const [appointmentDate, setAppointmentDate] = useState(
     new Date().toISOString().split("T")[0]
   );
@@ -26,6 +32,11 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
   const [selections, setSelections] = useState({});
   const [applyToAllEnabled, setApplyToAllEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Payment states
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentAmount, setPaymentAmount] = useState(0);
+  const [orderPayload, setOrderPayload] = useState(null);
 
   // Function to categorize time slots
   const categorizeSlots = (slots) => {
@@ -99,7 +110,18 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
     return labPackage ? { ...pkg, labPackage } : null;
   }).filter(Boolean);
 
-  console.log("home", normalizedLabCartItems);
+  console.log("Collection Type:", page, "isHomeCollection:", isHomeCollection, "items:", normalizedLabCartItems);
+
+  // Calculate total amount for payment
+  const calculateTotalAmount = () => {
+    let total = 0;
+    normalizedLabCartItems?.forEach(pkg => {
+      if (pkg?.labPackage?.price) {
+        total += parseFloat(pkg.labPackage.price);
+      }
+    });
+    return Math.round(total * 100); // Convert to paise for Razorpay
+  };
 
   // --- API Calls ---
   const fetchSlots = async (labId) => {
@@ -140,8 +162,10 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
 
   useEffect(() => {
     fetchFamilyMembers();
-    fetchAddress();
-  }, []);
+    if (isHomeCollection) {
+      fetchAddress();
+    }
+  }, [isHomeCollection]);
 
   useEffect(() => {
     if (activePackage) {
@@ -216,7 +240,19 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
       patientId: String(fm.id),
       patientName: fm.name
     });
-    setActiveStep("address");
+
+    // If it's visit lab, skip address step and auto-complete
+    if (isVisitLab) {
+      updateSelectionForActivePackage({
+        selectedAddressId: null,
+        addressName: "Lab Visit - No Address Required"
+      });
+      setActivePackage(null);
+      setActiveStep(null);
+    } else {
+      // For home collection, go to address step
+      setActiveStep("address");
+    }
   };
 
   const onSelectAddress = (ad) => {
@@ -228,39 +264,136 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
     setActiveStep(null);
   };
 
-  const handleCheckout = async () => {
-    setLoading(true);
+  // Prepare order payload (used by both payment and checkout)
+  const prepareOrderPayload = () => {
     const order = Object.values(selections)
-      .filter(
-        s =>
-          s &&
-          s.appointmentDate &&
-          s.selectedSlotId &&
-          s.selectedAddressId &&
-          s.selectedPackageId &&
-          s.patientId
-      )
-      .map(s => ({
-        appointmentDate: s.appointmentDate,
-        selectedSlotId: s.selectedSlotId,
-        selectedAddressId: s.selectedAddressId,
-        selectedPackageId: s.selectedPackageId,
-        patientId: s.patientId
-      }));
+      .filter(s => {
+        // Basic validation for all orders
+        if (!s || !s.appointmentDate || !s.selectedSlotId || !s.selectedPackageId || !s.patientId) {
+          return false;
+        }
 
-    const payload = { order };
-    console.log("FINAL PAYLOAD:", payload);
+        // For home collection, ensure address is selected
+        if (isHomeCollection && !s.selectedAddressId) {
+          return false;
+        }
+
+        // For visit lab, address can be null
+        if (isVisitLab) {
+          return true;
+        }
+
+        return true;
+      })
+      .map(s => {
+        // Base order object
+        const baseOrder = {
+          appointmentDate: s.appointmentDate,
+          selectedSlotId: s.selectedSlotId,
+          selectedPackageId: s.selectedPackageId,
+          patientId: s.patientId
+        };
+
+        // Add address only for home collection
+        if (isHomeCollection) {
+          baseOrder.selectedAddressId = s.selectedAddressId;
+        } else if (isVisitLab) {
+          // For visit lab, set address to null explicitly
+          baseOrder.selectedAddressId = null;
+        }
+
+        return baseOrder;
+      });
+
+    if (order.length === 0) {
+      return null;
+    }
+
+    return { order };
+  };
+
+  const initiateCheckout = () => {
+    // Prepare payload first
+    const payload = prepareOrderPayload();
+
+    if (!payload) {
+      alert("Please complete all selections before proceeding.");
+      return;
+    }
+
+    // Calculate total amount
+    const totalAmount = calculateTotalAmount();
+
+    if (totalAmount <= 0) {
+      alert("Invalid order amount. Please check your selections.");
+      return;
+    }
+
+    // Set payment amount and payload
+    setPaymentAmount(totalAmount);
+    setOrderPayload(payload);
+
+    // Show payment modal
+    setShowPaymentModal(true);
+  };
+
+  // Handle payment success
+  const handlePaymentSuccess = async (paymentResponse) => {
+    console.log("Payment successful:", paymentResponse);
+
+    // Close payment modal
+    setShowPaymentModal(false);
+
+    // Now call the actual checkout API
+    await callCheckoutAPI(paymentResponse);
+  };
+
+  // Handle payment failure
+  const handlePaymentFailure = (error) => {
+    console.error("Payment failed:", error);
+    alert("Payment failed. Please try again.");
+    setShowPaymentModal(false);
+  };
+
+  // Actual API call after successful payment
+  const callCheckoutAPI = async (paymentResponse) => {
+    setLoading(true);
 
     try {
-      const response = await axiosInstance.post(
-        `/endUserEndPoint/createMultipleAppointmentForTestPackage?endUserId=${userId}`,
-        payload
-      );
+      const finalPayload = {
+        ...orderPayload,
+        paymentDetails: {
+          razorpayPaymentId: paymentResponse.razorpay_payment_id,
+          razorpaySignature: paymentResponse.razorpay_signature,
+          amount: paymentAmount / 100, // Convert back to rupees
+          status: "success"
+        }
+      };
+
+      console.log("Final payload with payment:", finalPayload);
+
+      const response = await axiosInstance.post(`/endUserEndPoint/createMultipleAppointmentForTestPackage?endUserId=${userId}&razorpayOrderId=${paymentResponse.razorpay_order_id}`, finalPayload);
       console.log("Order response:", response.data);
+
+      // Clear cart
       await getAllLabCartItems();
-      navigate('/lab/appointment/confirm', { state: { orderResponse: response.data } });
+
+      // Navigate to confirmation page
+      navigate('/lab/appointment/confirm', {
+        state: {
+          orderResponse: response.data,
+          collectionType: page,
+          paymentResponse: paymentResponse
+        }
+      });
     } catch (error) {
       console.error("Order error:", error.response?.data || error.message);
+
+      // If API fails, we might need to refund
+      alert("Order creation failed after payment. Please contact support. Payment will be refunded if order not created.");
+
+      // You might want to call a refund API here
+      // await initiateRefund(paymentResponse.razorpay_payment_id);
     } finally {
       setLoading(false);
     }
@@ -268,22 +401,34 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
 
   const isPackageCompleted = (pkgId) => {
     const s = selections[pkgId];
-    return (
-      s &&
-      s.appointmentDate &&
-      s.selectedSlotId &&
-      s.selectedAddressId &&
-      s.selectedPackageId &&
-      s.patientId
-    );
+
+    // Basic validations for all
+    if (!s || !s.appointmentDate || !s.selectedSlotId || !s.selectedPackageId || !s.patientId) {
+      return false;
+    }
+
+    // For home collection, check address
+    if (isHomeCollection) {
+      return s.selectedAddressId != null;
+    }
+
+    // For visit lab, address is not required
+    if (isVisitLab) {
+      return true; // Only the above fields are needed
+    }
+
+    return false;
   };
 
   const renderSelectedSummary = (pkgId) => {
     const s = selections[pkgId];
     if (!s) return null;
+
     const slotName = s.slotStartAt && s.slotEndAt ? `${convertTo12Hour(s.slotStartAt)} - ${convertTo12Hour(s.slotEndAt)}` : "N/A";
     const patientName = s.patientName || "N/A";
-    const addressName = s.addressName || "N/A";
+    const addressName = isHomeCollection
+      ? (s.addressName || "N/A")
+      : (isVisitLab ? "Visit Lab" : "N/A");
 
     return (
       <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
@@ -305,8 +450,17 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
             <span className="text-sm font-semibold text-gray-900">{patientName}</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-xs font-medium text-gray-500 mb-1">Address</span>
-            <span className="text-sm font-semibold text-gray-900 truncate" title={addressName}>{addressName}</span>
+            <span className="text-xs font-medium text-gray-500 mb-1">
+              {isHomeCollection ? "Address" : "Visit Type"}
+            </span>
+            <span className="text-sm font-semibold text-gray-900 truncate" title={addressName}>
+              {addressName}
+              {isVisitLab && (
+                <span className="ml-2 text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
+                  Lab Visit
+                </span>
+              )}
+            </span>
           </div>
         </div>
       </div>
@@ -314,11 +468,20 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
   };
 
   const renderStepIndicator = () => {
-    const steps = [
-      { key: "slots", label: "Select Slot", icon: "🕒" },
-      { key: "family", label: "Select Patient", icon: "👨‍👩‍👧‍👦" },
-      { key: "address", label: "Select Address", icon: "📍" }
-    ];
+    // Define steps based on collection type
+    let steps;
+    if (isHomeCollection) {
+      steps = [
+        { key: "slots", label: "Select Slot", icon: "🕒" },
+        { key: "family", label: "Select Patient", icon: "👨‍👩‍👧‍👦" },
+        { key: "address", label: "Select Address", icon: "📍" }
+      ];
+    } else {
+      steps = [
+        { key: "slots", label: "Select Slot", icon: "🕒" },
+        { key: "family", label: "Select Patient", icon: "👨‍👩‍👧‍👦" }
+      ];
+    }
 
     const currentIndex = steps.findIndex(step => step.key === activeStep);
 
@@ -490,11 +653,20 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8 flex flex-col items-start">
-          <h1 className="text-md md:text-3xl font-bold text-gray-900 mb-1">
-            Schedule Lab Tests
-          </h1>
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="text-md md:text-3xl font-bold text-gray-900">
+              {isHomeCollection ? "Schedule Home Collection" : "Schedule Lab Visit"}
+            </h1>
+            <span className={`text-xs font-medium px-3 py-1 rounded-full ${isHomeCollection
+              ? "bg-teal-100 text-teal-800 border border-teal-200"
+              : "bg-blue-100 text-blue-800 border border-blue-200"}`}>
+              {isHomeCollection ? "🏠 Home Collection" : "🏥 Lab Visit"}
+            </span>
+          </div>
           <p className="text-gray-600 text-[12px] md:text-sm">
-            Select time slots and details for your lab packages
+            {isHomeCollection
+              ? "Select time slots, patient, and address for your lab packages"
+              : "Select time slots and patient for your lab visit"}
           </p>
         </div>
 
@@ -526,6 +698,42 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
                   </div>
                   <div className="text-xs text-gray-500">Complete</div>
                 </div>
+              </div>
+
+              {/* Order Summary */}
+              <div className="border-t border-gray-200 pt-4">
+                <h4 className="font-medium text-gray-700 mb-2">Order Summary</h4>
+                <div className="space-y-1 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Subtotal</span>
+                    <span className="font-medium">₹{calculateTotalAmount() / 100}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Tax</span>
+                    <span className="font-medium">₹0.00</span>
+                  </div>
+                  <div className="flex justify-between border-t pt-2 mt-2">
+                    <span className="font-medium">Total</span>
+                    <span className="font-bold text-teal-700">₹{calculateTotalAmount() / 100}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Collection Type Info */}
+              <div className={`border-t border-gray-200 pt-4 ${!isHomeCollection ? 'pb-4' : ''}`}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className={`text-lg ${isHomeCollection ? 'text-teal-600' : 'text-blue-600'}`}>
+                    {isHomeCollection ? '🏠' : '🏥'}
+                  </span>
+                  <span className="text-sm font-medium text-gray-700">
+                    {isHomeCollection ? 'Home Collection' : 'Lab Visit'}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500">
+                  {isHomeCollection
+                    ? 'Sample will be collected at your selected address'
+                    : 'Visit the lab at your selected time slot'}
+                </p>
               </div>
 
               {/* Apply to All Toggle */}
@@ -604,6 +812,14 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
                                   <span className="font-medium text-gray-700">Lab:</span>
                                   <span className="text-gray-900">{pkg.labPackage.lab?.labName || pkg.labPackage.lab?.firstName || "N/A"}</span>
                                 </div>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium text-gray-700">Type:</span>
+                                  <span className={`text-xs font-medium px-2 py-1 rounded ${isHomeCollection
+                                    ? 'bg-teal-100 text-teal-800'
+                                    : 'bg-blue-100 text-blue-800'}`}>
+                                    {isHomeCollection ? 'Home Collection' : 'Lab Visit'}
+                                  </span>
+                                </div>
                               </div>
                               <div>
                                 {pkg.labPackage.tests.map((tst, idx) => (
@@ -672,7 +888,7 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
                         {/* Family Members */}
                         {activeStep === "family" && (
                           <div className="bg-white rounded-lg border border-gray-200 p-5">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Patient </h3>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Patient</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                               {familyMembers.map((fm) => (
                                 <button
@@ -691,14 +907,20 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
                                 </button>
                               ))}
                               <button
-                                onClick={() => setAddNewPatientMdoal(true)}
-                                className="bg-teal-700 text-white cursor-pointer rounded-md">Add New Family</button>
+                                onClick={() => setAddNewPatientModal(true)}
+                                className="p-4 rounded-lg border-2 border-dashed border-teal-300 hover:border-teal-500 hover:bg-teal-50 transition-colors flex flex-col items-center justify-center cursor-pointer"
+                              >
+                                <div className="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 text-2xl mb-3">
+                                  +
+                                </div>
+                                <span className="font-semibold text-base text-teal-700">Add New Family</span>
+                              </button>
                             </div>
                           </div>
                         )}
 
-                        {/* Addresses */}
-                        {activeStep === "address" && (
+                        {/* Addresses (only for home collection) */}
+                        {isHomeCollection && activeStep === "address" && (
                           <div className="bg-white rounded-lg border border-gray-200 p-5">
                             <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Address</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -729,7 +951,17 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
                                   </div>
                                 </button>
                               ))}
-                              <button onClick={() => setAddNewAddressModal(true)} className="bg-teal-700 text-white rounded-md cursor-pointer">Add New Address</button>
+                              <button
+                                onClick={() => setAddNewAddressModal(true)}
+                                className="p-4 rounded-lg border-2 border-dashed border-teal-300 hover:border-teal-500 hover:bg-teal-50 transition-colors flex items-center justify-center cursor-pointer"
+                              >
+                                <div className="text-center">
+                                  <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 text-xl mb-2 mx-auto">
+                                    +
+                                  </div>
+                                  <span className="font-semibold text-base text-teal-700">Add New Address</span>
+                                </div>
+                              </button>
                             </div>
                           </div>
                         )}
@@ -744,7 +976,7 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
             <div className="mt-8 text-center">
               <button
                 disabled={!allPackagesCompleted || loading}
-                onClick={handleCheckout}
+                onClick={initiateCheckout}
                 className={`px-8 py-3 rounded-lg font-semibold text-white transition-all duration-300 ${allPackagesCompleted
                   ? "bg-teal-600 hover:bg-teal-700 hover:shadow-lg transform hover:-translate-y-0.5"
                   : "bg-gray-400 cursor-not-allowed"
@@ -756,34 +988,101 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
                     Processing...
                   </span>
                 ) : (
-                  "Proceed to Checkout"
+                  `Proceed to Payment - ₹${calculateTotalAmount() / 100}`
                 )}
               </button>
+              <p className="text-xs text-gray-500 mt-2">
+                {allPackagesCompleted
+                  ? "Complete payment to confirm your appointment"
+                  : "Complete all selections to proceed to payment"}
+              </p>
             </div>
           </div>
         </div>
       </div>
-      {addNewPatientModal &&
-        <div className="fixed inset-0 backdrop-brightness-50 flex justify-center items-center z-50">
 
-          {/* Modal Box */}
-          <div className="bg-white w-full max-w-2xl max-h-[90vh] rounded-md shadow-lg relative overflow-y-auto">
-            {/* Content */}
-            <div className="p-4">
-              <AddNewFamily onClose={() => setAddNewPatientMdoal(false)} onSuccess={() => fetchFamilyMembers()} />
+      {/* Razorpay Payment Modal */}
+      {showPaymentModal && (
+        <div className="fixed inset-0 backdrop-brightness-50 flex justify-center items-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold text-gray-900">Complete Payment</h3>
+                <button
+                  onClick={() => setShowPaymentModal(false)}
+                  className="text-gray-400 hover:text-gray-600 text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <div className="bg-gray-50 p-4 rounded-lg mb-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-gray-700">Total Amount</span>
+                    <span className="text-2xl font-bold text-teal-700">₹{paymentAmount / 100}</span>
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    {normalizedLabCartItems.length} lab package(s)
+                  </p>
+                </div>
+
+                <RazorpayPayment
+                  amount={paymentAmount / 100}
+                  email={userData?.email || ""}
+                  planId="1"
+                  contact={userData?.mobileNumber || ""}
+                  checkoutFrom="lab-booking"
+                  type="Lab Test Booking"
+                  userId={userData?.id}
+                  orderFrom="lab"
+                  description={`Lab tests booking for ${normalizedLabCartItems.length} package(s)`}
+                  selectedPaymentMethod={{
+                    selectedPayment: true,
+                    method: "Razorpay"
+                  }}
+                  onSuccess={handlePaymentSuccess}
+                  onfailure={handlePaymentFailure}
+                />
+              </div>
+
+              <div className="text-center">
+                <button
+                  onClick={() => setShowPaymentModal(false)}
+                  className="text-sm text-gray-600 hover:text-gray-800"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      }
-      {addNewAddressModal &&
-        <div className="fixed inset-0 backdrop-brightness-50 flex justify-center items-center z-50">
+      )}
 
-          {/* Modal Box */}
+      {/* Add New Family Modal */}
+      {addNewPatientModal && (
+        <div className="fixed inset-0 backdrop-brightness-50 flex justify-center items-center z-50">
           <div className="bg-white w-full max-w-2xl max-h-[90vh] rounded-md shadow-lg relative overflow-y-auto">
-            {/* Content */}
+            <div className="p-4">
+              <AddNewFamily
+                onClose={() => setAddNewPatientModal(false)}
+                onSuccess={() => {
+                  fetchFamilyMembers();
+                  setAddNewPatientModal(false);
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add New Address Modal */}
+      {addNewAddressModal && (
+        <div className="fixed inset-0 backdrop-brightness-50 flex justify-center items-center z-50">
+          <div className="bg-white w-full max-w-2xl max-h-[90vh] rounded-md shadow-lg relative overflow-y-auto">
             <div className="p-4">
               <AddNewAddress
-                onSucess={() => {
+                onSuccess={() => {
                   fetchAddress();
                   setAddNewAddressModal(false);
                 }}
@@ -794,7 +1093,7 @@ function LabSinglePackageHomeCollection({ labCartItems }) {
             </div>
           </div>
         </div>
-      }
+      )}
     </div>
   );
 }

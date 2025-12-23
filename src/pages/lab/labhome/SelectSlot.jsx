@@ -371,7 +371,6 @@ function SelectSlot({ labCartItems, page = "HomeCollection" }) {
             const payload = {
                 order: paymentData.order,
                 paymentId: paymentResponse.razorpay_payment_id,
-                orderId: paymentResponse.razorpay_order_id,
                 signature: paymentResponse.razorpay_signature,
                 paymentMethod: 'Razorpay',
                 amountPaid: amountPaid
@@ -380,7 +379,7 @@ function SelectSlot({ labCartItems, page = "HomeCollection" }) {
             console.log("FINAL PAYLOAD WITH PAYMENT:", JSON.stringify(payload, null, 2));
 
             const response = await axiosInstance.post(
-                `/endUserEndPoint/createMultipleAppointmentForTestPackage?endUserId=${userId}`,
+                `/endUserEndPoint/createMultipleAppointmentForTestPackage?endUserId=${userId}&razorpayOrderId=${paymentResponse.razorpay_order_id}`,
                 payload
             );
 
