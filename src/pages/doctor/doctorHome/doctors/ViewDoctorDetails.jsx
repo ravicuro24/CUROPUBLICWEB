@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FaStar, FaGraduationCap, FaHospitalAlt, FaCheckCircle, FaCalendarAlt } from "react-icons/fa";
-import { MdWork, MdOutlineLanguage } from "react-icons/md";
+import { MdWork, MdOutlineLanguage, MdEmail, MdPhone, MdAccessTime } from "react-icons/md";
 import { IoPersonCircleOutline, IoSchoolOutline } from "react-icons/io5";
 import SelectSlotModal from './SelectSlotModal';
 
@@ -126,7 +126,7 @@ export default function ViewDoctorDetails() {
     // Helper function to render qualifications
     const renderQualifications = () => {
         const qual = displayDoctor?.qualification;
-        
+
         if (qual && Array.isArray(qual)) {
             return qual.map((q, index) => (
                 <li key={index} className="flex items-start">
@@ -135,7 +135,7 @@ export default function ViewDoctorDetails() {
                 </li>
             ));
         }
-        
+
         return (
             <li className="flex items-start">
                 <FaCheckCircle className="w-4 h-4 text-teal-500 mt-1 mr-2 flex-shrink-0" />
@@ -155,10 +155,10 @@ export default function ViewDoctorDetails() {
         if (ratings.length === 0) {
             return { averageRating: 4.9, reviewCount: 875 };
         }
-        
+
         const totalRating = ratings.reduce((sum, rating) => sum + rating.rating, 0);
         const averageRating = totalRating / ratings.length;
-        
+
         return {
             averageRating: averageRating.toFixed(1),
             reviewCount: ratings.length
@@ -208,8 +208,7 @@ export default function ViewDoctorDetails() {
 
                                 <div className="flex items-center mt-3 space-x-4">
                                     <div className="flex items-center">
-                                        <FaStar className="text-yellow-400 w-5 h-5" />
-                                        <span className="ml-1 text-lg font-bold text-gray-900">{ratingData.averageRating}</span>
+                                        <FaStar className="text-yellow-400 w-4 h-4" />
                                         <span className="ml-1 text-gray-500">({ratingData.reviewCount} Reviews)</span>
                                     </div>
 
@@ -253,7 +252,7 @@ export default function ViewDoctorDetails() {
                                     </div>
                                     <p className="text-lg font-bold text-gray-900">{displayDoctor?.yearsOfExperience || 0} years</p>
                                 </div>
-                                
+
                                 <div className="flex gap-2 rounded-xl">
                                     <div className="flex items-center">
                                         <FaHospitalAlt className="w-5 h-5 text-teal-600 mr-2" />
@@ -267,14 +266,19 @@ export default function ViewDoctorDetails() {
                             <div className="mb-6">
                                 <h3 className="text-lg font-semibold text-gray-800 mb-3">Contact Information</h3>
                                 <div className="space-y-2">
-                                    <p className="text-gray-700">
-                                        <span className="font-semibold">Email:</span> {displayDoctor?.email || "Not provided"}
+                                    <p className="text-gray-700 flex items-center gap-2">
+                                        <MdEmail className="text-blue-500" />
+                                        <span>{displayDoctor?.email || "Not provided"}</span>
                                     </p>
-                                    <p className="text-gray-700">
-                                        <span className="font-semibold">Phone:</span> {displayDoctor?.contactNumber || "Not provided"}
+                                    <p className="text-gray-700 flex items-center gap-2">
+                                        <MdPhone className="text-green-500" />
+                                        <span>{displayDoctor?.contactNumber || "Not provided"}</span>
                                     </p>
-                                    <p className="text-gray-700">
-                                        <span className="font-semibold">Available Hours:</span> {displayDoctor?.availableHours || "09:00 AM - 05:00 PM"}
+                                    <p className="text-gray-700 flex items-center gap-2">
+                                        <MdAccessTime className="text-purple-500" />
+                                        <span>
+                                            {displayDoctor?.availableHours || "09:00 AM - 05:00 PM"}
+                                        </span>
                                     </p>
                                 </div>
                             </div>
@@ -311,7 +315,8 @@ export default function ViewDoctorDetails() {
 
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center">
-                                    <div className="text-4xl font-bold text-gray-900">{ratingData.averageRating}</div>
+                                    {console.log("Rating Data:", displayDoctor)}
+                                    <div className="text-4xl font-bold text-gray-900">{displayDoctor.ratingsReceived?.length || 0}</div>
                                     <div className="ml-4">
                                         <div className="flex">
                                             {[1, 2, 3, 4, 5].map((star) => (
@@ -346,7 +351,7 @@ export default function ViewDoctorDetails() {
                                                 <div className="flex-1">
                                                     <div className="flex items-center justify-between">
                                                         <span className="font-medium">
-                                                            {review.patientName || "Anonymous"}
+                                                            {review.ratingByName || "Anonymous"}
                                                         </span>
                                                         <div className="flex items-center text-yellow-400">
                                                             {[1, 2, 3, 4, 5].map((star) => (
@@ -361,8 +366,15 @@ export default function ViewDoctorDetails() {
                                                         {review.comment || "No comment provided"}
                                                     </p>
                                                     <span className="text-gray-400 text-xs mt-1 block">
-                                                        {review.createdAt ? new Date(review.createdAt).toLocaleDateString() : "Recently"}
+                                                        {review.createdAt
+                                                            ? new Date(review.createdAt).toLocaleDateString("en-GB", {
+                                                                day: "2-digit",
+                                                                month: "short",
+                                                                year: "numeric",
+                                                            })
+                                                            : "Recently"}
                                                     </span>
+
                                                 </div>
                                             </div>
                                         ))}
